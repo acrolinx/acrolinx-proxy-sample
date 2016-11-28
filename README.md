@@ -5,10 +5,13 @@ This java application is for implementing proxy in a single sign-on environment.
 ## To run the demo application, follow these steps
 
 Configure the Acrolinx core server for single sign-on by adding the following example properties to the coreserver.properties file:
+
+```
 singleSignOn.method=header
 singleSignOn.genericPassword=secret
 singleSignOn.usernameKey=username
 singleSignOn.passwordKey=password
+```
 
 Open this example project with Eclipse IDE for Java EE Developers.
 Configure the URL of the Acrolinx core server, username and Single sign-on password in the file web.xml. The param-name are "acrolinxCoreServer, username and secret".
