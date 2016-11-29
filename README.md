@@ -35,15 +35,15 @@ Make sure that you use a proper secret for the genericPassword.
 
 ### Configure the Integration
 
-In your Acrolinx integration [config.js](https://github.com/acrolinx/acrolinx-sidebar-demo/blob/master/samples/config.js) enable SSO by setting the property: 
+In the [config.js](https://github.com/acrolinx/acrolinx-sidebar-demo/blob/master/samples/config.js) of your Acrolinx integration, enable SSO and set server address to point to the relative proxy path as follows:
 
-`enableSingleSignOn : true`
+``` 
+enableSingleSignOn : true
+serverAddress: '/proxySample/proxy'
+```
 
-to plugin configuration. And set server address to point to the proxy:
-
-`serverAddress: '/proxySample/proxy'`.
-
-Make sure the webserver running the proxy also delivers the HTML of the integration. 
+Make sure the webserver running the proxy also delivers the HTML of the integration.
+Make sure the relative proxy path points to the correct location of your proxy.
 
 #### See:
 
