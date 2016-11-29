@@ -5,8 +5,8 @@ Demo code for implementing proxy in a single sign-on environment in Java.
 ## Prerequisites
 
 Make sure that you have configured your:
-* [Acrolinx Server for SSO](/acrolinx-proxy-sample#configure-the-acrolinx-server), and the 
-* [Integration](/acrolinx-proxy-sample#configure-the-integration).
+* [Acrolinx Server for SSO](/README.md#configure-the-acrolinx-server), and the 
+* [Integration](/README.md#acrolinx-proxy-sample#configure-the-integration).
 
 ## Configure Acrolinx Java Servlet Example
 
@@ -27,7 +27,7 @@ cp target/proxySample.war <WEBCONTAINER>/webapps/
 ```
 
 You can test, if you can connect the Acrolinx by just testing one rest calls.
-If you open `http://<WEBCONTAINER>/proxySample/proxy/iq/services/rest/registry/knownServiceNames`, like http://localhost:8080/proxySample/proxy/iq/services/rest/registry/knownServiceNames you should see a result like:
+If you open `http://<WEBCONTAINER>/proxySample/proxy/iq/services/rest/registry/knownServiceNames`, like [http://localhost:8080/proxySample/proxy/iq/services/rest/registry/knownServiceNames](http://localhost:8080/proxySample/proxy/iq/services/rest/registry/knownServiceNames) you should see a result like:
 
 ```
 [
