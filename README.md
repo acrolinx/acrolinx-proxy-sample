@@ -49,9 +49,9 @@ Make sure the webserver running the proxy also delivers the HTML of the integrat
 
 ### Configure the Proxy
 
-#### Java Proxy Servlet
+#### Java Servlet
 
-See: [Acrolinx Java Proxy Servlet](java/servlet/README.md)
+[Acrolinx Java Proxy Servlet](java/servlet/README.md)
 
 ## License
 
