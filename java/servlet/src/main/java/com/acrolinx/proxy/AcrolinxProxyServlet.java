@@ -8,7 +8,6 @@ import java.io.OutputStream;
 import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Enumeration;
 
 import javax.servlet.ServletException;
@@ -45,7 +44,6 @@ public class AcrolinxProxyServlet extends HttpServlet
     // Can be configured by init parameters in the web.xml
     private String acrolinxServer;
     private String secret;
-    private String username;
 
     public AcrolinxProxyServlet()
     {
@@ -76,8 +74,11 @@ public class AcrolinxProxyServlet extends HttpServlet
     {
         super.init();
         // Can be configured by init parameters in the web.xml
-        username = getInitParameterOrDefaultValue("username", "username");
+
         acrolinxServer = getInitParameterOrDefaultValue("acrolinxServer", "http://localhost:8031/");
+        if (!acrolinxServer.endsWith("/")) {
+            acrolinxServer += "/";
+        }
         secret = getInitParameterOrDefaultValue("secret", "secret");
     }
 
@@ -129,6 +130,9 @@ public class AcrolinxProxyServlet extends HttpServlet
         final URI targetURL = getTargetUrl(req);
         copyHeaders(req, httpMethod);
         modifyRequest(httpMethod, targetURL);
+
+        // Make sure to not call the following line in case a user is not authenticated to the
+        // application
         addSingleSignOn(httpMethod);
 
         CloseableHttpResponse httpResponse = null;
@@ -214,8 +218,15 @@ public class AcrolinxProxyServlet extends HttpServlet
 
     private void addSingleSignOn(final HttpRequestBase httpMethod)
     {
-        setRequestHeader(httpMethod, "username", username);
+        setRequestHeader(httpMethod, "username", getUsernameFromApplicationSession());
         setRequestHeader(httpMethod, "password", this.secret);
+    }
+
+    private String getUsernameFromApplicationSession()
+    {
+        return getInitParameterOrDefaultValue("username", "username");
+        // TODO: Set user name from the current applications session. In this is just example code
+        // the user name comes from web.xml.
     }
 
     @SuppressWarnings("unchecked")
@@ -228,16 +239,15 @@ public class AcrolinxProxyServlet extends HttpServlet
         }
     }
 
-    private URI getTargetUrl(final HttpServletRequest req) throws IOException
+    private URI getTargetUrl(final HttpServletRequest req)
     {
-        final URI targetURL;
+        final String queryPart = req.getQueryString() != null ? "?" + req.getQueryString() : "";
+        final String urlStr = acrolinxServer + req.getPathInfo() + queryPart;
         try {
-            final String queryPart = req.getQueryString() != null ? "?" + req.getQueryString() : "";
-            targetURL = new URI(acrolinxServer + req.getPathInfo() + queryPart);
-        } catch (final URISyntaxException e) {
-            throw new IOException(e);
+            return new URI(urlStr);
+        } catch (final Exception e) {
+            throw new RuntimeException("'" + urlStr + "' is not a valid url!", e);
         }
-        return targetURL;
     }
 
 }
