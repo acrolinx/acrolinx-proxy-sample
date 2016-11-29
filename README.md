@@ -1,6 +1,6 @@
 # Acrolinx Single Sign-On Proxy Sample
 
-Demo code for implementing proxy in a single sign-on environment.
+Demo code for implementing a proxy in a single sign-on environment.
 
 ## Prerequisites
 
@@ -16,7 +16,7 @@ After the meeting, we provide you with test server credentials and configuration
 
 ### Configure the Acrolinx Server
 
-For single sign-on add the following example properties to the coreserver.properties file:
+To enable single sign-on, add the following example properties to the coreserver.properties file:
 
 ```
 singleSignOn.method=header
@@ -27,7 +27,7 @@ singleSignOn.passwordKey=password
 
 #### See:
 
-[Setting Up Your Acrolinx Server for Single Sign-on](https://support.acrolinx.com/hc/en-us/articles/207827495-Setting-Up-Your-Acrolinx-Server-for-Single-Sign-on)
+[Setting Up Your Acrolinx Server for Single Sign-on](https://support.acrolinx.com/hc/en-us/articles/207827495)
 
 #### Note:
 
@@ -39,7 +39,7 @@ In your Acrolinx integration [config.js](https://github.com/acrolinx/acrolinx-si
 
 `enableSingleSignOn : true`
 
-to plugin configuration. Add set server address to point to the proxy:
+to plugin configuration. And set server address to point to the proxy:
 
 `serverAddress: '/proxySample/proxy'`.
 
