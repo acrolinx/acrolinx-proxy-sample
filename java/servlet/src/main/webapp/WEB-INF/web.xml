@@ -15,7 +15,7 @@
 			<param-value>username</param-value>
 		</init-param>
 		<init-param>
-			<param-name>acrolinxCoreServer</param-name>
+			<param-name>acrolinxServer</param-name>
 			<param-value>http://localhost:8031</param-value>
 		</init-param>
 		<init-param>
