@@ -42,6 +42,8 @@ to plugin configuration add set server address to point to the proxy
 serverAddress: '/proxySample/proxy'
 ´´´
 
+Make sure the webserver running the proxy also delivers the HTML of the integration. 
+
 #### See:
 
 [Acrolinx Sidebar InitParameters Interface](https://cdn.rawgit.com/acrolinx/acrolinx-sidebar-demo/master/doc/pluginDoc/interfaces/_plugin_interfaces_.initparameters.html#enablesinglesignon)
