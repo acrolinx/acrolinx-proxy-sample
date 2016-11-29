@@ -8,7 +8,7 @@
 		<servlet-name>AcrolinxProxyServlet</servlet-name>
 		<display-name>AcrolinxProxyServlet</display-name>
 		<description></description>
-		<servlet-class>com.acrolinx.AcrolinxProxyServlet</servlet-class>
+		<servlet-class>com.acrolinx.proxy.AcrolinxProxyServlet</servlet-class>
 
 		<init-param>
 			<param-name>username</param-name>

@@ -1,4 +1,4 @@
-package com.acrolinx;
+package com.acrolinx.proxy;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -207,9 +207,6 @@ public class AcrolinxProxyServlet extends HttpServlet {
 		Enumeration<String> headerNames = req.getHeaderNames();
 		while (headerNames.hasMoreElements()) {
 			String headerName = headerNames.nextElement();
-			if (headerName.toLowerCase().equals("cookie")) {
-				continue;
-			}
 			httpMethod.setHeader(headerName, req.getHeader(headerName));
 		}
 	}
