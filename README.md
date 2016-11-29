@@ -8,6 +8,10 @@ Please contact Acrolinx SDK support (sdk-support@acrolinx.com) for initial consu
 We like to schedule a kickoff meeting to answer any questions about your integration project. 
 After the meeting, we provide you with test server credentials and configuration settings you need to get started.
 
+## Overview
+
+![Architecture Diagram](https://writers.acrolinx.com/images/sidebarArchitectureDiagram.png)
+
 ## Configuration of the Sample
 
 ### Configure the Acrolinx Server
