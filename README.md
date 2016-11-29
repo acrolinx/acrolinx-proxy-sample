@@ -47,6 +47,7 @@ Make sure the webserver running the proxy also delivers the HTML of the integrat
 #### See:
 
 [Acrolinx Sidebar InitParameters Interface](https://cdn.rawgit.com/acrolinx/acrolinx-sidebar-demo/master/doc/pluginDoc/interfaces/_plugin_interfaces_.initparameters.html#enablesinglesignon)
+
 [Acrolinx Sidebar Demo](https://github.com/acrolinx/acrolinx-sidebar-demo)
 
 ### Configure the Proxy

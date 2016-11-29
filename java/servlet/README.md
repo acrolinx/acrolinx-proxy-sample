@@ -1,6 +1,6 @@
-# Acrolinx Single Sign-On Proxy Sample
+# Acrolinx Single Sign-On Proxy Java Servlet Sample
 
-Demo code for implementing proxy in a single sign-on environment.
+Demo code for implementing proxy in a single sign-on environment in Java.
 
 ## Prerequisites
 
