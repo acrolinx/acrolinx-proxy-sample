@@ -1,27 +1,52 @@
-# Acrolinx Java Proxy Servlet Sample
+# Acrolinx Single Sign-On Proxy Sample
 
-This java application is for implementing proxy in a single sign-on environment.
+Demo code for implementing proxy in a single sign-on environment.
 
-## To run the demo application, follow these steps
+## Prerequisites
 
-Configure the Acrolinx core server for single sign-on by adding the following example properties to the coreserver.properties file:
+Make sure you have configured your Acrolinx server as well as the integration.
 
-```
-singleSignOn.method=header
-singleSignOn.genericPassword=secret
-singleSignOn.usernameKey=username
-singleSignOn.passwordKey=password
-```
+## Configure Acrolinx Java Servlet Example
+
+Configure the URL of the Acrolinx Server, username and single sign-on password in the file web.xml. The param-name are "acrolinxCoreServer, username and secret".
+
+## Run Servlet in IDE
 
 Open this example project with Eclipse IDE for Java EE Developers.
-Configure the URL of the Acrolinx core server, username and Single sign-on password in the file web.xml. The param-name are "acrolinxCoreServer, username and secret".
 
 Right-click on the project and select "Run As / Run on Server" in the shortcut menu or export a war and deploy it to your tomcat server.
-In your Acrolinx integration enable SSO by adding property "enableSingleSignOn : true" to plugin configuration add set server address to point to the proxy "serverAddress: /proxySample/proxy".
+
+## Build and Deploy to a Webcontainer like Apache Tomcat 
+
+```
+	cd java/servlet
+	mvn package
+	
+```
+
 
 ## Java Class Overview
+
 
 
 ### com.acrolinx.AcrolinxProxyServlet
 
 This servlet acts as a reverse proxy. The Acrolinx integration uses this servlet to communicate with the Acrolinx core server.
+
+## License
+
+Copyright 2015-2016 Acrolinx GmbH
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+For more information visit: http://www.acrolinx.com
