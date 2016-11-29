@@ -35,9 +35,9 @@ In your Acrolinx integration [config.js](https://github.com/acrolinx/acrolinx-si
 
 `enableSingleSignOn : true`
 
-to plugin configuration add set server address to point to the proxy 
+to plugin configuration. Add set server address to point to the proxy:
 
-`serverAddress: '/proxySample/proxy'`
+`serverAddress: '/proxySample/proxy'`.
 
 Make sure the webserver running the proxy also delivers the HTML of the integration. 
 
