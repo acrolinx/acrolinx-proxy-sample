@@ -73,7 +73,7 @@ public class AcrolinxProxyServlet extends HttpServlet
     public void init() throws ServletException
     {
         super.init();
-        // Can be configured by init parameters in the web.xml
+        // Properties can be configured by init parameters in the web.xml.
 
         acrolinxServer = getInitParameterOrDefaultValue("acrolinxServer", "http://localhost:8031/");
         if (!acrolinxServer.endsWith("/")) {
@@ -131,8 +131,8 @@ public class AcrolinxProxyServlet extends HttpServlet
         copyHeaders(req, httpMethod);
         modifyRequest(httpMethod, targetURL);
 
-        // Make sure to not call the following line in case a user is not authenticated to the
-        // application
+        // TODO: Make sure not to call the following line in case a user is not authenticated to the
+        // application.
         addSingleSignOn(httpMethod);
 
         CloseableHttpResponse httpResponse = null;
