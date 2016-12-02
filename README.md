@@ -1,6 +1,6 @@
 # Acrolinx Single Sign-On Proxy Sample
 
-Demo code for implementing a proxy in a single sign-on environment.
+Demo code for implementing a proxy in a single sign-on environment for sidebar integrations.
 
 ## Prerequisites
 
