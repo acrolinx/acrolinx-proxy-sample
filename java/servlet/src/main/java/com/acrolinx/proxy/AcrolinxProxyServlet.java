@@ -92,11 +92,8 @@ public class AcrolinxProxyServlet extends HttpServlet
             throws ServletException, IOException
     {
         final HttpRequestBase httpMethod = new HttpDelete();
-        try {
-            proxyRequest(req, resp, httpMethod);
-        } catch (final Exception e) {
-            e.printStackTrace();
-        }
+        proxyRequest(req, resp, httpMethod);
+
     }
 
     @Override
@@ -105,11 +102,9 @@ public class AcrolinxProxyServlet extends HttpServlet
     {
         final HttpRequestBase httpMethod = new HttpPost();
         ((HttpPost) httpMethod).setEntity(new InputStreamEntity(req.getInputStream()));
-        try {
-            proxyRequest(req, resp, httpMethod);
-        } catch (final Exception e) {
-            e.printStackTrace();
-        }
+        proxyRequest(req, resp, httpMethod);
+
+
     }
 
     @Override
@@ -117,11 +112,9 @@ public class AcrolinxProxyServlet extends HttpServlet
             throws ServletException, IOException
     {
         final HttpRequestBase httpMethod = new HttpGet();
-        try {
-            proxyRequest(req, resp, httpMethod);
-        } catch (final Exception e) {
-            e.printStackTrace();
-        }
+        proxyRequest(req, resp, httpMethod);
+
+
     }
 
     private void proxyRequest(final HttpServletRequest req, final HttpServletResponse resp,
@@ -225,7 +218,7 @@ public class AcrolinxProxyServlet extends HttpServlet
     private String getUsernameFromApplicationSession()
     {
         return getInitParameterOrDefaultValue("username", "username");
-        // TODO: Set user name from the current applications session. In this is just example code
+        // TODO: Set user name from the current applications session. This is just an example code
         // the user name comes from web.xml.
     }
 
@@ -239,14 +232,14 @@ public class AcrolinxProxyServlet extends HttpServlet
         }
     }
 
-    private URI getTargetUrl(final HttpServletRequest req)
+    private URI getTargetUrl(final HttpServletRequest req) throws IOException
     {
         final String queryPart = req.getQueryString() != null ? "?" + req.getQueryString() : "";
         final String urlStr = acrolinxServer + req.getPathInfo() + queryPart;
         try {
             return new URI(urlStr);
         } catch (final Exception e) {
-            throw new RuntimeException("'" + urlStr + "' is not a valid url!", e);
+            throw new IOException("Not a valid URI");
         }
     }
 
