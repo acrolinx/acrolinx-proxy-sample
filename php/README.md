@@ -8,7 +8,7 @@ Make sure that you have configured your:
 * [Acrolinx Server for SSO](/README.md#configure-the-acrolinx-server), and the 
 * [Integration](/README.md#acrolinx-proxy-sample#configure-the-integration).
 
-## Configure Acrolinx Java PHP Example
+## Configure Acrolinx PHP Example
 
 1. Set all values marked with a TODO-comment in [proxy.php](proxy.php).
 2. Copy [proxy.php](proxy.php) to `/acrolinx/proxy.php` on your php-enabled webserver.
