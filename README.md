@@ -57,6 +57,10 @@ Make sure the relative proxy path points to the correct location of your proxy.
 
 [Acrolinx Java Proxy Servlet](java/servlet/README.md)
 
+#### PHP
+
+[Acrolinx PHP Proxy](php/README.md)
+
 ## License
 
 Copyright 2015-2016 Acrolinx GmbH
