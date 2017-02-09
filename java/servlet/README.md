@@ -10,7 +10,7 @@ Make sure that you have configured your:
 
 ## Configure Acrolinx Java Servlet Example
 
-Configure the Acrolinx server address, user name and single sign-on password in the file web.xml. The parameter names are "acrolinxServer, username and secret".
+Configure the Acrolinx server address, user name, and single sign-on password in the file web.xml. The parameter names are `acrolinxServer`, `username` and `secret`.
 
 ## Run Servlet in IDE
 
@@ -26,7 +26,7 @@ mvn package
 cp target/proxySample.war <WEBCONTAINER>/webapps/
 ```
 
-To test the connection to Acrolinx, test one of the rest calls.
+### To test the proxy connection to Acrolinx, test one of the rest calls.
 If you open `http://<WEBCONTAINER>/proxySample/proxy/iq/services/rest/registry/knownServiceNames`, like [http://localhost:8080/proxySample/proxy/iq/services/rest/registry/knownServiceNames](http://localhost:8080/proxySample/proxy/iq/services/rest/registry/knownServiceNames) you should see a result like:
 
 ```
@@ -37,6 +37,17 @@ If you open `http://<WEBCONTAINER>/proxySample/proxy/iq/services/rest/registry/k
   "terminology",
   "user",
   ...
+]
+```
+
+### To test the proxy authentication, test if the authenticate call returns a username and token.
+
+If you open `http://<WEBCONTAINER>/proxySample/proxy/sso/v1/authenticate`, like [http://localhost:8080/proxySample/proxy/sso/v1/authenticate](http://localhost:8080/proxySample/proxy/sso/v1/authenticate) you should see a result like:
+
+```
+[
+  <div id="username">admin</div>
+  <div id="authToken">wboSz31sQTjTAFDIWKSDF31sQTHEPQcreXDwboSz31sQTXDwboSz31sQQcreXDwboSz31sp4vnHEPQcreXD==</div>
 ]
 ```
 
