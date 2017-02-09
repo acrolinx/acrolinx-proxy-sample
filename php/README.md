@@ -33,8 +33,6 @@ If you open `http://<WEBCONTAINER>/acrolinx/proxy.php/iq/services/rest/registry/
 If you open `http://<WEBCONTAINER>/acrolinx/proxy.php/sso/v1/authenticate`, like [http://localhost:8080/acrolinx/proxy.php/sso/v1/authenticate](http://localhost:8080/acrolinx/proxy.php/sso/v1/authenticate) you should see a result like:
 
 ```
-[
-  <div id="username">admin</div>
-  <div id="authToken">wboSz31sQTjTAFDIWKSDF31sQTHEPQcreXDwboSz31sQTXDwboSz31sQQcreXDwboSz31sp4vnHEPQcreXD==</div>
-]
+<div id="username">admin</div>
+<div id="authToken">wboSz31sQTjTAFDIWKSDF31sQTHEPQcreXDwboSz31sQTXDwboSz31sQQcreXDwboSz31sp4vnHEPQcreXD==</div>
 ```
