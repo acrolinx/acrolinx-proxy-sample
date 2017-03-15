@@ -10,7 +10,7 @@ After the meeting, we provide you with test server credentials and configuration
 
 ## Overview
 
-![Architecture Diagram](https://writers.acrolinx.com/images/sidebarArchitectureDiagram.png)
+![Architecture Diagram](https://writers.acrolinx.com/images/sidebarArchitectureDiagram14.3.1.png)
 
 ## Configuration of the Sample
 
