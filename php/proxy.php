@@ -71,9 +71,9 @@ class Proxy {
     private function proxyRequest($url){
         $ch = curl_init();
         curl_setopt ($ch, CURLOPT_URL, $url);
-//Uncomment the following code line to write all requests to std error.disable_gzip
-//Apache will write to /var/log/apache2/error.log by default.
-//Don’t use it in production. All passwords, cookies, and tokens are logged.
+//To write all requests to std error, uncomment the following line of code.
+//By default, Apache will write to /var/log/apache2/error.log.
+//Don’t use this sample in production. All passwords, cookies, and tokens are logged.
 //	    curl_setopt ($ch, CURLOPT_VERBOSE, true); 
         
         if($_SERVER['REQUEST_METHOD'] == 'POST'){
