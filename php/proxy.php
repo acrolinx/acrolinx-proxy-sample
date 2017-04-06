@@ -47,6 +47,12 @@ class Proxy {
         $isAuthToken = false; 
         foreach (getallheaders() as $name => $value) {
           $headerString = $name.':'.$value;
+
+          //Setting target Server as Host
+          if(strtolower($name) == 'host') {
+              $headerString = $name.':'.parse_url(self::getSettings()['url'])['host'];
+          }
+
           if($name == 'authToken') {
             $isAuthToken = true;
           }
