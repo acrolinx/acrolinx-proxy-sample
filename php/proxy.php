@@ -112,7 +112,7 @@ class Proxy {
         $responseArray = explode("\r\n\r\n", $response, 2);
         $headers = $responseArray[0];
         $result = $responseArray[1];
-        $headerArray = split(chr(10), $headers); 
+        $headerArray = explode(chr(10), $headers);
         
         foreach($headerArray as $header=>$headerValue){
             if(!preg_match("/^Transfer-Encoding/", $headerValue)){
