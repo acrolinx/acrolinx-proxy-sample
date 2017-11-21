@@ -133,7 +133,7 @@ class Proxy {
         self::disable_gzip();
         $settings = self::getSettings();
         $targetPath = $settings['url'];
-        if($_SERVER['HTTPS'] == 'on'){
+        if(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on'){
             $domainURL = 'https://'.$_SERVER['HTTP_HOST'];
         } else {
             $domainURL = 'http://'.$_SERVER['HTTP_HOST'];
