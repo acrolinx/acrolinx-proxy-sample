@@ -42,6 +42,7 @@ class Proxy {
         return substr_replace($requestURI, '', 0, ($pos+strlen($part)));
     }
 
+    // This function is used as a fallback for getallheaders on Nginx server.
     private function emulate_getallheaders() {
         foreach ($_SERVER as $name => $value) {
             if (substr($name, 0, 5) == 'HTTP_') {
@@ -59,30 +60,25 @@ class Proxy {
     private function getHeadersOfRequest() {
         $headers = array();
         $isAuthToken = false;
+        $headers = (function_exists('getallheaders')) ? getallheaders() : self::emulate_getallheaders();
 
-        foreach (self::emulate_getallheaders() as $name => $value) {
-
+        foreach ($headers as $name => $value) {
             $headerString = $name.':'.$value;
 
             //Setting target Server as Host
             if(strtolower($name) == 'host') {
                 $headerString = $name.':'.$this->host;
             }
-            if($name == 'authToken') {
-                $isAuthToken = true;
-            }
             array_push($headers,"$headerString");
         }
 
-        if($isAuthToken == false){
-            $this->settings = self::getSettings();
-            $this->username = 'username:'.$this->settings['username'];
-            $this->password = 'password:'.$this->settings['password'];
-            array_push($headers, $this->username);
-            array_push($headers, $this->password);
-            array_push($headers,'User-Agent:Drupal Proxy');
+        $this->settings = self::getSettings();
+        $this->username = 'username:'.$this->settings['username'];
+        $this->password = 'password:'.$this->settings['password'];
+        array_push($headers, $this->username);
+        array_push($headers, $this->password);
+        array_push($headers,'User-Agent:Acrolinx Proxy');
 
-        }
         return $headers;
     }
 
@@ -91,7 +87,9 @@ class Proxy {
     }
 
     public function __construct() {
-        self::disable_gzip();
+        //If response is getting truncated try disabling gzip
+        //self::disable_gzip();
+
         $this->settings = self::getSettings();
         $this->targetPath = rtrim($this->settings['url'],"/");
         $this->host = parse_url($this->targetPath)['host'];
@@ -109,7 +107,10 @@ class Proxy {
         if ($pos !== false) {
             $requiredURI = self::getActualURI($requestURI, $pos, $part);
             $this->url = $this->targetPath.$requiredURI;
+        } else {
+            echo "Ensure correct location of proxy.php on server is set. Check $part variable.";
         }
+
     }
 
     public function processRequest() {
@@ -125,19 +126,20 @@ class Proxy {
             $postData = self::getPOSTdata();
             curl_setopt ($ch, CURLOPT_POST, 1);
             curl_setopt ($ch, CURLOPT_POSTFIELDS, $postData);
-        }
 
-        if($_SERVER['REQUEST_METHOD'] == 'PUT'){
+        }else if($_SERVER['REQUEST_METHOD'] == 'PUT'){
             $postData = self::getPOSTdata();
             curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: ' . $_SERVER["CONTENT_TYPE"]  . ''));
             curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'PUT');
             curl_setopt($ch, CURLOPT_POSTFIELDS,$postData);
-        }
 
-        if($_SERVER['REQUEST_METHOD'] == 'DELETE'){
+        }else if($_SERVER['REQUEST_METHOD'] == 'DELETE'){
             $postData = self::getPOSTdata();
             curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'DELETE');
             curl_setopt($ch, CURLOPT_POSTFIELDS,$postData);
+        }else if(!($_SERVER['REQUEST_METHOD'] == 'GET')){
+          header("HTTP/1.0 405 Method Not Allowed");
+          exit();
         }
 
         $headers = self::getHeadersOfRequest();
@@ -181,8 +183,6 @@ class Proxy {
                 header(trim($headerValue));
             }
         }
-
-        $result = str_replace($this->targetPath, $this->domainURL, $result);
 
         echo $result;
     }
