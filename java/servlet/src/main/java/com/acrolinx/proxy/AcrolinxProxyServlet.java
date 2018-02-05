@@ -23,6 +23,7 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -103,8 +104,15 @@ public class AcrolinxProxyServlet extends HttpServlet
         final HttpRequestBase httpMethod = new HttpPost();
         ((HttpPost) httpMethod).setEntity(new InputStreamEntity(req.getInputStream()));
         proxyRequest(req, resp, httpMethod);
+    }
 
-
+    @Override
+    protected void doPut(final HttpServletRequest req, final HttpServletResponse resp)
+            throws ServletException, IOException
+    {
+        final HttpRequestBase httpMethod = new HttpPut();
+        ((HttpPut) httpMethod).setEntity(new InputStreamEntity(req.getInputStream()));
+        proxyRequest(req, resp, httpMethod);
     }
 
     @Override
@@ -143,8 +151,8 @@ public class AcrolinxProxyServlet extends HttpServlet
             in = httpResponse.getEntity().getContent();
 
             out = resp.getOutputStream();
-            final int size = spoolResponseBody(in, out);
-            resp.setContentLength(size);
+            resp.setContentLength((int) httpResponse.getEntity().getContentLength());
+            spoolResponseBody(in, out);
             httpResponse.close();
         } catch (final ConnectException e) {
             resp.setStatus(HttpURLConnection.HTTP_BAD_GATEWAY); // 502
@@ -182,18 +190,15 @@ public class AcrolinxProxyServlet extends HttpServlet
         }
     }
 
-    private static int spoolResponseBody(final InputStream in, final OutputStream out) throws IOException
+    private static void spoolResponseBody(final InputStream in, final OutputStream out) throws IOException
     {
-        int offset = 0;
         if (in != null) {
             final byte[] buffer = new byte[8192];
             int n;
             while (-1 != (n = in.read(buffer))) {
                 out.write(buffer, 0, n);
-                offset = offset + n;
             }
         }
-        return offset;
     }
 
     private static void modifyRequest(final HttpRequestBase httpMethod, final URI targetURL)
