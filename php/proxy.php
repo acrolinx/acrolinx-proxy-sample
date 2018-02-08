@@ -100,7 +100,7 @@ class Proxy {
             $this->domainURL = 'http://'.$_SERVER['HTTP_HOST'];
         }
 
-        $part = '/acrolinx/proxy.php'; //TODO: Ensure that this is the correct location of the 'proxy.php' on the server.
+        $part = $_SERVER['PHP_SELF'];
         $requestURI = $_SERVER['REQUEST_URI'];
         $pos = self::getPosition($requestURI, $part);
 
