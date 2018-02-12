@@ -3,102 +3,165 @@
  * Acrolinx Proxy
  * Description - Creates proxy for Acrolinx.
  * Author - Acrolinx
- * Version - 1.0
+ * Version - 1.1
  */
- 
+
 class Proxy {
+
     private $settings;
     private $targetPath;
     private $username;
     private $password;
-    private $domainURL;	
-	
+    private $domainURL;
+    private $host;
+    private $url;
+
     private function disable_gzip() {
         @ini_set('zlib.output_compression', 'Off');
-        @ini_set('output_handler', '');	
+        @ini_set('output_handler', '');
     }
-    
-    
+
     private function getSettings() {
         $acrolinxSettings = array();
-
         $acrolinxSettings['isSSO'] = 1; //TODO: Set if SSO should be used, otherwise it will be just a reverse proxy.
         $acrolinxSettings['url'] = ""; //TODO: Set Acrolinx server url here.
         $acrolinxSettings['genericPassword'] = "secret"; //TODO: Set secret token here.
 
         if($acrolinxSettings['isSSO'] == 1) {
-
             $acrolinxSettings['password'] = $acrolinxSettings['genericPassword'];
             $acrolinxSettings['username'] = get_current_user(); //TODO: Implement get_current_user, which retrieves the username from the current session.
         }
         return $acrolinxSettings;
     }
-    
+
     private function getPosition($requestURI, $part) {
         return strpos($requestURI, $part);
     }
-    
+
     private function getActualURI($requestURI, $pos, $part) {
         return substr_replace($requestURI, '', 0, ($pos+strlen($part)));
     }
-    
-    private function getHeadersOfRequest() {
-        $headers = array();
-        $isAuthToken = false; 
-        foreach (getallheaders() as $name => $value) {
-          $headerString = $name.':'.$value;
 
-          //Setting target Server as Host
-          if(strtolower($name) == 'host') {
-              $headerString = $name.':'.parse_url(self::getSettings()['url'])['host'];
-          }
-
-          if($name == 'authToken') {
-            $isAuthToken = true;
-          }
-          array_push($headers,"$headerString");
-        }
-        
-        if($isAuthToken == false){
-            $settings = self::getSettings();
-            $username = 'username:'.$settings['username'];
-            $password = 'password:'.$settings['password'];
-            array_push($headers, $username);
-            array_push($headers, $password);
-            array_push($headers,'User-Agent:Tinymce Proxy');
+    // This function is used as a fallback for getallheaders on Nginx server.
+    private function emulate_getallheaders() {
+        foreach ($_SERVER as $name => $value) {
+            if (substr($name, 0, 5) == 'HTTP_') {
+                $name = str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))));
+                $headers[$name] = $value;
+            } else if ($name == "CONTENT_TYPE") {
+                $headers["Content-Type"] = $value;
+            } else if ($name == "CONTENT_LENGTH") {
+                $headers["Content-Length"] = $value;
+            }
         }
         return $headers;
     }
-    
+
+    private function getHeadersOfRequest() {
+        $headers = array();
+        $isAuthToken = false;
+        $headers = (function_exists('getallheaders')) ? getallheaders() : self::emulate_getallheaders();
+
+        foreach ($headers as $name => $value) {
+            $headerString = $name.':'.$value;
+
+            //Setting target Server as Host
+            if(strtolower($name) == 'host') {
+                $headerString = $name.':'.$this->host;
+            }
+            array_push($headers,"$headerString");
+        }
+
+        $this->settings = self::getSettings();
+        $this->username = 'username:'.$this->settings['username'];
+        $this->password = 'password:'.$this->settings['password'];
+        array_push($headers, $this->username);
+        array_push($headers, $this->password);
+        array_push($headers,'User-Agent:Acrolinx Proxy');
+
+        return $headers;
+    }
+
     private function getPOSTdata(){
         return file_get_contents("php://input");
     }
-    
-    private function proxyRequest($url){
+
+    public function __construct() {
+        //If response is getting truncated try disabling gzip
+        //self::disable_gzip();
+
+        $this->settings = self::getSettings();
+        $this->targetPath = rtrim($this->settings['url'],"/");
+        $this->host = parse_url($this->targetPath)['host'];
+
+        if(isset($_SERVER['HTTPS'] ) && $_SERVER['HTTPS'] == 'on'){
+            $this->domainURL = 'https://'.$_SERVER['HTTP_HOST'];
+        } else {
+            $this->domainURL = 'http://'.$_SERVER['HTTP_HOST'];
+        }
+
+        $part = $_SERVER['PHP_SELF'];
+        $requestURI = $_SERVER['REQUEST_URI'];
+        $pos = self::getPosition($requestURI, $part);
+
+        if ($pos !== false) {
+            $requiredURI = self::getActualURI($requestURI, $pos, $part);
+            $this->url = $this->targetPath.$requiredURI;
+        } else {
+            echo "Ensure correct location of proxy.php on server is set. Check $part variable.";
+        }
+
+    }
+
+    public function processRequest() {
         $ch = curl_init();
-        curl_setopt ($ch, CURLOPT_URL, $url);
-//To write all requests to std error, uncomment the following line of code.
-//By default, Apache will write to /var/log/apache2/error.log.
-//Don’t use this sample in production. All passwords, cookies, and tokens are logged.
-//	    curl_setopt ($ch, CURLOPT_VERBOSE, true); 
-        
+        curl_setopt ($ch, CURLOPT_URL, $this->url);
+
+         //To write all requests to std error, uncomment the following line of code.
+         //By default, Apache will write to /var/log/apache2/error.log.
+         //Don't use this sample in production. All passwords, cookies, and tokens are logged.
+         //curl_setopt ($ch, CURLOPT_VERBOSE, true);
+
         if($_SERVER['REQUEST_METHOD'] == 'POST'){
-            $postData = self::getPOSTdata();  
+            $postData = self::getPOSTdata();
             curl_setopt ($ch, CURLOPT_POST, 1);
             curl_setopt ($ch, CURLOPT_POSTFIELDS, $postData);
+
+        }else if($_SERVER['REQUEST_METHOD'] == 'PUT'){
+            $postData = self::getPOSTdata();
+            curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: ' . $_SERVER["CONTENT_TYPE"]  . ''));
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'PUT');
+            curl_setopt($ch, CURLOPT_POSTFIELDS,$postData);
+
+        }else if($_SERVER['REQUEST_METHOD'] == 'DELETE'){
+            $postData = self::getPOSTdata();
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'DELETE');
+            curl_setopt($ch, CURLOPT_POSTFIELDS,$postData);
+        }else if(!($_SERVER['REQUEST_METHOD'] == 'GET')){
+          header("HTTP/1.0 405 Method Not Allowed");
+          exit();
         }
-        
-        if($_SERVER['REQUEST_METHOD'] == 'PUT'){
-            curl_setopt($ch, CURLOPT_PUT, 1);
-        }
-        
-        $headers = self::getHeadersOfRequest(); 
-     
+
+        $headers = self::getHeadersOfRequest();
+
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         curl_setopt($ch, CURLOPT_HEADER, 1);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-								
-        $response = curl_exec ($ch);
+
+        //Uncomment below 2 lines to disable SSL verification
+
+        //curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+        //curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+
+
+        //Uncomment and set certificate path for SSL verification.
+
+        //curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+        //curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
+        //curl_setopt($ch, CURLOPT_CAINFO, getcwd() . "path to .crt file");
+
+        $response = curl_exec($ch);
+
         if (curl_error($ch)){
             print curl_error($ch);
         } else {
@@ -106,47 +169,26 @@ class Proxy {
         }
         curl_close ($ch);
     }
-    
+
     private function processResponse($response) {
         $response = str_replace("HTTP/1.1 100 Continue\r\n\r\n","",$response);
         $responseArray = explode("\r\n\r\n", $response, 2);
         $headers = $responseArray[0];
         $result = $responseArray[1];
         $headerArray = explode(chr(10), $headers);
-        
+
         foreach($headerArray as $header=>$headerValue){
             if(!preg_match("/^Transfer-Encoding/", $headerValue)){
-                $headerValue = str_replace($targetPath, $domainURL, $headerValue);
+                $headerValue = str_replace($this->targetPath, $this->domainURL, $headerValue);
                 header(trim($headerValue));
             }
         }
-        
-        if(strpos($requestURI,'report.xml') !== false){
-            echo $result;
-        } else {
-            $result = str_replace($targetPath, $domainURL, $result);
-            print $result;
-        }
-    }
-    
-    public function initialize() {
-        self::disable_gzip();
-        $settings = self::getSettings();
-        $targetPath = $settings['url'];
-        if(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on'){
-            $domainURL = 'https://'.$_SERVER['HTTP_HOST'];
-        } else {
-            $domainURL = 'http://'.$_SERVER['HTTP_HOST'];
-        }
-        $part = '/acrolinx/proxy.php'; //TODO: Ensure that this is the correct location of the 'proxy.php' on the server.
-        $requestURI = $_SERVER['REQUEST_URI'];
-        $pos = self::getPosition($requestURI, $part);
-        if ($pos !== false) {
-            $requiredURI = self::getActualURI($requestURI, $pos, $part);
-            $url = $targetPath.$requiredURI;
-        }
-        self::proxyRequest($url); 
+
+        echo $result;
     }
 }
-Proxy::initialize();
+
+$acrolinxProxyInstance = new Proxy();
+$acrolinxProxyInstance->processRequest();
+
 ?>
