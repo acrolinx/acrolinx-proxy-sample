@@ -100,7 +100,7 @@ class Proxy {
             $this->domainURL = 'http://'.$_SERVER['HTTP_HOST'];
         }
 
-        $part = $_SERVER['PHP_SELF'];
+        $part = basename(__FILE__);
         $requestURI = $_SERVER['REQUEST_URI'];
         $pos = self::getPosition($requestURI, $part);
 
