@@ -60,12 +60,24 @@ class Proxy {
     private function getHeadersOfRequest() {
         $headers = array();
         $isAuthToken = false;
-        $headers = (function_exists('getallheaders')) ? getallheaders() : self::emulate_getallheaders();
+        $requestHeaders = (function_exists('getallheaders')) ? getallheaders() : self::emulate_getallheaders();
+		$headers = array();
+        $isHostHeaderPresent = 0;
+        foreach ($requestHeaders as $name => $value) {
+            $headerString = $name.':'.$value;
+
+            //Setting target Server as Host
+            if(strtolower($name) == 'host') {
+                $headerString = $name.':'.$this->host;
+                $isHostHeaderPresent = 1;
+            }
+            array_push($headers,"$headerString");
+        }
 
         $this->settings = self::getSettings();
         $this->username = 'username:'.$this->settings['username'];
         $this->password = 'password:'.$this->settings['password'];
-        array_push($headers, 'Host:'.$this->host);
+        if(!$isHostHeaderPresent){array_push($headers, 'Host:'.$this->host);}
         array_push($headers, $this->username);
         array_push($headers, $this->password);
         array_push($headers,'User-Agent:Acrolinx Proxy');
