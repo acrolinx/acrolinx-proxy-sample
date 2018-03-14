@@ -74,7 +74,6 @@ class Proxy {
             array_push($headers,"$headerString");
         }
 
-        $this->settings = self::getSettings();
         $this->username = 'username:'.$this->settings['username'];
         $this->password = 'password:'.$this->settings['password'];
         if(!$isHostHeaderPresent){array_push($headers, 'Host:'.$this->host);}
