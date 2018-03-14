@@ -61,7 +61,7 @@ class Proxy {
         $headers = array();
         $isAuthToken = false;
         $requestHeaders = (function_exists('getallheaders')) ? getallheaders() : self::emulate_getallheaders();
-		$headers = array();
+        $headers = array();
         $isHostHeaderPresent = 0;
         foreach ($requestHeaders as $name => $value) {
             $headerString = $name.':'.$value;
