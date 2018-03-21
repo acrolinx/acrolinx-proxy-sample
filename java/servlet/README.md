@@ -48,6 +48,24 @@ If you open `http://<WEBCONTAINER>/proxySample/proxy/sso/v1/authenticate`, like 
 <div id="username">admin</div>
 <div id="authToken">wboSz31sQTjTAFDIWKSDF31sQTHEPQcreXDwboSz31sQTXDwboSz31sQQcreXDwboSz31sp4vnHEPQcreXD==</div>
 ```
+### Troubleshooting
+
+#### Connecting to HTTPS Acrolinx server throws javax.net.ssl.SSLHandshakeException
+This exception indicates that the client and server could not negotiate the desired level of security.
+
+Try installing certificate from Acrolinx server in JVM's trust store.
+
+Obtain the public certificate from the server you're trying to connect.
+Can be done by opening Acrolinx server url in browser,
+Click on security icon in address bar.
+Export certificate
+
+Run keytool by executing command.
+keytool -import -file "path-to-your-cer-file\test-ssl.cer" -alias test-ssl -keystore "path-to-cacert-directory"
+for example: "C:\Program Files\Java\jre1.8.0_151\lib\security\cacerts"
+If asked for password provide your keystore password the default password with java is "changeit"
+
+Restart your Web server.
 
 ## Java Class Overview
 
