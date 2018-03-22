@@ -50,9 +50,6 @@ If you open `http://<WEBCONTAINER>/proxySample/proxy/sso/v1/authenticate`, like 
 ```
 ### Troubleshooting
 
-#### Connecting to HTTPS Acrolinx server throws javax.net.ssl.SSLHandshakeException
-This exception indicates that the client and server could not negotiate the desired level of security.
-
 #### Connecting to HTTPS Acrolinx throws javax.net.ssl.SSLHandshakeException
 This exception indicates that the integration and server couldn’t negotiate the desired level of security.
 Get Acrolinx SSL certificate from your administrator.
