@@ -1,12 +1,21 @@
 # Acrolinx Single Sign-On Proxy Sample
 
-Demo code for implementing a proxy in a single sign-on environment for sidebar integrations.
+Demo code for implementing a proxy in a single sign-on environment for [Acrolinx](https://www.acrolinx.com/) Sidebar integrations.
 
 ## Prerequisites
 
-Please contact Acrolinx SDK support (sdk-support@acrolinx.com) for initial consulting. 
-We like to schedule a kickoff meeting to answer any questions about your integration project. 
-After the meeting, we provide you with test server credentials and configuration settings you need to get started.
+Please contact [Acrolinx SDK support](https://github.com/acrolinx/acrolinx-coding-guidance/blob/master/topics/sdk-support.md)
+for consulting and getting your integration certified.
+This sample works with a test license on an internal Acrolinx URL.
+This license is only meant for demonstration and developing purposes.
+Once you finished your integration, you'll have to get a license for your integration from Acrolinx.
+  
+Acrolinx offers different other SDKs, and examples for developing integrations.
+
+Before you start developing your own integration, you might benefit from looking into:
+
+* [Getting Started with Custom Integrations](https://support.acrolinx.com/hc/en-us/articles/205687652-Getting-Started-with-Custom-Integrations), and
+* the [Guidance for the Development of Acrolinx Integrations](https://github.com/acrolinx/acrolinx-coding-guidance).
 
 ## Overview
 
@@ -14,42 +23,39 @@ After the meeting, we provide you with test server credentials and configuration
 
 ## Configuration of the Sample
 
-### Configure the Acrolinx Server
+### Configure the Acrolinx Platform
 
-To enable single sign-on, add the following example properties to the coreserver.properties file:
+To enable single sign-on, add the following example properties to the `coreserver.properties` file:
 
-```
+```properties
 singleSignOn.method=header
 singleSignOn.genericPassword=secret
 singleSignOn.usernameKey=username
 singleSignOn.passwordKey=password
 ```
 
-#### See:
+See: [Setting Up Your Core Platform for Single Sign-on](https://support.acrolinx.com/hc/en-us/articles/207827495).
 
-[Setting Up Your Acrolinx Server for Single Sign-on](https://support.acrolinx.com/hc/en-us/articles/207827495)
-
-#### Note:
-
-Make sure that you use a proper secret for the genericPassword.
+*Note: Make sure that you use a proper secret for the genericPassword.*
 
 ### Configure the Integration
 
-In the [config.js](https://github.com/acrolinx/acrolinx-sidebar-demo/blob/master/samples/config.js) of your Acrolinx integration, enable SSO and set server address to point to the relative proxy path as follows:
+In the [`config.js`](https://github.com/acrolinx/acrolinx-sidebar-demo/blob/master/samples/config.js) of your Acrolinx Integration, enable SSO and set Acrolinx URL to point to the relative proxy path as follows:
 
-``` 
+```javascript
 enableSingleSignOn : true
 serverAddress: '/proxySample/proxy'
 ```
 
-Make sure the webserver running the proxy also delivers the HTML of the integration.
-Make sure the relative proxy path points to the correct location of your proxy.
+Make sure:
 
-#### See:
+* the webserver running the proxy delivers the HTML of the integration.
+* the relative proxy path points to the correct location of your proxy.
 
-[Acrolinx Sidebar InitParameters Interface](https://cdn.rawgit.com/acrolinx/acrolinx-sidebar-demo/master/doc/pluginDoc/interfaces/_plugin_interfaces_.initparameters.html#enablesinglesignon)
+See also:
 
-[Acrolinx Sidebar Demo](https://github.com/acrolinx/acrolinx-sidebar-demo)
+* [Acrolinx Sidebar InitParameters Interface](https://cdn.rawgit.com/acrolinx/acrolinx-sidebar-demo/master/doc/pluginDoc/interfaces/_plugin_interfaces_.initparameters.html#enablesinglesignon)
+* [Acrolinx Sidebar Demo](https://github.com/acrolinx/acrolinx-sidebar-demo)
 
 ### Configure the Proxy
 
@@ -63,13 +69,13 @@ Make sure the relative proxy path points to the correct location of your proxy.
 
 ## License
 
-Copyright 2015-2016 Acrolinx GmbH
+Copyright 2015-present Acrolinx GmbH
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
+You may obtain a copy of the License at:
 
-http://www.apache.org/licenses/LICENSE-2.0
+[http://www.apache.org/licenses/LICENSE-2.0](http://www.apache.org/licenses/LICENSE-2.0)
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -77,4 +83,4 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
-For more information visit: http://www.acrolinx.com
+For more information visit: [https://www.acrolinx.com](https://www.acrolinx.com)
