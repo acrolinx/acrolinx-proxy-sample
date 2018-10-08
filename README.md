@@ -14,7 +14,8 @@ Acrolinx offers different other SDKs, and examples for developing integrations.
 
 Before you start developing your own integration, you might benefit from looking into:
 
-* [Getting Started with Custom Integrations](https://support.acrolinx.com/hc/en-us/articles/205687652-Getting-Started-with-Custom-Integrations), and
+* [Getting Started with Custom Integrations](https://support.acrolinx.com/hc/en-us/articles/205687652-Getting-Started-with-Custom-Integrations)
+  , and
 * the [Guidance for the Development of Acrolinx Integrations](https://github.com/acrolinx/acrolinx-coding-guidance).
 
 ## Overview
@@ -40,7 +41,8 @@ See: [Setting Up Your Core Platform for Single Sign-on](https://support.acrolinx
 
 ### Configure the Integration
 
-In the [`config.js`](https://github.com/acrolinx/acrolinx-sidebar-demo/blob/master/samples/config.js) of your Acrolinx Integration, enable SSO and set Acrolinx URL to point to the relative proxy path as follows:
+In the [`config.js`](https://github.com/acrolinx/acrolinx-sidebar-demo/blob/master/samples/config.js) of your Acrolinx Integration,
+enable SSO and set Acrolinx URL to point to the relative proxy path as follows:
 
 ```javascript
 enableSingleSignOn : true
@@ -54,7 +56,7 @@ Make sure:
 
 See also:
 
-* [Acrolinx Sidebar InitParameters Interface](https://cdn.rawgit.com/acrolinx/acrolinx-sidebar-demo/master/doc/pluginDoc/interfaces/_plugin_interfaces_.initparameters.html#enablesinglesignon)
+* [Acrolinx Sidebar InitParameters Interface](https://acrolinx.github.io/sidebar-sdk-js/pluginDoc/interfaces/_acrolinx_libs_plugin_interfaces_.initparameters.html#enablesinglesignon)
 * [Acrolinx Sidebar Demo](https://github.com/acrolinx/acrolinx-sidebar-demo)
 
 ### Configure the Proxy
