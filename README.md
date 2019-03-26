@@ -34,7 +34,7 @@ singleSignOn.usernameKey=username
 singleSignOn.passwordKey=password
 ```
 
-See: [Setting Up Your Core Platform for Single Sign-on](https://support.acrolinx.com/hc/en-us/articles/207827495).
+See: [Setting Up Your Core Platform for Single Sign-on](https://docs.acrolinx.com/coreplatform/latest/en/advanced/sidebar-configurations/set-up-acrolinx-for-single-sign-on).
 
 *Note: Make sure that you use a proper secret for the genericPassword.*
 
