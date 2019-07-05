@@ -71,6 +71,10 @@ class Proxy {
                 $headerString = $name.':'.$this->host;
                 $isHostHeaderPresent = 1;
             }
+            //Remove cookies from request
+	        if(strtolower($name) == 'cookie') {
+		        continue;
+	        }
             array_push($headers,"$headerString");
         }
 
