@@ -41,10 +41,9 @@ See: [Setting Up Your Core Platform for Single Sign-on](https://docs.acrolinx.co
 ### Configure the Integration
 
 In the [`config.js`](https://github.com/acrolinx/acrolinx-sidebar-demo/blob/master/samples/config.js) of your Acrolinx Integration,
-enable SSO and set Acrolinx URL to point to the relative proxy path as follows:
+set Acrolinx URL to point to the relative proxy path as follows:
 
 ```javascript
-enableSingleSignOn : true
 serverAddress: '/proxySample/proxy'
 ```
 
@@ -55,7 +54,6 @@ Make sure:
 
 See also:
 
-* [Acrolinx Sidebar InitParameters Interface](https://acrolinx.github.io/sidebar-sdk-js/pluginDoc/interfaces/_acrolinx_libs_plugin_interfaces_.initparameters.html#enablesinglesignon)
 * [Acrolinx Sidebar Demo](https://github.com/acrolinx/acrolinx-sidebar-demo)
 
 ### Configure the Proxy
