@@ -22,7 +22,6 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpException;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpRequestInterceptor;
-import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
@@ -88,7 +87,7 @@ public class AcrolinxProxyServlet extends HttpServlet {
 
 	@Override
 	protected void doDelete(final HttpServletRequest req, final HttpServletResponse resp)
-			throws ServletException, IOException {
+			throws IOException {
 		final HttpRequestBase httpMethod = new HttpDelete();
 		logger.debug("Processing delete");
 		proxyRequest(req, resp, httpMethod);
@@ -97,7 +96,7 @@ public class AcrolinxProxyServlet extends HttpServlet {
 
 	@Override
 	protected void doPost(final HttpServletRequest req, final HttpServletResponse resp)
-			throws ServletException, IOException {
+			throws IOException {
 		final HttpRequestBase httpMethod = new HttpPost();
 		((HttpPost) httpMethod).setEntity(new InputStreamEntity(req.getInputStream()));
 		logger.debug("Processing post");
@@ -106,7 +105,7 @@ public class AcrolinxProxyServlet extends HttpServlet {
 
 	@Override
 	protected void doPut(final HttpServletRequest req, final HttpServletResponse resp)
-			throws ServletException, IOException {
+			throws IOException {
 		final HttpRequestBase httpMethod = new HttpPut();
 		((HttpPut) httpMethod).setEntity(new InputStreamEntity(req.getInputStream()));
 		logger.debug("Processing put");
@@ -115,7 +114,7 @@ public class AcrolinxProxyServlet extends HttpServlet {
 
 	@Override
 	protected void doGet(final HttpServletRequest req, final HttpServletResponse resp)
-			throws ServletException, IOException {
+			throws IOException {
 		final HttpRequestBase httpMethod = new HttpGet();
 		logger.debug("Processing get");
 		proxyRequest(req, resp, httpMethod);
