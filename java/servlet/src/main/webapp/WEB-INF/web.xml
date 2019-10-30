@@ -12,14 +12,14 @@
 
 		<init-param>
 			<param-name>username</param-name>
-			<param-value>username</param-value>
+			<param-value>testuser</param-value>
 		</init-param>
 		<init-param>
-			<param-name>acrolinxServer</param-name>
-			<param-value>http://localhost:8031</param-value>
+			<param-name>acrolinxURL</param-name>
+			<param-value>http://localhost:8031/</param-value>
 		</init-param>
 		<init-param>
-			<param-name>secret</param-name>
+			<param-name>genericToken</param-name>
 			<param-value>secret</param-value>
 		</init-param>
 

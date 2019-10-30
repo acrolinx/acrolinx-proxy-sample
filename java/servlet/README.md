@@ -1,4 +1,4 @@
-# Acrolinx Single Sign-On Proxy Java Servlet Sample
+# Acrolinx single sign-on Proxy Java Servlet Sample
 
 Demo code for implementing a proxy in a single sign-on environment in Java.
 
@@ -12,7 +12,7 @@ Make sure that you've configured your:
 ## Configure Acrolinx Java Servlet Example
 
 Configure the Acrolinx URL, username, and single sign-on password in the file `web.xml`.
-The parameter names are `acrolinxServer`, `username`, and `secret`.
+The parameter names are `acrolinxURL`, `username`, and `genericToken`.
 
 ## Run Servlet in IDE
 
@@ -33,31 +33,10 @@ cp target/proxySample.war <WEBCONTAINER>/webapps/
 
 ### Test the Proxy
 
-If you open `http://<WEBCONTAINER>/proxySample/proxy/iq/services/rest/registry/knownServiceNames`, like [http://localhost:8080/proxySample/proxy/iq/services/rest/registry/knownServiceNames](http://localhost:8080/proxySample/proxy/iq/services/rest/registry/knownServiceNames).
-You should see a result like:
+Given sample demonstrates consuming `api/v1/auth/sign-ins` for Acrolinx authentication.
 
-```json
-[
-  "checking",
-  "message",
-  "core",
-  "terminology",
-  "user",
-  //...
-]
-```
-
-### Test the Proxy Authentication
-
-Test if the authenticate call returns a username and token.
-
-If you open `http://<WEBCONTAINER>/proxySample/proxy/sso/v1/authenticate`, like [http://localhost:8080/proxySample/proxy/sso/v1/authenticate](http://localhost:8080/proxySample/proxy/sso/v1/authenticate).
-You should see a result like:
-
-```html
-<div id="username">admin</div>
-<div id="authToken">wboSz31sQTjTAFDIWKSDF31sQTHEPQcreXDwboSz31sQTXDwboSz31sQQcreXDwboSz31sp4vnHEPQcreXD==</div>
-```
+If you open `http://<WEBCONTAINER>/proxySample/`, like [http://localhost:8080/proxySample/](http://localhost:8080/proxySample/)
+then press SIGN IN button and it will either give you interactive url to complete sign-in or success message with details.
 
 ### Troubleshooting
 
