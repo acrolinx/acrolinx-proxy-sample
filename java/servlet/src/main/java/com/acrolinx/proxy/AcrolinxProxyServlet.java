@@ -215,7 +215,7 @@ public class AcrolinxProxyServlet extends HttpServlet {
 	private static void modifyRequest(final HttpRequestBase httpRequest, final URI targetURL) {
 		httpRequest.setURI(targetURL);
 		setRequestHeader(httpRequest, "User-Agent", "Acrolinx Proxy");
-		setRequestHeader(httpRequest, "Host", targetURL.getHost() + ":" + targetURL.getPort());
+		setRequestHeader(httpRequest, "Host", targetURL.getHost());
 	}
 
 	private static void setRequestHeader(final HttpRequestBase httpRequest, final String headerName,
@@ -246,7 +246,6 @@ public class AcrolinxProxyServlet extends HttpServlet {
 			} else {
 				httpRequest.addHeader(headerName, servletRequest.getHeader(headerName));
 			}
-
 		}
 	}
 
