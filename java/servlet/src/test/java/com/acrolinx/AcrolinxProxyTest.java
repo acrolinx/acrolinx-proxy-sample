@@ -20,7 +20,7 @@ import java.util.regex.Pattern;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-public class AcrolinxProxyTestServlet extends Mockito {
+public class AcrolinxProxyTest extends Mockito {
 
     private static final String CLIENT_SIGNATURE = "SW50ZWdyYXRpb25EZXZlbG9wbWVudERlbW9Pbmx5";
     private static final String LOCAL_SERVER_URL = "http://localhost:8080";
@@ -93,12 +93,6 @@ public class AcrolinxProxyTestServlet extends Mockito {
         final byte[] data = servletOutputStream.os.toByteArray();
         Assert.assertNotNull(data);
         Assert.assertTrue(data.length > 0);
-
-        String responseBody = new String(data);
-        assertTrue(responseBody.contains("links"));
-        assertTrue(responseBody.contains("poll"));
-        assertTrue(responseBody.contains("interactive"));
-
     }
 
     @Test
