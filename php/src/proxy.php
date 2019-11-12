@@ -152,7 +152,8 @@ class Proxy
             }
             //Remove cookies from request
             if (strtolower($name) == 'cookie') {
-                continue;
+                $acrolincCookies = self::filterCookies($value);
+                array_push($headers, $name . ": " . $acrolincCookies);
             }
             array_push($headers, "$headerString");
         }
@@ -168,6 +169,18 @@ class Proxy
         array_push($headers,'X-Acrolinx-Base-Url:' . $this->constructBaseUrl());
 
         return $headers;
+    }
+
+    private function filterCookies($cookieString) {
+        $acrolinxCookies = array();
+        $cookies =  explode(";", $cookieString);
+        foreach ($cookies as &$cookie) {
+            $trimedCookie = trim($cookie, " ");
+            if (strpos($trimedCookie, 'X-Acrolinx-') === 0) {
+                array_push($acrolinxCookies, $trimedCookie);
+            }
+        }
+        return join(";", $acrolinxCookies);
     }
 
     private function constructBaseUrl(){
