@@ -52,6 +52,8 @@ class Proxy
         $acrolinxSettings['url'] = ""; //TODO: Set Acrolinx server url here.
         $acrolinxSettings['genericPassword'] = "secret"; //TODO: Set secret token here.
 
+        //TODO: Make sure not to call the following line in case a user is not
+		//authenticated to the application.
         if ($acrolinxSettings['isSSO'] == 1) {
             $acrolinxSettings['password'] = $acrolinxSettings['genericPassword'];
             $acrolinxSettings['username'] = get_current_user(); //TODO: Implement get_current_user, which retrieves the username from the current session.
