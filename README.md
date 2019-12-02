@@ -1,4 +1,4 @@
-# Acrolinx single sign-on Proxy Sample
+# Acrolinx Single Sign-On Proxy Sample
 
 Demo code for implementing a proxy in a single sign-on environment for [Acrolinx](https://www.acrolinx.com/) Sidebar integrations.
 
