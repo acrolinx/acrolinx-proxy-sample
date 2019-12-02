@@ -48,15 +48,15 @@ public class AcrolinxProxyServlet extends HttpServlet {
 	// TODO: Set this path in context of your servlet's reverse proxy implementation
 	private static final String PROXY_PATH = "proxySample/proxy";
 
-	CloseableHttpClient httpClient;
+	private static CloseableHttpClient httpClient;
 
 	// Can be configured by init parameters in the web.xml
-	private String acrolinxURL;
-	private String genericToken;
+	private static String acrolinxURL;
+	private static String genericToken;
 
 	public AcrolinxProxyServlet() {
 		super();
-		this.httpClient = createHttpClient();
+		AcrolinxProxyServlet.httpClient = createHttpClient();
 	}
 
 	private static class ContentLengthHeaderRemover implements HttpRequestInterceptor {
@@ -122,16 +122,9 @@ public class AcrolinxProxyServlet extends HttpServlet {
 
 	private void proxyRequest(final HttpServletRequest servletRequest, final HttpServletResponse servletResponse,
 			final HttpRequestBase httpRequest) throws IOException {
-		final URI targetURL = getTargetUri(servletRequest);
 		copyHeaders(servletRequest, httpRequest);
 
-		// add an extra header which is needed for acrolinx to support client's
-		// reverse proxy
-		String baseUrl = servletRequest.getRequestURL().toString();
-		baseUrl = baseUrl.substring(0, baseUrl.indexOf(PROXY_PATH) + PROXY_PATH.length());
-		httpRequest.setHeader("X-Acrolinx-Base-Url", baseUrl);
-
-		modifyRequest(httpRequest, targetURL);
+		modifyRequest(httpRequest, servletRequest);
 
 		// TODO: Make sure not to call the following line in case a user is not
 		// authenticated to the application.
@@ -150,7 +143,8 @@ public class AcrolinxProxyServlet extends HttpServlet {
 
 			Header[] clonedHeaders = httpResponse.getAllHeaders().clone();
 			for (Header header : clonedHeaders) {
-				if (!(header.getName().startsWith("Content-Length") || header.getName().startsWith("Content-Type"))) {
+				if (!(header.getName().startsWith("Transfer-Encoding") ||
+						header.getName().startsWith("Content-Length") || header.getName().startsWith("Content-Type"))) {
 					servletResponse.setHeader(header.getName(), header.getValue());
 				}
 			}
@@ -210,13 +204,22 @@ public class AcrolinxProxyServlet extends HttpServlet {
 		}
 	}
 
-	private static void modifyRequest(final HttpRequestBase httpRequest, final URI targetURL) {
+	private void modifyRequest(final HttpRequestBase httpRequest, final HttpServletRequest servletRequest) throws IOException {
+		final URI targetURL = getTargetUri(servletRequest);
 		httpRequest.setURI(targetURL);
 		setRequestHeader(httpRequest, "User-Agent", "Acrolinx Proxy");
 		setRequestHeader(httpRequest, "Host", targetURL.getHost());
+		setRequestHeader(httpRequest, "X-Acrolinx-Integration-Proxy-Version", "2");
+
+
+		// add an extra header which is needed for acrolinx to support client's
+		// reverse proxy
+		String baseUrl = servletRequest.getRequestURL().toString();
+		baseUrl = baseUrl.substring(0, baseUrl.indexOf(PROXY_PATH) + PROXY_PATH.length());
+		httpRequest.setHeader("X-Acrolinx-Base-Url", baseUrl);
 	}
 
-	private static void setRequestHeader(final HttpRequestBase httpRequest, final String headerName,
+	private void setRequestHeader(final HttpRequestBase httpRequest, final String headerName,
 			final String headerValue) {
 		httpRequest.removeHeaders(headerName);
 		httpRequest.setHeader(headerName, headerValue);
@@ -250,7 +253,7 @@ public class AcrolinxProxyServlet extends HttpServlet {
 	private String filterCookies(String rawCookie) {
 		String[] rawCookieParams = rawCookie.split(";");
 		String[] rawCookieNameAndValues = Arrays.stream(rawCookieParams)
-				.filter(rawCookieNameAndValue -> rawCookieNameAndValue.startsWith("X-Acrolinx-"))
+				.filter(rawCookieNameAndValue -> rawCookieNameAndValue.toUpperCase().startsWith("X-ACROLINX-"))
 				.toArray(String[]::new);
 		String rawAcrolinxCookies = String.join(";", rawCookieNameAndValues);
 		logger.debug("Processed acrolinx cookies: " + rawAcrolinxCookies.isEmpty());
