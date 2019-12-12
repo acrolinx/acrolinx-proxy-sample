@@ -19,7 +19,7 @@ Before you start developing your own integration, you might benefit from looking
 
 ## Overview
 
-![Architecture Diagram](https://writers.acrolinx.com/images/sidebarArchitectureDiagram14.3.1.png)
+![Architecture Diagram](images/sidebarArchitectureDiagram14.3.1.png)
 
 ## Configuration of the Sample
 
@@ -34,7 +34,7 @@ singleSignOn.usernameKey=username
 singleSignOn.passwordKey=password
 ```
 
-See: [Setting Up Your Core Platform for Single Sign-on](https://docs.acrolinx.com/display/CP/Set+Up+Acrolinx+for+Single+Sign-on).
+See: [Setting Up Your Core Platform for single sign-on](https://docs.acrolinx.com/display/CP/Set+Up+Acrolinx+for+Single+Sign-on).
 
 *Note: Make sure that you use a proper secret for the genericPassword.*
 
