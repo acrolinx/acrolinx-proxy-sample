@@ -89,7 +89,6 @@ public class AcrolinxProxyTest extends Mockito {
         acrolinxProxyServlet.init(sg);
         acrolinxProxyServlet.doPost(request, response);
 
-
         final byte[] data = servletOutputStream.os.toByteArray();
         Assert.assertNotNull(data);
         Assert.assertTrue(data.length > 0);
@@ -103,7 +102,8 @@ public class AcrolinxProxyTest extends Mockito {
         when(request.getRequestURL()).thenReturn(new StringBuffer(LOCAL_SERVER_URL + "/proxySample/proxy" + api));
         when(request.getPathInfo()).thenReturn(api);
 
-        String postData = "{\"content\": \"Test content\", \"document\" : {\"reference\" : \"test.txt\"}}";
+        String postData = "{\"content\": \"Test content\", \"document\" : {\"reference\" : \"test.txt\", "
+                + "\"customFields\": [ {\"key\":\"Name\", \"value\":\"A blog post\"} ] }}";
 
         final StubServletInputStream stubServletInputStream = new StubServletInputStream(postData);
         when(request.getInputStream()).thenReturn(stubServletInputStream);
@@ -176,7 +176,6 @@ public class AcrolinxProxyTest extends Mockito {
         assertTrue(responseBody.contains("<title>Scorecard</title>"));
 
     }
-
 
     private void initializeRequestResponse(boolean addAuthToken) throws IOException {
         final ArrayList<String> headers = new ArrayList<>();
