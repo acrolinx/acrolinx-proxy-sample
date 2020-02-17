@@ -124,6 +124,8 @@ public class AcrolinxProxyTest {
         String pollResponseBody = check(acrolinxProxyServlet, postData);
 
         if (pollResponseBody.contains("customFieldsIncorrect")) {
+            assertTrue("Expect that the respnse would require to set the custom field called Name. Response: "
+                    + pollResponseBody, pollResponseBody.contains("Name"));
             postData = createCheckBody(true); // Set hard coded custom field called "Name"
             pollResponseBody = check(acrolinxProxyServlet, postData);
         }
