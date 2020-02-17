@@ -86,8 +86,7 @@ public class AcrolinxProxyServlet extends HttpServlet {
 	}
 
 	@Override
-	public void doDelete(final HttpServletRequest req, final HttpServletResponse resp)
-			throws IOException {
+	public void doDelete(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
 		final HttpRequestBase httpMethod = new HttpDelete();
 		logger.debug("Processing delete");
 		proxyRequest(req, resp, httpMethod);
@@ -95,8 +94,7 @@ public class AcrolinxProxyServlet extends HttpServlet {
 	}
 
 	@Override
-	public void doPost(final HttpServletRequest req, final HttpServletResponse resp)
-			throws IOException {
+	public void doPost(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
 		final HttpRequestBase httpMethod = new HttpPost();
 		((HttpPost) httpMethod).setEntity(new InputStreamEntity(req.getInputStream()));
 		logger.debug("Processing post");
@@ -104,8 +102,7 @@ public class AcrolinxProxyServlet extends HttpServlet {
 	}
 
 	@Override
-	public void doPut(final HttpServletRequest req, final HttpServletResponse resp)
-			throws IOException {
+	public void doPut(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
 		final HttpRequestBase httpMethod = new HttpPut();
 		((HttpPut) httpMethod).setEntity(new InputStreamEntity(req.getInputStream()));
 		logger.debug("Processing put");
@@ -113,8 +110,7 @@ public class AcrolinxProxyServlet extends HttpServlet {
 	}
 
 	@Override
-	public void doGet(final HttpServletRequest req, final HttpServletResponse resp)
-			throws IOException {
+	public void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
 		final HttpRequestBase httpMethod = new HttpGet();
 		logger.debug("Processing get");
 		proxyRequest(req, resp, httpMethod);
@@ -143,8 +139,8 @@ public class AcrolinxProxyServlet extends HttpServlet {
 
 			Header[] clonedHeaders = httpResponse.getAllHeaders().clone();
 			for (Header header : clonedHeaders) {
-				if (!(header.getName().startsWith("Transfer-Encoding") ||
-						header.getName().startsWith("Content-Length") || header.getName().startsWith("Content-Type"))) {
+				if (!(header.getName().startsWith("Transfer-Encoding") || header.getName().startsWith("Content-Length")
+						|| header.getName().startsWith("Content-Type"))) {
 					servletResponse.setHeader(header.getName(), header.getValue());
 				}
 			}
@@ -204,13 +200,13 @@ public class AcrolinxProxyServlet extends HttpServlet {
 		}
 	}
 
-	private void modifyRequest(final HttpRequestBase httpRequest, final HttpServletRequest servletRequest) throws IOException {
+	private void modifyRequest(final HttpRequestBase httpRequest, final HttpServletRequest servletRequest)
+			throws IOException {
 		final URI targetURL = getTargetUri(servletRequest);
 		httpRequest.setURI(targetURL);
 		setRequestHeader(httpRequest, "User-Agent", "Acrolinx Proxy");
 		setRequestHeader(httpRequest, "Host", targetURL.getHost());
 		setRequestHeader(httpRequest, "X-Acrolinx-Integration-Proxy-Version", "2");
-
 
 		// add an extra header which is needed for acrolinx to support client's
 		// reverse proxy
@@ -227,7 +223,7 @@ public class AcrolinxProxyServlet extends HttpServlet {
 
 	private void addSingleSignOn(final HttpRequestBase httpRequest) {
 		setRequestHeader(httpRequest, "username", getUsernameFromApplicationSession());
-		setRequestHeader(httpRequest, "password", this.genericToken);
+		setRequestHeader(httpRequest, "password", genericToken);
 	}
 
 	private String getUsernameFromApplicationSession() {
@@ -237,8 +233,7 @@ public class AcrolinxProxyServlet extends HttpServlet {
 		// the user name comes from web.xml.
 	}
 
-	@SuppressWarnings("unchecked")
-	private void copyHeaders(final HttpServletRequest servletRequest, final HttpRequestBase httpRequest) {
+	private static void copyHeaders(final HttpServletRequest servletRequest, final HttpRequestBase httpRequest) {
 		final Enumeration<String> headerNames = servletRequest.getHeaderNames();
 		while (headerNames.hasMoreElements()) {
 			final String headerName = headerNames.nextElement();
@@ -250,7 +245,7 @@ public class AcrolinxProxyServlet extends HttpServlet {
 		}
 	}
 
-	private String filterCookies(String rawCookie) {
+	private static String filterCookies(String rawCookie) {
 		String[] rawCookieParams = rawCookie.split(";");
 		String[] rawCookieNameAndValues = Arrays.stream(rawCookieParams)
 				.filter(rawCookieNameAndValue -> rawCookieNameAndValue.toUpperCase().startsWith("X-ACROLINX-"))
@@ -260,7 +255,7 @@ public class AcrolinxProxyServlet extends HttpServlet {
 		return rawAcrolinxCookies;
 	}
 
-	private URI getTargetUri(final HttpServletRequest servletRequest) throws IOException {
+	private static URI getTargetUri(final HttpServletRequest servletRequest) throws IOException {
 		final String queryPart = servletRequest.getQueryString() != null ? "?" + servletRequest.getQueryString() : "";
 		final String urlStr = acrolinxURL + servletRequest.getPathInfo() + queryPart;
 		try {
