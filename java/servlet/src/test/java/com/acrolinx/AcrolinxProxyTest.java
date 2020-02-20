@@ -83,8 +83,7 @@ public class AcrolinxProxyTest {
 
     @Test
     public void testSignInSSO() throws IOException, ServletException {
-        final StubServletInputStream stubServletInputStream = new StubServletInputStream("");
-        when(request.getInputStream()).thenReturn(stubServletInputStream);
+        when(request.getInputStream()).thenReturn(new StubServletInputStream(""));
 
         final AcrolinxProxyServlet acrolinxProxyServlet = new AcrolinxProxyServlet();
         acrolinxProxyServlet.init(sg);
@@ -119,6 +118,46 @@ public class AcrolinxProxyTest {
 
         AcrolinxProxyServlet acrolinxProxyServlet = new AcrolinxProxyServlet();
         acrolinxProxyServlet.init(sg);
+
+        String postData = createCheckBody(false);
+        String pollResponseBody = check(acrolinxProxyServlet, postData);
+
+        if (pollResponseBody.contains("customFieldsIncorrect")) {
+            assertTrue("Expect that the respnse would require to set the custom field called Name. Response: "
+                    + pollResponseBody, pollResponseBody.contains("Name"));
+            postData = createCheckBody(true); // Set hard coded custom field called "Name"
+            pollResponseBody = check(acrolinxProxyServlet, postData);
+        }
+
+        String scorecardUrl = getJsonValue(pollResponseBody, "Score Card\",\"link");
+
+        assertNotNull("Scorecard Url not found. Request: " + postData + "\nresponse: " + pollResponseBody,
+                scorecardUrl);
+        initializeRequestResponse(false);
+
+        String scorecardUrlRequest = scorecardUrl.substring(scorecardUrl.indexOf(PROXY_PATH) + PROXY_PATH.length());
+
+        String scorecardResponseBody = get(acrolinxProxyServlet, scorecardUrlRequest);
+        assertTrue("Doesn't look like a score card. Request: " + postData + "\nresponse: " + scorecardResponseBody,
+                scorecardResponseBody.contains("<title>Scorecard</title>"));
+
+    }
+
+    @Test
+    public void testSsoCheckAndGetScoreCardThroughProxy()
+            throws IOException, ServletException, URISyntaxException, InterruptedException {
+
+        when(request.getInputStream()).thenReturn(new StubServletInputStream(""));
+
+        final AcrolinxProxyServlet acrolinxProxyServlet = new AcrolinxProxyServlet();
+        acrolinxProxyServlet.init(sg);
+
+        String signInResult = post(acrolinxProxyServlet, "/api/v1/auth/sign-ins", "");
+
+        assertTrue(signInResult + " should contain ACROLINX_SSO", signInResult.contains("ACROLINX_SSO"));
+        assertTrue(signInResult + " should contain accessToken", signInResult.contains("accessToken"));
+
+        initializeRequestResponse(getJsonValue(signInResult, "accessToken"));
 
         String postData = createCheckBody(false);
         String pollResponseBody = check(acrolinxProxyServlet, postData);
@@ -220,13 +259,21 @@ public class AcrolinxProxyTest {
     }
 
     private void initializeRequestResponse(boolean addAuthToken) throws IOException {
+        initializeRequestResponse(addAuthToken, ACROLINX_API_TOKEN_STRING);
+    }
+
+    private void initializeRequestResponse(String token) throws IOException {
+        initializeRequestResponse(true, token);
+    }
+
+    private void initializeRequestResponse(boolean addAuthToken, String token) throws IOException {
         final ArrayList<String> headers = new ArrayList<>();
         headers.add("X-Acrolinx-Client");
         headers.add("X-Acrolinx-Client-Locale");
         headers.add("Content-Type");
         if (addAuthToken) {
             headers.add("X-Acrolinx-Auth");
-            when(request.getHeader("X-Acrolinx-Auth")).thenReturn(ACROLINX_API_TOKEN_STRING);
+            when(request.getHeader("X-Acrolinx-Auth")).thenReturn(token);
         }
 
         when(request.getHeaderNames()).thenReturn(Collections.enumeration(headers));
