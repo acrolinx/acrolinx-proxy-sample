@@ -167,6 +167,7 @@ class Proxy
         array_push($headers, $this->username);
         array_push($headers, $this->password);
         array_push($headers, 'User-Agent:Acrolinx Proxy');
+        array_push($headers,'X-Acrolinx-Integration-Proxy-Version:2');
         array_push($headers,'X-Acrolinx-Base-Url:' . $this->constructBaseUrl());
 
         return $headers;
@@ -194,7 +195,7 @@ class Proxy
 
         $part = basename(__FILE__);
         $pos = strpos($baseURL, $part);
-        substr_replace($baseURL, '', 0, ($pos+strlen($part)));
+        $baseURL = substr_replace($baseURL, '', ($pos+strlen($part)));
         return $baseURL;
 
     }
