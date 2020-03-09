@@ -33,18 +33,18 @@ cp target/proxySample.war <WEBCONTAINER>/webapps/
 
 ### Test the Proxy
 
-Given sample demonstrates consuming `api/v1/auth/sign-ins` for Acrolinx authentication.
+The given sample demonstrates consuming the rest call `api/v1/auth/sign-ins` for Acrolinx authentication.
 
 If you open `http://<WEBCONTAINER>/proxySample/`, like [http://localhost:8080/proxySample/](http://localhost:8080/proxySample/)
-then press SIGN IN button and it will either give you interactive url to complete sign-in or success message with details.
+then press the sign-in button and it will either give you the interactive URL to the complete sign-in or success message with details.
 
 ### Troubleshooting
 
 #### Connecting to HTTPS Acrolinx Throws `javax.net.ssl.SSLHandshakeException`
 
 This exception indicates that the integration and platform couldn't negotiate the desired level of security.
-Get Acrolinx SSL certificate from your administrator.
-To install Acrolinx certificate to JVM's trust store,
+Get the Acrolinx SSL certificate from your administrator.
+To install the Acrolinx certificate to JVM's trust store,
 follow the [Java tool signing steps](https://docs.oracle.com/javase/tutorial/security/toolsign/rstep2.html).
 
 Restart your Web server.
