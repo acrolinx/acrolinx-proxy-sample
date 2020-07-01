@@ -137,6 +137,8 @@ public class AcrolinxProxyTest {
 
         String scorecardUrlRequest = scorecardUrl.substring(scorecardUrl.indexOf(PROXY_PATH) + PROXY_PATH.length());
 
+        Thread.sleep(1000);
+
         String scorecardResponseBody = get(acrolinxProxyServlet, scorecardUrlRequest);
         assertTrue("Doesn't look like a score card. Request: " + postData + "\nresponse: " + scorecardResponseBody,
                 scorecardResponseBody.contains("<title>Scorecard</title>"));
