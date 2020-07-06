@@ -70,6 +70,7 @@ public class AcrolinxProxyServlet extends HttpServlet {
 		final HttpClientBuilder httpClientBuilder = HttpClientBuilder.create().setConnectionManager(cm);
 		httpClientBuilder.disableRedirectHandling();
 		httpClientBuilder.addInterceptorFirst(new ContentLengthHeaderRemover());
+		httpClientBuilder.useSystemProperties();
 		return httpClientBuilder.build();
 	}
 
