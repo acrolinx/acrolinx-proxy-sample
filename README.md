@@ -36,12 +36,12 @@ singleSignOn.passwordKey=password
 
 See: [Setting Up Your Core Platform for single sign-on](https://docs.acrolinx.com/display/CP/Set+Up+Acrolinx+for+Single+Sign-on).
 
-*Note: Make sure that you use a proper secret for the genericPassword.*
+*Note: Make sure that you use a proper secret for the `genericPassword`.*
 
 ### Configure the Integration
 
 In the [`config.js`](https://github.com/acrolinx/acrolinx-sidebar-demo/blob/master/samples/config.js) of your Acrolinx Integration,
-set Acrolinx URL to point to the relative proxy path as follows:
+set the Acrolinx URL to point to the relative proxy path as follows:
 
 ```javascript
 serverAddress: '/proxySample/proxy'
