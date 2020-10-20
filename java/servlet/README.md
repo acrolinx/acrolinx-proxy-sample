@@ -11,7 +11,7 @@ Make sure that you've configured your:
 
 ## Configure Acrolinx Java Servlet Example
 
-Configure the Acrolinx URL, username, and single sign-on password in the file `web.xml`.
+Configure the Acrolinx URL, username, and single sign-on password in the file [`web.xml`](src/main/webapp/WEB-INF/web.xml).
 The parameter names are `acrolinxURL`, `username`, and `genericToken`.
 
 ## Run Servlet in IDE
@@ -36,7 +36,18 @@ cp target/proxySample.war <WEBCONTAINER>/webapps/
 The given sample demonstrates consuming the rest call `api/v1/auth/sign-ins` for Acrolinx authentication.
 
 If you open `http://<WEBCONTAINER>/proxySample/`, like [http://localhost:8080/proxySample/](http://localhost:8080/proxySample/)
-then press the sign-in button and it will either give you the interactive URL to the complete sign-in or success message with details.
+then press the sign-in button and it will either give you the interactive URL to the complete sign-in,
+or a success message with details.
+
+### Test Using Docker
+
+1. Make sure [docker](https://www.docker.com/) is installed.
+2. Make sure you are in the directory `java/servlet`.
+3. [Configure](#configure-acrolinx-java-servlet-example) the proxy [`web.xml`](src/main/webapp/WEB-INF/web.xml).
+4. To build the `war`-file, run `mvn package -DskipTests`.
+5. To build a docker image, run `docker build -t mywebapp ./`
+6. Run the docker image, by running `docker run -p 8888:8080 mywebapp`.
+7. Connect using a web browser [localhost:8888/proxySample](http://localhost:8888/proxySample/).
 
 ### Troubleshooting
 
@@ -48,6 +59,11 @@ To install the Acrolinx certificate to JVM's trust store,
 follow the [Java tool signing steps](https://docs.oracle.com/javase/tutorial/security/toolsign/rstep2.html).
 
 Restart your Web server.
+
+##### See Also
+
+* [java-https-tester](https://github.com/acrolinx/java-https-tester)
+* [Acrolinx Secure Tunnel](https://github.com/acrolinx/secure-tunnel)
 
 ## Java Class Overview
 
