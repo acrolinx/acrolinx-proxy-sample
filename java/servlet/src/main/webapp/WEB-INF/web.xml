@@ -16,7 +16,7 @@
 		</init-param>
 		<init-param>
 			<param-name>acrolinxURL</param-name>
-			<param-value>https://test-ssl.acrolinx.com/</param-value>
+			<param-value>http://localhost:8031/</param-value>
 		</init-param>
 		<init-param>
 			<param-name>genericToken</param-name>
