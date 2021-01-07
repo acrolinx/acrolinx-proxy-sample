@@ -66,6 +66,30 @@ See also:
 
 [Acrolinx PHP Proxy](php/README.md)
 
+### Security
+
+Make sure to implement the proxy in a [secure way](https://github.com/acrolinx/acrolinx-coding-guidance/blob/master/topics/security-safety.md#security).
+Especially take care of:
+
+* The entire authentication is checked in the proxy layer.
+* The username is already authenticated in the system you integrate.
+* The proxy adds the username header and the SSO token header.
+* The SSO token is kept secret between the system's backend and the Acrolinx Platform.
+* It's impossible to fake a request to the proxy and obtain an authentication token
+  for a different user than the authenticated user.
+
+#### Connection / TLS / Pitfall
+
+The Acrolinx Platform usually runs on state-of-the-art security standards.
+Out of the box and HTTP clients might not be able to connect.
+Make sure that you configured your VM, operating system, and backend to allow connections with modern
+[TLS versions](https://en.wikipedia.org/wiki/Transport_Layer_Security).
+
+*Note:* [test-ssl.acrolinx.com](https://test-ssl.acrolinx.com) is configured to allow more TLS versions than typical
+production instances usually do.
+The reasoning behind this is to support older environments and simplify testing.
+Please make sure to test with an appropriate configuration before rollout.
+
 ## License
 
 Copyright 2015-present Acrolinx GmbH
