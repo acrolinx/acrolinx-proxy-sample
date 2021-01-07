@@ -27,7 +27,7 @@ You should see a result like:
 
 Test if the authenticate call returns a username and token.
 
-If you perform an http `post` to `http://<WEBCONTAINER>/acrolinx/proxy.php/sso/v1/auth/sign-ins`
+If you perform an http `post` to `http://<WEBCONTAINER>/acrolinx/proxy.php/sso/v1/auth/sign-ins` like:
 
 ```bash
 curl -X POST 'http://localhost:8888/acrolinx/proxy.php/api/v1/auth/sign-ins' \
