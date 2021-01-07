@@ -28,15 +28,13 @@ Before you start developing your own integration, you might benefit from looking
 To enable single sign-on, add the following example properties to the `coreserver.properties` file:
 
 ```properties
-singleSignOn.method=header
 singleSignOn.genericPassword=secret
-singleSignOn.usernameKey=username
-singleSignOn.passwordKey=password
 ```
 
 See: [Setting Up Your Core Platform for single sign-on](https://docs.acrolinx.com/display/CP/Set+Up+Acrolinx+for+Single+Sign-on).
 
 *Note: Make sure that you use a proper secret for the `genericPassword`.*
+*Note: Older Acrolinx Platform versions might require more configuration properties to be set.*
 
 ### Configure the Integration
 
