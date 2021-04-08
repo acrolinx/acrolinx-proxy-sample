@@ -34,6 +34,8 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.protocol.HttpContext;
+import org.apache.http.client.config.CookieSpecs;
+import org.apache.http.client.config.RequestConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,6 +70,10 @@ public class AcrolinxProxyServlet extends HttpServlet {
 	private static CloseableHttpClient createHttpClient() {
 		final PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager();
 		final HttpClientBuilder httpClientBuilder = HttpClientBuilder.create().setConnectionManager(cm);
+		RequestConfig localConfig = RequestConfig.custom()
+				.setCookieSpec(CookieSpecs.STANDARD)
+				.build();
+		httpClientBuilder.setDefaultRequestConfig(localConfig);
 		httpClientBuilder.disableRedirectHandling();
 		httpClientBuilder.addInterceptorFirst(new ContentLengthHeaderRemover());
 		httpClientBuilder.useSystemProperties();
