@@ -20,10 +20,6 @@ jobs:
       with:
         java-version: '8'
         distribution: 'adopt'
-      
-      env:
-        ACROLINX_API_USERNAME: ${{ secrets.TEST_SERVER_USERNAME }}
-        ACROLINX_API_SSO_TOKEN: ${{ secrets.TEST_SERVER_SSO_TOKEN }}
 
     - name: Build proxy
       run: |
@@ -34,6 +30,8 @@ jobs:
       env:
         ACROLINX_URL: ${{ secrets.TEST_SERVER_URL_UNSTABLE }}
         ACROLINX_API_TOKEN: ${{ secrets.TEST_SERVER_API_TOKEN_UNSTABLE }}
+        ACROLINX_API_USERNAME: ${{ secrets.TEST_SERVER_USERNAME }}
+        ACROLINX_API_SSO_TOKEN: ${{ secrets.TEST_SERVER_SSO_TOKEN }}
       run: |
         cd java/servlet/
         mvn '-Dtest=com.acrolinx.*Test' test
@@ -42,6 +40,8 @@ jobs:
       env:      
         ACROLINX_URL: ${{ secrets.TEST_SERVER_URL_STABLE }}
         ACROLINX_API_TOKEN: ${{ secrets.TEST_SERVER_API_TOKEN_STABLE }}
+        ACROLINX_API_USERNAME: ${{ secrets.TEST_SERVER_USERNAME }}
+        ACROLINX_API_SSO_TOKEN: ${{ secrets.TEST_SERVER_SSO_TOKEN }}
       run: |
         cd java/servlet/
         curl -Is $ACROLINX_URL | head -1
