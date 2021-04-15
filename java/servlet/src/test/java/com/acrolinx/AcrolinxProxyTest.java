@@ -287,6 +287,7 @@ public class AcrolinxProxyTest {
         when(request.getHeader("Content-Type")).thenReturn("application/json");
 
         when(sg.getInitParameter("acrolinxURL")).thenReturn(ACROLINX_URL);
+        System.out.println(new StringBuilder(ACROLINX_URL).reverse().toString());
         when(sg.getInitParameter("genericToken")).thenReturn(ACROLINX_API_SSO_TOKEN);
         when(sg.getInitParameter("username")).thenReturn(ACROLINX_API_USERNAME);
         when(response.getOutputStream()).thenReturn(servletOutputStream);
