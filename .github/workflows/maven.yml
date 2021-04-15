@@ -33,6 +33,7 @@ jobs:
         mvn '-Dtest=com.acrolinx.*Test' test
     - name: Test proxy with Unstable
       run: |
-        export ACROLINX_API_TOKEN = ${{ secrets.TEST_SERVER_API_TOKEN_UNSTABLE }}
-        export ACROLIX_URL = ${{ secrets.TEST_SERVER_URL_UNSTABLE }}
+        ACROLINX_API_TOKEN = ${{ secrets.TEST_SERVER_API_TOKEN_UNSTABLE }}
+        ACROLIX_URL = ${{ secrets.TEST_SERVER_URL_UNSTABLE }}
+        cd java/servlet/
         mvn '-Dtest=com.acrolinx.*Test' test
