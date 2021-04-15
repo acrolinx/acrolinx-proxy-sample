@@ -18,11 +18,9 @@ jobs:
       with:
         java-version: '8'
         distribution: 'adopt'
-    - name: Change directory
-      run: cd java/servlet/
-      
-    - name: Compile 
-      run: mvn compile
-    
-    - name: Run tests on stable
-      run: mvn '-Dtest=com.acrolinx.*Test' test
+    - name: Test proxy
+      run: |
+        cd java/servlet/
+        mvn compile
+        mvn '-Dtest=com.acrolinx.*Test' test
+        
