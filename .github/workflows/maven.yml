@@ -2,9 +2,11 @@ name: Test Java Proxy
 
 on:
   push:
-    branches: [ master, actions-setup ]
+    branches: [ master ]
   pull_request:
     branches: [ master ]
+  schedule:
+    - cron: "* 12 * * *"
 
 jobs:
   build:
