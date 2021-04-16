@@ -2,7 +2,7 @@ name: Test Java Proxy
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, actions-setup ]
   pull_request:
     branches: [ master ]
 
@@ -26,21 +26,24 @@ jobs:
         cd java/servlet/
         mvn compile
 
-    - name: Test proxy with Stable
+    - name: Test proxy with Unstable
+      env:
+        ACROLINX_URL: ${{ secrets.TEST_SERVER_URL_UNSTABLE }}
+        ACROLINX_API_TOKEN: ${{ secrets.TEST_SERVER_API_TOKEN_UNSTABLE }}
+        ACROLINX_API_USERNAME: ${{ secrets.TEST_SERVER_USERNAME }}
+        ACROLINX_API_SSO_TOKEN: ${{ secrets.TEST_SERVER_SSO_TOKEN }}
       run: |
-        export ACROLINX_API_USERNAME=${{ secrets.TEST_SERVER_USERNAME }}
-        export ACROLINX_API_SSO_TOKEN=${{ secrets.TEST_SERVER_SSO_TOKEN }}
-        export ACROLIX_URL=${{ secrets.TEST_SERVER_URL_STABLE }}
-        export ACROLINX_API_TOKEN=${{ secrets.TEST_SERVER_API_TOKEN_STABLE }}
-        [ -z "$ACROLIX_URL" ] && echo "Empty"
         cd java/servlet/
         mvn '-Dtest=com.acrolinx.*Test' test
 
-    - name: Test proxy with 
+    - name: Test proxy with Stable
+      env:      
+        ACROLINX_URL: ${{ secrets.TEST_SERVER_URL_STABLE }}
+        ACROLINX_API_TOKEN: ${{ secrets.TEST_SERVER_API_TOKEN_STABLE }}
+        ACROLINX_API_USERNAME: ${{ secrets.TEST_SERVER_USERNAME }}
+        ACROLINX_API_SSO_TOKEN: ${{ secrets.TEST_SERVER_SSO_TOKEN }}
       run: |
-        export ACROLINX_API_USERNAME=${{ secrets.TEST_SERVER_USERNAME }}
-        export ACROLINX_API_SSO_TOKEN=${{ secrets.TEST_SERVER_SSO_TOKEN }}
-        export ACROLIX_URL=${{ secrets.TEST_SERVER_URL_UNSTABLE }}
-        export ACROLINX_API_TOKEN=${{ secrets.TEST_SERVER_API_TOKEN_UNSTABLE }}
         cd java/servlet/
+        curl -Is $ACROLINX_URL | head -1
         mvn '-Dtest=com.acrolinx.*Test' test
+
