@@ -7,6 +7,12 @@ on:
     branches: [ main ]
   schedule:
     - cron: "* 12 * * *"
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: "Trigger Comment (Optional)"
+        required: false
+        default: "Manual Workflow Run"
 
 jobs:
   build:
@@ -31,15 +37,6 @@ jobs:
         cd java/servlet/
         mvn compile
 
-    - name: Test proxy with Unstable
-      env:
-        ACROLINX_URL: ${{ secrets.TEST_SERVER_URL_UNSTABLE }}
-        ACROLINX_API_TOKEN: ${{ secrets.TEST_SERVER_API_TOKEN_UNSTABLE }}
-
-      run: |
-        cd java/servlet/
-        mvn '-Dtest=com.acrolinx.*Test' test
-
     - name: Test proxy with Stable
       env:      
         ACROLINX_URL: ${{ secrets.TEST_SERVER_URL_STABLE }}
@@ -47,6 +44,4 @@ jobs:
 
       run: |
         cd java/servlet/
-        curl -Is $ACROLINX_URL | head -1
         mvn '-Dtest=com.acrolinx.*Test' test
-
