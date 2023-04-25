@@ -1,18 +1,10 @@
+
 package com.acrolinx;
 
-import com.acrolinx.proxy.AcrolinxProxyServlet;
-import io.github.cdimascio.dotenv.Dotenv;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.when;
 
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -20,16 +12,29 @@ import java.util.Collections;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.when;
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
+
+import com.acrolinx.proxy.AcrolinxProxyServlet;
+
+import io.github.cdimascio.dotenv.Dotenv;
 
 @RunWith(MockitoJUnitRunner.class)
-public class AcrolinxProxyTest {
+public class AcrolinxProxyTest
+{
 
-    private static final String CLIENT_SIGNATURE = "SW50ZWdyYXRpb25EZXZlbG9wbWVudERlbW9Pbmx5";
-    private static final String LOCAL_SERVER_URL = "http://localhost:8080";
     static Dotenv dotenv = Dotenv.configure().ignoreIfMissing().load();
+    private static final String CLIENT_SIGNATURE = dotenv.get("ACROLINX_DEV_SIGNATURE");
+    private static final String LOCAL_SERVER_URL = "http://localhost:8080";
     private static final String ACROLINX_URL = dotenv.get("ACROLINX_URL");
     private static final String ACROLINX_API_SSO_TOKEN = dotenv.get("ACROLINX_API_SSO_TOKEN");
     private static final String ACROLINX_API_USERNAME = dotenv.get("ACROLINX_API_USERNAME");
@@ -45,12 +50,14 @@ public class AcrolinxProxyTest {
     private HttpServletResponse response;
 
     @Before
-    public void setUp() throws IOException {
+    public void setUp() throws IOException
+    {
         initializeRequestResponse(false);
     }
 
     @Test
-    public void testSimpleGet() throws IOException, ServletException {
+    public void testSimpleGet() throws IOException, ServletException
+    {
         String api = "/api/v1";
         when(request.getRequestURL()).thenReturn(new StringBuffer(LOCAL_SERVER_URL + "/proxySample/proxy" + api));
         when(request.getPathInfo()).thenReturn("/api/v1");
@@ -65,7 +72,8 @@ public class AcrolinxProxyTest {
     }
 
     @Test
-    public void testFetchingSidebarHTML() throws IOException, ServletException {
+    public void testFetchingSidebarHTML() throws IOException, ServletException
+    {
         String api = "/sidebar/v14/index.html";
         setRequestUrl(api);
 
@@ -97,7 +105,8 @@ public class AcrolinxProxyTest {
     }
 
     @Test
-    public void testSubmitCheck() throws IOException, ServletException, URISyntaxException, InterruptedException {
+    public void testSubmitCheck() throws IOException, ServletException, URISyntaxException, InterruptedException
+    {
 
         AcrolinxProxyServlet acrolinxProxyServlet = new AcrolinxProxyServlet();
         acrolinxProxyServlet.init(sg);
@@ -114,7 +123,8 @@ public class AcrolinxProxyTest {
 
     @Test
     public void testCheckAndGetScoreCardThroughProxy()
-            throws IOException, ServletException, URISyntaxException, InterruptedException {
+            throws IOException, ServletException, URISyntaxException, InterruptedException
+    {
 
         AcrolinxProxyServlet acrolinxProxyServlet = new AcrolinxProxyServlet();
         acrolinxProxyServlet.init(sg);
@@ -187,7 +197,8 @@ public class AcrolinxProxyTest {
     }
 
     private String check(AcrolinxProxyServlet acrolinxProxyServlet, String postData)
-            throws IOException, InterruptedException {
+            throws IOException, InterruptedException
+    {
         initializeRequestResponse(true);
         String resultResponseBody = post(acrolinxProxyServlet, "/api/v1/checking/checks", postData);
 
@@ -204,14 +215,16 @@ public class AcrolinxProxyTest {
         return pollResponseBody;
     }
 
-    private String createCheckBody(boolean withCustomFields) {
+    private String createCheckBody(boolean withCustomFields)
+    {
         String postData = "{\"content\": \"Test content\", \"document\" : {\"reference\" : \"test.txt\""
                 + (withCustomFields ? ", \"customFields\": [ {\"key\":\"Name\", \"value\":\"A blog post\"} ]" : "")
                 + "}}";
         return postData;
     }
 
-    private String get(AcrolinxProxyServlet acrolinxProxyServlet, String url) throws IOException {
+    private String get(AcrolinxProxyServlet acrolinxProxyServlet, String url) throws IOException
+    {
         setRequestUrl(url);
 
         acrolinxProxyServlet.doGet(request, response);
@@ -219,7 +232,8 @@ public class AcrolinxProxyTest {
         return readBody();
     }
 
-    private String post(AcrolinxProxyServlet acrolinxProxyServlet, String url, String postData) throws IOException {
+    private String post(AcrolinxProxyServlet acrolinxProxyServlet, String url, String postData) throws IOException
+    {
         setRequestUrl(url);
 
         setRequestData(postData);
@@ -229,7 +243,8 @@ public class AcrolinxProxyTest {
         return resultResponseBody;
     }
 
-    private String getJsonValue(String resultResponseBody, String key) {
+    private String getJsonValue(String resultResponseBody, String key)
+    {
         String regex = key + "\":\"(.*?)\"";
         Pattern pattern = Pattern.compile(regex, Pattern.MULTILINE);
         Matcher matcher = pattern.matcher(resultResponseBody);
@@ -242,7 +257,8 @@ public class AcrolinxProxyTest {
         return result;
     }
 
-    private void setRequestData(String postData) throws IOException {
+    private void setRequestData(String postData) throws IOException
+    {
         final StubServletInputStream stubServletInputStream = new StubServletInputStream(postData);
         when(request.getInputStream()).thenReturn(stubServletInputStream);
     }
@@ -252,7 +268,8 @@ public class AcrolinxProxyTest {
         when(request.getPathInfo()).thenReturn(api);
     }
 
-    private String readBody() {
+    private String readBody()
+    {
         byte[] data = servletOutputStream.os.toByteArray();
         Assert.assertNotNull(data);
         Assert.assertTrue(data.length > 0);
@@ -261,15 +278,18 @@ public class AcrolinxProxyTest {
         return responseBody;
     }
 
-    private void initializeRequestResponse(boolean addAuthToken) throws IOException {
+    private void initializeRequestResponse(boolean addAuthToken) throws IOException
+    {
         initializeRequestResponse(addAuthToken, ACROLINX_API_TOKEN_STRING);
     }
 
-    private void initializeRequestResponse(String token) throws IOException {
+    private void initializeRequestResponse(String token) throws IOException
+    {
         initializeRequestResponse(true, token);
     }
 
-    private void initializeRequestResponse(boolean addAuthToken, String token) throws IOException {
+    private void initializeRequestResponse(boolean addAuthToken, String token) throws IOException
+    {
         final ArrayList<String> headers = new ArrayList<>();
         headers.add("X-Acrolinx-Client");
         headers.add("X-Acrolinx-Client-Locale");

@@ -7,6 +7,12 @@ on:
     branches: [ main ]
   schedule:
     - cron: "* 12 * * *"
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: "Trigger Comment (Optional)"
+        required: false
+        default: "Manual Workflow Run"
 
 jobs:
   build:
@@ -14,9 +20,6 @@ jobs:
     defaults:
       run:
         shell: bash
-    env:
-      ACROLINX_API_USERNAME: ${{ secrets.TEST_SERVER_USERNAME }}
-      ACROLINX_API_SSO_TOKEN: ${{ secrets.TEST_SERVER_SSO_TOKEN }}
 
     steps:
     - uses: actions/checkout@v2
@@ -31,22 +34,14 @@ jobs:
         cd java/servlet/
         mvn compile
 
-    - name: Test proxy with Unstable
-      env:
-        ACROLINX_URL: ${{ secrets.TEST_SERVER_URL_UNSTABLE }}
-        ACROLINX_API_TOKEN: ${{ secrets.TEST_SERVER_API_TOKEN_UNSTABLE }}
-
-      run: |
-        cd java/servlet/
-        mvn '-Dtest=com.acrolinx.*Test' test
-
     - name: Test proxy with Stable
-      env:      
+      env:
+        ACROLINX_API_USERNAME: ${{ secrets.TEST_SERVER_USERNAME }}
+        ACROLINX_API_SSO_TOKEN: ${{ secrets.TEST_SERVER_SSO_TOKEN }}
         ACROLINX_URL: ${{ secrets.TEST_SERVER_URL_STABLE }}
         ACROLINX_API_TOKEN: ${{ secrets.TEST_SERVER_API_TOKEN_STABLE }}
+        ACROLINX_DEV_SIGNATURE: ${{ secrets.ACROLINX_DEV_SIGNATURE }}
 
       run: |
         cd java/servlet/
-        curl -Is $ACROLINX_URL | head -1
         mvn '-Dtest=com.acrolinx.*Test' test
-
