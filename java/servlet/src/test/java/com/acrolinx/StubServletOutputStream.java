@@ -1,25 +1,29 @@
+
 package com.acrolinx;
+
+import java.io.ByteArrayOutputStream;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.WriteListener;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 
+class StubServletOutputStream extends ServletOutputStream
+{
+    final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
-public class StubServletOutputStream extends ServletOutputStream {
-    public ByteArrayOutputStream os = new ByteArrayOutputStream();
-
-    public void write(int i) throws IOException {
-        os.write(i);
+    @Override
+    public void write(int i)
+    {
+        byteArrayOutputStream.write(i);
     }
 
     @Override
-    public boolean isReady() {
+    public boolean isReady()
+    {
         return false;
     }
 
     @Override
-    public void setWriteListener(WriteListener writeListener) {
-
+    public void setWriteListener(WriteListener writeListener)
+    {
     }
 }
