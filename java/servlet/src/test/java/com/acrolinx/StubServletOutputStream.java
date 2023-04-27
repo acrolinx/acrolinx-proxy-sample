@@ -25,5 +25,6 @@ class StubServletOutputStream extends ServletOutputStream
     @Override
     public void setWriteListener(WriteListener writeListener)
     {
+        // do nothing
     }
 }
