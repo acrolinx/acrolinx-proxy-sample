@@ -44,4 +44,4 @@ jobs:
 
       run: |
         cd java/servlet/
-        mvn '-Dtest=com.acrolinx.*Test' test
+        mvn test

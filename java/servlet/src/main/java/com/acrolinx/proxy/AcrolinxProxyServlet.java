@@ -11,6 +11,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Enumeration;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -18,8 +19,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
-import org.apache.http.HttpRequest;
-import org.apache.http.HttpRequestInterceptor;
 import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -33,8 +32,6 @@ import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import org.apache.http.protocol.HTTP;
-import org.apache.http.protocol.HttpContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,28 +48,12 @@ public class AcrolinxProxyServlet extends HttpServlet
     private static final String PROXY_PATH = "proxySample/proxy";
 
     private final CloseableHttpClient closeableHttpClient;
-    private String acrolinxURL;
+    private String acrolinxUrl;
     private String genericToken;
 
     public AcrolinxProxyServlet()
     {
         closeableHttpClient = createHttpClient();
-    }
-
-    static final class ContentLengthHeaderRemover implements HttpRequestInterceptor
-    {
-        static final HttpRequestInterceptor INSTANCE = new ContentLengthHeaderRemover();
-
-        private ContentLengthHeaderRemover()
-        {
-            // do nothing
-        }
-
-        @Override
-        public void process(final HttpRequest httpRequest, final HttpContext httpContext)
-        {
-            httpRequest.removeHeaders(HTTP.CONTENT_LEN);
-        }
     }
 
     private static CloseableHttpClient createHttpClient()
@@ -89,7 +70,7 @@ public class AcrolinxProxyServlet extends HttpServlet
     public void init()
     {
         // Properties can be configured by init parameters in the web.xml.
-        acrolinxURL = getInitParameterOrDefaultValue("acrolinxURL", "http://localhost:8031/").replaceAll("/$", "");
+        acrolinxUrl = getInitParameterOrDefaultValue("acrolinxURL", "http://localhost:8031/").replaceAll("/$", "");
         genericToken = getInitParameterOrDefaultValue("genericToken", "secret");
     }
 
@@ -100,7 +81,7 @@ public class AcrolinxProxyServlet extends HttpServlet
     }
 
     @Override
-    public void doDelete(final HttpServletRequest httpServletRequest, final HttpServletResponse httpServletResponse)
+    protected void doDelete(final HttpServletRequest httpServletRequest, final HttpServletResponse httpServletResponse)
             throws IOException
     {
         final HttpDelete httpDelete = new HttpDelete();
@@ -109,7 +90,7 @@ public class AcrolinxProxyServlet extends HttpServlet
     }
 
     @Override
-    public void doPost(final HttpServletRequest httpServletRequest, final HttpServletResponse httpServletResponse)
+    protected void doPost(final HttpServletRequest httpServletRequest, final HttpServletResponse httpServletResponse)
             throws IOException
     {
         final HttpPost httpPost = new HttpPost();
@@ -119,7 +100,7 @@ public class AcrolinxProxyServlet extends HttpServlet
     }
 
     @Override
-    public void doPut(final HttpServletRequest httpServletRequest, final HttpServletResponse httpServletResponse)
+    protected void doPut(final HttpServletRequest httpServletRequest, final HttpServletResponse httpServletResponse)
             throws IOException
     {
         final HttpPut httpPut = new HttpPut();
@@ -129,7 +110,7 @@ public class AcrolinxProxyServlet extends HttpServlet
     }
 
     @Override
-    public void doGet(final HttpServletRequest httpServletRequest, final HttpServletResponse httpServletResponse)
+    protected void doGet(final HttpServletRequest httpServletRequest, final HttpServletResponse httpServletResponse)
             throws IOException
     {
         final HttpGet httpGet = new HttpGet();
@@ -142,27 +123,22 @@ public class AcrolinxProxyServlet extends HttpServlet
     {
         copyHeaders(httpServletRequest, httpRequestBase);
 
-        modifyRequest(httpRequestBase, httpServletRequest);
+        modifyRequest(httpServletRequest, httpRequestBase);
 
         // TODO: Make sure not to call the following line in case a user is not
         // authenticated to the application.
-        addSingleSignOn(httpRequestBase);
+        addSingleSignOnHeaders(httpRequestBase);
 
-        CloseableHttpResponse httpResponse = null;
-        InputStream inputStream = null;
-        OutputStream outputStream = null;
+        logger.debug("Sending request to Acrolinx");
 
-        try {
-            logger.debug("Sending request to Acrolinx");
-            httpResponse = closeableHttpClient.execute(httpRequestBase);
-
+        try (CloseableHttpResponse httpResponse = closeableHttpClient.execute(httpRequestBase)) {
             final int status = httpResponse.getStatusLine().getStatusCode();
             logger.debug("Response received: {}", status);
             servletResponse.setStatus(status);
 
-            Header[] clonedHeaders = httpResponse.getAllHeaders().clone();
+            Header[] allHeaders = httpResponse.getAllHeaders();
 
-            for (Header header : clonedHeaders) {
+            for (Header header : allHeaders) {
                 if (!(header.getName().startsWith("Transfer-Encoding") || header.getName().startsWith("Content-Length")
                         || header.getName().startsWith("Content-Type"))) {
                     servletResponse.setHeader(header.getName(), header.getValue());
@@ -172,69 +148,40 @@ public class AcrolinxProxyServlet extends HttpServlet
             HttpEntity httpEntity = httpResponse.getEntity();
 
             if (httpEntity != null) {
-                inputStream = httpEntity.getContent();
-                outputStream = servletResponse.getOutputStream();
+                try (InputStream inputStream = httpEntity.getContent();
+                        OutputStream outputStream = servletResponse.getOutputStream()) {
+                    servletResponse.setContentType(httpResponse.getEntity().getContentType().getValue());
+                    servletResponse.setContentLength((int) httpResponse.getEntity().getContentLength());
 
-                servletResponse.setContentType(httpResponse.getEntity().getContentType().getValue());
-                servletResponse.setContentLength((int) httpResponse.getEntity().getContentLength());
-
-                spoolResponseBody(inputStream, outputStream);
-                logger.debug("Forwarded response to client");
+                    copy(inputStream, outputStream);
+                    logger.debug("Forwarded response to client");
+                }
             }
-
-            httpResponse.close();
         } catch (final ConnectException e) {
             servletResponse.sendError(HttpURLConnection.HTTP_BAD_GATEWAY, e.getClass().getName());
             logger.error("Error while processing proxy request", e);
         } finally {
-            cleanUp(httpRequestBase, inputStream, outputStream);
-        }
-    }
-
-    private static void cleanUp(final HttpRequestBase httpRequestBase, final InputStream inputStream,
-            final OutputStream outputStream)
-    {
-        if (inputStream != null) {
-            try {
-                inputStream.close();
-            } catch (final IOException ioe) {
-                // ignore
-            }
-        }
-
-        if (outputStream != null) {
-            try {
-                outputStream.close();
-            } catch (final IOException ioe) {
-                // ignore
-            }
-        }
-
-        if (httpRequestBase != null) {
             httpRequestBase.releaseConnection();
         }
     }
 
-    private static void spoolResponseBody(final InputStream inputStream, final OutputStream outputStream)
-            throws IOException
+    private static void copy(final InputStream inputStream, final OutputStream outputStream) throws IOException
     {
-        if (inputStream != null) {
-            final byte[] buffer = new byte[8_192];
-            int n;
+        final byte[] buffer = new byte[8_192];
+        int length;
 
-            while (-1 != (n = inputStream.read(buffer))) {
-                outputStream.write(buffer, 0, n);
-            }
+        while ((length = inputStream.read(buffer)) != -1) {
+            outputStream.write(buffer, 0, length);
         }
     }
 
-    private void modifyRequest(final HttpRequestBase httpRequestBase, final HttpServletRequest httpServletRequest)
+    private void modifyRequest(final HttpServletRequest httpServletRequest, final HttpRequestBase httpRequestBase)
             throws IOException
     {
-        final URI targetURL = getTargetUri(httpServletRequest);
-        httpRequestBase.setURI(targetURL);
+        final URI targetUri = getTargetUri(httpServletRequest);
+        httpRequestBase.setURI(targetUri);
         setRequestHeader(httpRequestBase, "User-Agent", "Acrolinx Proxy");
-        setRequestHeader(httpRequestBase, "Host", targetURL.getHost());
+        setRequestHeader(httpRequestBase, "Host", targetUri.getHost());
         setRequestHeader(httpRequestBase, "X-Acrolinx-Integration-Proxy-Version", "2");
 
         // add an extra header which is needed for acrolinx to support client's reverse proxy
@@ -250,7 +197,7 @@ public class AcrolinxProxyServlet extends HttpServlet
         httpRequestBase.setHeader(headerName, headerValue);
     }
 
-    private void addSingleSignOn(final HttpRequestBase httpRequestBase)
+    private void addSingleSignOnHeaders(final HttpRequestBase httpRequestBase)
     {
         setRequestHeader(httpRequestBase, "username", getUsernameFromApplicationSession());
         setRequestHeader(httpRequestBase, "password", genericToken);
@@ -269,38 +216,35 @@ public class AcrolinxProxyServlet extends HttpServlet
 
         while (headerNames.hasMoreElements()) {
             final String headerName = headerNames.nextElement();
+            String headerValue = httpServletRequest.getHeader(headerName);
 
             if (headerName.equalsIgnoreCase("cookie")) {
-                httpRequestBase.addHeader(headerName, filterCookies(httpServletRequest.getHeader(headerName)));
-            } else {
-                httpRequestBase.addHeader(headerName, httpServletRequest.getHeader(headerName));
+                headerValue = filterCookies(headerValue);
             }
+
+            httpRequestBase.addHeader(headerName, headerValue);
         }
     }
 
-    private static String filterCookies(String rawCookie)
+    private static String filterCookies(String headerValue)
     {
-        String[] rawCookieParams = rawCookie.split(";");
-        String[] rawCookieNameAndValues = Arrays.stream(rawCookieParams).filter(
-                rawCookieNameAndValue -> rawCookieNameAndValue.toUpperCase().startsWith("X-ACROLINX-")).toArray(
-                        String[]::new);
-        String rawAcrolinxCookies = String.join(";", rawCookieNameAndValues);
-        logger.debug("Processed acrolinx cookies: {}", rawAcrolinxCookies.isEmpty());
-        return rawAcrolinxCookies;
+        return Arrays.stream(headerValue.split(";")).filter(
+                rawCookieNameAndValue -> rawCookieNameAndValue.toUpperCase().startsWith("X-ACROLINX-")).collect(
+                        Collectors.joining(";"));
     }
 
     private URI getTargetUri(final HttpServletRequest httpServletRequest) throws IOException
     {
         final String queryPart = httpServletRequest.getQueryString() != null ? "?" + httpServletRequest.getQueryString()
                 : "";
-        final String urlStr = acrolinxURL + httpServletRequest.getPathInfo() + queryPart;
+        final String uriString = acrolinxUrl + httpServletRequest.getPathInfo() + queryPart;
 
         try {
-            URI targetURI = new URI(urlStr);
-            logger.debug("Request URL: {}", targetURI);
-            return targetURI;
+            URI targetUri = new URI(uriString);
+            logger.debug("Request URI: {}", targetUri);
+            return targetUri;
         } catch (final URISyntaxException e) {
-            throw new IOException("Not a valid URI", e);
+            throw new IOException(e);
         }
     }
 }

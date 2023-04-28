@@ -7,7 +7,6 @@
 	<servlet>
 		<servlet-name>AcrolinxProxyServlet</servlet-name>
 		<display-name>AcrolinxProxyServlet</display-name>
-		<description></description>
 		<servlet-class>com.acrolinx.proxy.AcrolinxProxyServlet</servlet-class>
 
 		<init-param>
@@ -22,8 +21,8 @@
 			<param-name>genericToken</param-name>
 			<param-value>secret</param-value>
 		</init-param>
-
 	</servlet>
+
 	<servlet-mapping>
 		<servlet-name>AcrolinxProxyServlet</servlet-name>
 		<url-pattern>/proxy/*</url-pattern>
