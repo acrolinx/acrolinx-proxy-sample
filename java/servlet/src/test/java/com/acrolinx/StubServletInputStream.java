@@ -31,6 +31,7 @@ class StubServletInputStream extends ServletInputStream
     @Override
     public void setReadListener(ReadListener readListener)
     {
+        // do nothing
     }
 
     @Override

@@ -1,9 +1,8 @@
 
 package com.acrolinx;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -17,19 +16,16 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import com.acrolinx.proxy.AcrolinxProxyServlet;
 
 import io.github.cdimascio.dotenv.Dotenv;
 
-@RunWith(MockitoJUnitRunner.class)
-public class AcrolinxProxyTest
+class AcrolinxProxyTest
 {
     private static final Dotenv dotenv = Dotenv.configure().ignoreIfMissing().load();
     private static final String CLIENT_SIGNATURE = dotenv.get("ACROLINX_DEV_SIGNATURE");
@@ -41,40 +37,34 @@ public class AcrolinxProxyTest
     private static final String PROXY_PATH = "proxySample/proxy";
 
     private final StubServletOutputStream servletOutputStream = new StubServletOutputStream();
+    private final ServletConfig servletConfig = Mockito.mock(ServletConfig.class);
+    private final HttpServletRequest httpServletRequest = Mockito.mock(HttpServletRequest.class);
+    private final HttpServletResponse httpServletResponse = Mockito.mock(HttpServletResponse.class);
 
-    @Mock
-    private ServletConfig servletConfig;
-
-    @Mock
-    private HttpServletRequest httpServletRequest;
-
-    @Mock
-    private HttpServletResponse httpServletResponse;
-
-    @Before
-    public void setUp() throws IOException
+    @BeforeEach
+    void beforeEach() throws IOException
     {
         initializeRequestResponse(false);
     }
 
     @Test
-    public void testSimpleGet() throws IOException, ServletException
+    void testSimpleGet() throws IOException, ServletException
     {
         String api = "/api/v1";
-        when(httpServletRequest.getRequestURL()).thenReturn(
+        Mockito.when(httpServletRequest.getRequestURL()).thenReturn(
                 new StringBuffer(LOCAL_SERVER_URL + "/proxySample/proxy" + api));
-        when(httpServletRequest.getPathInfo()).thenReturn("/api/v1");
+        Mockito.when(httpServletRequest.getPathInfo()).thenReturn("/api/v1");
 
         final AcrolinxProxyServlet acrolinxProxyServlet = new AcrolinxProxyServlet();
         acrolinxProxyServlet.init(servletConfig);
         acrolinxProxyServlet.doGet(httpServletRequest, httpServletResponse);
 
         final byte[] data = servletOutputStream.byteArrayOutputStream.toByteArray();
-        Assert.assertTrue(data.length > 0);
+        Assertions.assertTrue(data.length > 0);
     }
 
     @Test
-    public void testFetchingSidebarHTML() throws IOException, ServletException
+    void testFetchingSidebarHTML() throws IOException, ServletException
     {
         String api = "/sidebar/v14/index.html";
         setRequestUrl(api);
@@ -84,29 +74,30 @@ public class AcrolinxProxyTest
         acrolinxProxyServlet.doGet(httpServletRequest, httpServletResponse);
 
         final byte[] data = servletOutputStream.byteArrayOutputStream.toByteArray();
-        Assert.assertTrue(data.length > 0);
+        Assertions.assertTrue(data.length > 0);
 
         String responseBody = new String(data);
         assertTrue(responseBody.contains("<title>Acrolinx</title>"));
     }
 
     @Test
-    public void testSignInSSO() throws IOException, ServletException {
-        when(httpServletRequest.getInputStream()).thenReturn(new StubServletInputStream(""));
+    void testSignInSSO() throws IOException, ServletException
+    {
+        Mockito.when(httpServletRequest.getInputStream()).thenReturn(new StubServletInputStream(""));
 
         final AcrolinxProxyServlet acrolinxProxyServlet = new AcrolinxProxyServlet();
         acrolinxProxyServlet.init(servletConfig);
 
         String signInResult = post(acrolinxProxyServlet, "/api/v1/auth/sign-ins", "");
 
-        assertTrue(signInResult + " should contain ACROLINX_SSO", signInResult.contains("ACROLINX_SSO"));
-        assertTrue(signInResult + " should contain getUser", signInResult.contains("getUser"));
-        assertTrue(signInResult + " should contain accessToken", signInResult.contains("accessToken"));
-        assertTrue(signInResult + " should contain Success", signInResult.contains("Success"));
+        assertTrue(signInResult.contains("ACROLINX_SSO"), signInResult);
+        assertTrue(signInResult.contains("getUser"), signInResult);
+        assertTrue(signInResult.contains("accessToken"), signInResult);
+        assertTrue(signInResult.contains("Success"), signInResult);
     }
 
     @Test
-    public void testSubmitCheck() throws IOException, ServletException
+    void testSubmitCheck() throws IOException, ServletException
     {
         AcrolinxProxyServlet acrolinxProxyServlet = new AcrolinxProxyServlet();
         acrolinxProxyServlet.init(servletConfig);
@@ -117,12 +108,12 @@ public class AcrolinxProxyTest
         initializeRequestResponse(true);
         String resultResponseBody = post(acrolinxProxyServlet, "/api/v1/checking/checks", postData);
 
-        assertTrue("Check response should look like json. Request: " + postData + " Response: " + resultResponseBody,
-                resultResponseBody.trim().startsWith("{") && resultResponseBody.trim().endsWith("}"));
+        assertTrue(resultResponseBody.trim().startsWith("{") && resultResponseBody.trim().endsWith("}"),
+                "Request: \" + postData + \" Response: \" + resultResponseBody");
     }
 
     @Test
-    public void testCheckAndGetScoreCardThroughProxy() throws IOException, ServletException, InterruptedException
+    void testCheckAndGetScoreCardThroughProxy() throws IOException, ServletException, InterruptedException
     {
         AcrolinxProxyServlet acrolinxProxyServlet = new AcrolinxProxyServlet();
         acrolinxProxyServlet.init(servletConfig);
@@ -131,8 +122,7 @@ public class AcrolinxProxyTest
         String pollResponseBody = check(acrolinxProxyServlet, postData);
 
         if (pollResponseBody.contains("customFieldsIncorrect")) {
-            assertTrue("Expect that the respnse would require to set the custom field called Name. Response: "
-                    + pollResponseBody, pollResponseBody.contains("Name"));
+            assertTrue(pollResponseBody.contains("Name"), pollResponseBody);
             postData = createCheckBody(true); // Set hard coded custom field called "Name"
             pollResponseBody = check(acrolinxProxyServlet, postData);
         }
@@ -148,21 +138,22 @@ public class AcrolinxProxyTest
         Thread.sleep(1_000);
 
         String scorecardResponseBody = get(acrolinxProxyServlet, scorecardUrlRequest);
-        assertTrue("Doesn't look like a score card. Request: " + postData + "\nresponse: " + scorecardResponseBody,
-                scorecardResponseBody.contains("<title>Scorecard</title>"));
+        assertTrue(scorecardResponseBody.contains("<title>Scorecard</title>"),
+                "Request: \" + postData + \"\\nresponse: \" + scorecardResponseBody");
     }
 
     @Test
-    public void testSsoCheckAndGetScoreCardThroughProxy() throws IOException, ServletException, InterruptedException {
-        when(httpServletRequest.getInputStream()).thenReturn(new StubServletInputStream(""));
+    void testSsoCheckAndGetScoreCardThroughProxy() throws IOException, ServletException, InterruptedException
+    {
+        Mockito.when(httpServletRequest.getInputStream()).thenReturn(new StubServletInputStream(""));
 
         final AcrolinxProxyServlet acrolinxProxyServlet = new AcrolinxProxyServlet();
         acrolinxProxyServlet.init(servletConfig);
 
         String signInResult = post(acrolinxProxyServlet, "/api/v1/auth/sign-ins", "");
 
-        assertTrue(signInResult + " should contain ACROLINX_SSO", signInResult.contains("ACROLINX_SSO"));
-        assertTrue(signInResult + " should contain accessToken", signInResult.contains("accessToken"));
+        assertTrue(signInResult.contains("ACROLINX_SSO"), signInResult);
+        assertTrue(signInResult.contains("accessToken"), signInResult);
 
         initializeRequestResponse(getJsonValue(signInResult, "accessToken"));
 
@@ -170,8 +161,7 @@ public class AcrolinxProxyTest
         String pollResponseBody = check(acrolinxProxyServlet, postData);
 
         if (pollResponseBody.contains("customFieldsIncorrect")) {
-            assertTrue("Expect that the respnse would require to set the custom field called Name. Response: "
-                    + pollResponseBody, pollResponseBody.contains("Name"));
+            assertTrue(pollResponseBody.contains("Name"), pollResponseBody);
             postData = createCheckBody(true); // Set hard coded custom field called "Name"
             pollResponseBody = check(acrolinxProxyServlet, postData);
         }
@@ -186,8 +176,8 @@ public class AcrolinxProxyTest
 
         Thread.sleep(1_000);
         String scorecardResponseBody = get(acrolinxProxyServlet, scorecardUrlRequest);
-        assertTrue("Doesn't look like a score card. Request: " + postData + "\nresponse: " + scorecardResponseBody,
-                scorecardResponseBody.contains("<title>Scorecard</title>"));
+        assertTrue(scorecardResponseBody.contains("<title>Scorecard</title>"),
+                "Request: " + postData + "\nresponse: " + scorecardResponseBody);
     }
 
     private String check(AcrolinxProxyServlet acrolinxProxyServlet, String postData)
@@ -252,18 +242,20 @@ public class AcrolinxProxyTest
     private void setRequestData(String postData) throws IOException
     {
         final StubServletInputStream stubServletInputStream = new StubServletInputStream(postData);
-        when(httpServletRequest.getInputStream()).thenReturn(stubServletInputStream);
+        Mockito.when(httpServletRequest.getInputStream()).thenReturn(stubServletInputStream);
     }
 
-    private void setRequestUrl(String api) {
-        when(httpServletRequest.getRequestURL()).thenReturn(new StringBuffer(LOCAL_SERVER_URL + "/proxySample/proxy" + api));
-        when(httpServletRequest.getPathInfo()).thenReturn(api);
+    private void setRequestUrl(String api)
+    {
+        Mockito.when(httpServletRequest.getRequestURL()).thenReturn(
+                new StringBuffer(LOCAL_SERVER_URL + "/proxySample/proxy" + api));
+        Mockito.when(httpServletRequest.getPathInfo()).thenReturn(api);
     }
 
     private String readBody()
     {
         byte[] data = servletOutputStream.byteArrayOutputStream.toByteArray();
-        Assert.assertTrue(data.length > 0);
+        Assertions.assertTrue(data.length > 0);
 
         return new String(data);
     }
@@ -287,19 +279,19 @@ public class AcrolinxProxyTest
 
         if (addAuthToken) {
             headers.add("X-Acrolinx-Auth");
-            when(httpServletRequest.getHeader("X-Acrolinx-Auth")).thenReturn(token);
+            Mockito.when(httpServletRequest.getHeader("X-Acrolinx-Auth")).thenReturn(token);
         }
 
-        when(httpServletRequest.getHeaderNames()).thenReturn(Collections.enumeration(headers));
-        when(httpServletRequest.getQueryString()).thenReturn("");
+        Mockito.when(httpServletRequest.getHeaderNames()).thenReturn(Collections.enumeration(headers));
+        Mockito.when(httpServletRequest.getQueryString()).thenReturn("");
 
-        when(httpServletRequest.getHeader("X-Acrolinx-Client")).thenReturn(CLIENT_SIGNATURE);
-        when(httpServletRequest.getHeader("X-Acrolinx-Client-Locale")).thenReturn("en-US");
-        when(httpServletRequest.getHeader("Content-Type")).thenReturn("application/json");
+        Mockito.when(httpServletRequest.getHeader("X-Acrolinx-Client")).thenReturn(CLIENT_SIGNATURE);
+        Mockito.when(httpServletRequest.getHeader("X-Acrolinx-Client-Locale")).thenReturn("en-US");
+        Mockito.when(httpServletRequest.getHeader("Content-Type")).thenReturn("application/json");
 
-        when(servletConfig.getInitParameter("acrolinxURL")).thenReturn(ACROLINX_URL);
-        when(servletConfig.getInitParameter("genericToken")).thenReturn(ACROLINX_API_SSO_TOKEN);
-        when(servletConfig.getInitParameter("username")).thenReturn(ACROLINX_API_USERNAME);
-        when(httpServletResponse.getOutputStream()).thenReturn(servletOutputStream);
+        Mockito.when(servletConfig.getInitParameter("acrolinxURL")).thenReturn(ACROLINX_URL);
+        Mockito.when(servletConfig.getInitParameter("genericToken")).thenReturn(ACROLINX_API_SSO_TOKEN);
+        Mockito.when(servletConfig.getInitParameter("username")).thenReturn(ACROLINX_API_USERNAME);
+        Mockito.when(httpServletResponse.getOutputStream()).thenReturn(servletOutputStream);
     }
 }
