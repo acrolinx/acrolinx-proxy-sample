@@ -1,5 +1,5 @@
 
-package com.acrolinx;
+package com.acrolinx.proxy;
 
 import java.io.ByteArrayOutputStream;
 
