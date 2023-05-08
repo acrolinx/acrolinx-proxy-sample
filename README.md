@@ -4,7 +4,7 @@ Demo code for implementing a proxy in a single sign-on environment for [Acrolinx
 
 ## Prerequisites
 
-Please contact [Acrolinx SDK support](https://github.com/acrolinx/acrolinx-coding-guidance/blob/master/topics/sdk-support.md)
+Please contact [Acrolinx SDK support](https://github.com/acrolinx/acrolinx-coding-guidance/blob/main/topics/sdk-support.md)
 for consulting and getting your integration certified.
 This sample works with a test license on an internal Acrolinx URL.
 This license is only meant for demonstration and developing purposes.
@@ -14,7 +14,7 @@ Acrolinx offers different other SDKs, and examples for developing integrations.
 
 Before you start developing your own integration, you might benefit from looking into:
 
-* [Getting Started with Custom Integrations](https://docs.acrolinx.com/customintegrations), and
+* [Build With Acrolinx](https://support.acrolinx.com/hc/en-us/categories/10209837818770-Build-With-Acrolinx), and
 * the [Guidance for the Development of Acrolinx Integrations](https://github.com/acrolinx/acrolinx-coding-guidance).
 
 ## Overview
@@ -31,14 +31,14 @@ To enable single sign-on, add the following example properties to the `coreserve
 singleSignOn.genericPassword=secret
 ```
 
-See: [Setting Up Your Core Platform for single sign-on](https://docs.acrolinx.com/display/CP/Set+Up+Acrolinx+for+Single+Sign-on).
+See: [ About Single Sign-On with Acrolinx ](https://support.acrolinx.com/hc/en-us/articles/10306041280274-About-Single-Sign-On-with-Acrolinx).
 
 *Note: Make sure that you use a proper secret for the `genericPassword`.*
 *Note: Older Acrolinx Platform versions might require more configuration properties to be set.*
 
 ### Configure the Integration
 
-In the [`config.js`](https://github.com/acrolinx/acrolinx-sidebar-demo/blob/master/samples/config.js) of your Acrolinx Integration,
+In the [`config.js`](https://github.com/acrolinx/acrolinx-sidebar-demo/blob/main/samples/config.js) of your Acrolinx Integration,
 set the Acrolinx URL to point to the relative proxy path as follows:
 
 ```javascript
@@ -66,7 +66,7 @@ See also:
 
 ### Security
 
-Make sure to implement the proxy in a [secure way](https://github.com/acrolinx/acrolinx-coding-guidance/blob/master/topics/security-safety.md#security).
+Make sure to implement the proxy in a [secure way](https://github.com/acrolinx/acrolinx-coding-guidance/blob/main/topics/security-safety.md#security).
 Especially take care of:
 
 * The entire authentication is checked in the proxy layer.
@@ -96,7 +96,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at:
 
-[http://www.apache.org/licenses/LICENSE-2.0](http://www.apache.org/licenses/LICENSE-2.0)
+[https://www.apache.org/licenses/LICENSE-2.0](https://www.apache.org/licenses/LICENSE-2.0)
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
