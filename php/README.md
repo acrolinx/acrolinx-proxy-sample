@@ -41,4 +41,4 @@ You should see a result like:
 {"links":{"getUser":"http://localhost:8888/acrolinx/proxy.php/api/v1/user/123","updateUser":"http://localhost:8888/acrolinx/proxy.php/api/v1/user/123"},"data":{"accessToken":"abc.def.ghi","user":{"id":"123","username":"testUser"},"authorizedUsing":"ACROLINX_SSO","state":"Success","doNotStoreAccessToken":"false"},"addons":[]}}}
 ```
 
-*Note:* Make sure to implement the proxy in a [secure way](https://github.com/acrolinx/acrolinx-coding-guidance/blob/master/topics/security-safety.md#security).
+*Note:* Make sure to implement the proxy in a [secure way](https://github.com/acrolinx/acrolinx-coding-guidance/blob/main/topics/security-safety.md#security).
