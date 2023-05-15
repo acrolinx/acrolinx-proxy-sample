@@ -42,7 +42,7 @@ In the [`config.js`](https://github.com/acrolinx/acrolinx-sidebar-demo/blob/main
 set the Acrolinx URL to point to the relative proxy path as follows:
 
 ```javascript
-serverAddress: '/proxySample/proxy'
+serverAddress: '/proxy-sample/proxy'
 ```
 
 Make sure:

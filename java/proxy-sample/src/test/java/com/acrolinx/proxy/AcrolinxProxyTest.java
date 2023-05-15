@@ -32,7 +32,7 @@ class AcrolinxProxyTest
     private static final String ACROLINX_API_SSO_TOKEN = dotenv.get("ACROLINX_API_SSO_TOKEN");
     private static final String ACROLINX_API_USERNAME = dotenv.get("ACROLINX_API_USERNAME");
     private static final String ACROLINX_API_TOKEN_STRING = dotenv.get("ACROLINX_API_TOKEN");
-    private static final String PROXY_PATH = "proxySample/proxy";
+    private static final String PROXY_PATH = "proxy-sample/proxy";
 
     private final StubServletOutputStream servletOutputStream = new StubServletOutputStream();
     private final ServletConfig servletConfig = Mockito.mock(ServletConfig.class);
@@ -50,7 +50,7 @@ class AcrolinxProxyTest
     {
         String api = "/api/v1";
         Mockito.when(httpServletRequest.getRequestURL()).thenReturn(
-                new StringBuffer(LOCAL_SERVER_URL + "/proxySample/proxy" + api));
+                new StringBuffer(LOCAL_SERVER_URL + "/proxy-sample/proxy" + api));
         Mockito.when(httpServletRequest.getPathInfo()).thenReturn("/api/v1");
 
         final AcrolinxProxyServlet acrolinxProxyServlet = new AcrolinxProxyServlet();
@@ -246,7 +246,7 @@ class AcrolinxProxyTest
     private void setRequestUrl(String api)
     {
         Mockito.when(httpServletRequest.getRequestURL()).thenReturn(
-                new StringBuffer(LOCAL_SERVER_URL + "/proxySample/proxy" + api));
+                new StringBuffer(LOCAL_SERVER_URL + "/proxy-sample/proxy" + api));
         Mockito.when(httpServletRequest.getPathInfo()).thenReturn(api);
     }
 
