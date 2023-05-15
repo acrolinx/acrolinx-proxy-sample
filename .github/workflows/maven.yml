@@ -38,5 +38,5 @@ jobs:
         ACROLINX_API_TOKEN: ${{ secrets.TEST_SERVER_API_TOKEN_STABLE }}
         ACROLINX_DEV_SIGNATURE: ${{ secrets.ACROLINX_DEV_SIGNATURE }}
       run: |
-        cd java/servlet/
+        cd java/proxy-sample/
         mvn clean verify

@@ -28,14 +28,14 @@ Deploy to a Web container like Apache Tomcat:
 ```bash
 cd java/servlet
 mvn package
-cp target/proxySample.war <WEBCONTAINER>/webapps/
+cp target/proxy-sample.war <WEBCONTAINER>/webapps/
 ```
 
 ### Test the Proxy
 
 The given sample demonstrates consuming the rest call `api/v1/auth/sign-ins` for Acrolinx authentication.
 
-If you open `http://<WEBCONTAINER>/proxySample/`, like [http://localhost:8080/proxySample/](http://localhost:8080/proxySample/)
+If you open `http://<WEBCONTAINER>/proxy-sample/`, like [http://localhost:8080/proxy-sample/](http://localhost:8080/proxy-sample/)
 then press the sign-in button and it will either give you the interactive URL to the complete sign-in,
 or a success message with details.
 
@@ -47,7 +47,7 @@ or a success message with details.
 4. To build the `war`-file, run `mvn package -DskipTests`.
 5. To build a docker image, run `docker build -t mywebapp ./`
 6. Run the docker image, by running `docker run -p 8888:8080 mywebapp`.
-7. Connect using a web browser [localhost:8888/proxySample](http://localhost:8888/proxySample/).
+7. Connect using a web browser [localhost:8888/proxy-sample](http://localhost:8888/proxy-sample/).
 
 ### Troubleshooting
 
