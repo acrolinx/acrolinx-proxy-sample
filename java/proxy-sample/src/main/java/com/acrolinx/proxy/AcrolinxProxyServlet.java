@@ -118,8 +118,8 @@ public class AcrolinxProxyServlet extends HttpServlet
         proxyRequest(httpServletRequest, httpServletResponse, httpGet);
     }
 
-    private void proxyRequest(final HttpServletRequest httpServletRequest, final HttpServletResponse servletResponse,
-            final HttpRequestBase httpRequestBase) throws IOException
+    private void proxyRequest(final HttpServletRequest httpServletRequest,
+            final HttpServletResponse httpServletResponse, final HttpRequestBase httpRequestBase) throws IOException
     {
         copyHeaders(httpServletRequest, httpRequestBase);
 
@@ -134,14 +134,12 @@ public class AcrolinxProxyServlet extends HttpServlet
         try (CloseableHttpResponse httpResponse = closeableHttpClient.execute(httpRequestBase)) {
             final int status = httpResponse.getStatusLine().getStatusCode();
             logger.debug("Response received: {}", status);
-            servletResponse.setStatus(status);
+            httpServletResponse.setStatus(status);
 
-            Header[] allHeaders = httpResponse.getAllHeaders();
-
-            for (Header header : allHeaders) {
+            for (Header header : httpResponse.getAllHeaders()) {
                 if (!(header.getName().startsWith("Transfer-Encoding") || header.getName().startsWith("Content-Length")
                         || header.getName().startsWith("Content-Type"))) {
-                    servletResponse.setHeader(header.getName(), header.getValue());
+                    httpServletResponse.setHeader(header.getName(), header.getValue());
                 }
             }
 
@@ -149,29 +147,19 @@ public class AcrolinxProxyServlet extends HttpServlet
 
             if (httpEntity != null) {
                 try (InputStream inputStream = httpEntity.getContent();
-                        OutputStream outputStream = servletResponse.getOutputStream()) {
-                    servletResponse.setContentType(httpResponse.getEntity().getContentType().getValue());
-                    servletResponse.setContentLength((int) httpResponse.getEntity().getContentLength());
+                        OutputStream outputStream = httpServletResponse.getOutputStream()) {
+                    httpServletResponse.setContentType(httpResponse.getEntity().getContentType().getValue());
+                    httpServletResponse.setContentLength((int) httpResponse.getEntity().getContentLength());
 
-                    copy(inputStream, outputStream);
+                    inputStream.transferTo(outputStream);
                     logger.debug("Forwarded response to client");
                 }
             }
         } catch (final ConnectException e) {
-            servletResponse.sendError(HttpURLConnection.HTTP_BAD_GATEWAY, e.getClass().getName());
+            httpServletResponse.sendError(HttpURLConnection.HTTP_BAD_GATEWAY, e.getClass().getName());
             logger.error("Error while processing proxy request", e);
         } finally {
             httpRequestBase.releaseConnection();
-        }
-    }
-
-    private static void copy(final InputStream inputStream, final OutputStream outputStream) throws IOException
-    {
-        final byte[] buffer = new byte[8_192];
-        int length;
-
-        while ((length = inputStream.read(buffer)) != -1) {
-            outputStream.write(buffer, 0, length);
         }
     }
 
