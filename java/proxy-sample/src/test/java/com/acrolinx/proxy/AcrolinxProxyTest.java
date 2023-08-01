@@ -230,6 +230,7 @@ class AcrolinxProxyTest
         Matcher matcher = pattern.matcher(resultResponseBody);
 
         String result = null;
+
         while (matcher.find()) {
             result = matcher.group(1);
         }
