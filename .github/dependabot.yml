@@ -1,0 +1,8 @@
+version: 2
+updates:
+  - package-ecosystem: "maven"
+    directory: "/java/proxy-sample/"
+    schedule:
+      interval: "daily"
+    reviewers:
+      - /acrolinx/integrationdevs-java
