@@ -9,7 +9,7 @@ import javax.servlet.ServletInputStream;
 
 class StubServletInputStream extends ServletInputStream
 {
-    private ByteArrayInputStream byteArrayInputStream;
+    private final ByteArrayInputStream byteArrayInputStream;
 
     StubServletInputStream(String postData)
     {
