@@ -10,31 +10,47 @@ on:
   workflow_dispatch:
 
 jobs:
+  Sonar-Check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Sonar analysis
+        env:
+          ACROLINX_API_USERNAME: ${{ secrets.TEST_SERVER_USERNAME }}
+          ACROLINX_API_SSO_TOKEN: ${{ secrets.TEST_SERVER_SSO_TOKEN }}
+          ACROLINX_URL: ${{ secrets.TEST_SERVER_URL_STABLE }}
+          ACROLINX_API_TOKEN: ${{ secrets.TEST_SERVER_API_TOKEN_STABLE }}
+          ACROLINX_DEV_SIGNATURE: ${{ secrets.ACROLINX_DEV_SIGNATURE }}
+          SONAR_TOKEN: ${{ secrets.SONARCLOUD_TOKEN }}
+        run: mvn --file java/proxy-sample/pom.xml clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=acrolinx_acrolinx-proxy-sample
+
   build:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        shell: bash
-
     steps:
-    - uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
+      - name: Checkout
+        uses: actions/checkout@v3
 
-    - name: Setup Java
-      uses: actions/setup-java@v3
-      with:
-        java-version: '11'
-        distribution: 'adopt'
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: '11'
+          distribution: 'temurin'
 
-    - name: Build and test proxy with Stable
-      env:
-        ACROLINX_API_USERNAME: ${{ secrets.TEST_SERVER_USERNAME }}
-        ACROLINX_API_SSO_TOKEN: ${{ secrets.TEST_SERVER_SSO_TOKEN }}
-        ACROLINX_URL: ${{ secrets.TEST_SERVER_URL_STABLE }}
-        ACROLINX_API_TOKEN: ${{ secrets.TEST_SERVER_API_TOKEN_STABLE }}
-        ACROLINX_DEV_SIGNATURE: ${{ secrets.ACROLINX_DEV_SIGNATURE }}
-        SONAR_TOKEN: ${{ secrets.SONARCLOUD_TOKEN }}
-      run: |
-        cd java/proxy-sample/
-        mvn -B clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=acrolinx_acrolinx-proxy-sample
+      - name: Maven build
+        env:
+          ACROLINX_API_USERNAME: ${{ secrets.TEST_SERVER_USERNAME }}
+          ACROLINX_API_SSO_TOKEN: ${{ secrets.TEST_SERVER_SSO_TOKEN }}
+          ACROLINX_URL: ${{ secrets.TEST_SERVER_URL_STABLE }}
+          ACROLINX_API_TOKEN: ${{ secrets.TEST_SERVER_API_TOKEN_STABLE }}
+          ACROLINX_DEV_SIGNATURE: ${{ secrets.ACROLINX_DEV_SIGNATURE }}
+        run: mvn --file java/proxy-sample/pom.xml clean verify
