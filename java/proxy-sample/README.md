@@ -42,7 +42,7 @@ or a success message with details.
 ### Test Using Docker
 
 1. Make sure [docker](https://www.docker.com/) is installed.
-2. Make sure you are in the directory `java/servlet`.
+2. Make sure you are in the directory `java/proxy-sample`.
 3. [Configure](#configure-acrolinx-java-servlet-example) the proxy [`web.xml`](src/main/webapp/WEB-INF/web.xml).
 4. To build the `war`-file, run `mvn package -DskipTests`.
 5. To build a docker image, run `docker build -t mywebapp ./`
@@ -62,10 +62,9 @@ Restart your Web server.
 
 ##### See Also
 
-* [java-https-tester](https://github.com/acrolinx/java-https-tester)
 * [Acrolinx Secure Tunnel](https://github.com/acrolinx/secure-tunnel)
 
 ## Java Class Overview
 
-The servlet `com.acrolinx.AcrolinxProxyServlet` acts as a reverse proxy.
+The servlet `com.acrolinx.proxy.AcrolinxProxyServlet` acts as a reverse proxy.
 The Acrolinx Integration uses this servlet to communicate with the Acrolinx Core Platform.
