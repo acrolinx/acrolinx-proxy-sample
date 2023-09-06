@@ -5,10 +5,8 @@
  * Author - Acrolinx
  * Version - 1.1
  */
-
 class Proxy
 {
-
     private $settings;
     private $targetPath;
     private $username;
@@ -42,7 +40,6 @@ class Proxy
         } else {
             echo "Ensure correct location of proxy.php on server is set. Check $part variable.";
         }
-
     }
 
     private function getSettings()
@@ -57,6 +54,7 @@ class Proxy
             $acrolinxSettings['password'] = $acrolinxSettings['genericPassword'];
             $acrolinxSettings['username'] = get_current_user(); //TODO: Implement get_current_user, which retrieves the username from the current session.
         }
+
         return $acrolinxSettings;
     }
 
@@ -114,7 +112,6 @@ class Proxy
         //curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
         //curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
 
-
         //Uncomment and set certificate path for SSL verification.
 
         //curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
@@ -128,6 +125,7 @@ class Proxy
         } else {
             self::processResponse($response);
         }
+
         curl_close($ch);
     }
 
@@ -143,6 +141,7 @@ class Proxy
         $requestHeaders = (function_exists('getallheaders')) ? getallheaders() : self::emulate_getallheaders();
         $headers = array();
         $isHostHeaderPresent = 0;
+
         foreach ($requestHeaders as $name => $value) {
             $headerString = $name . ':' . $value;
 
@@ -161,9 +160,11 @@ class Proxy
 
         $this->username = 'username:' . $this->settings['username'];
         $this->password = 'password:' . $this->settings['password'];
+
         if (!$isHostHeaderPresent) {
             array_push($headers, 'Host:' . $this->host);
         }
+
         array_push($headers, $this->username);
         array_push($headers, $this->password);
         array_push($headers, 'User-Agent:Acrolinx Proxy');
@@ -176,12 +177,14 @@ class Proxy
     private function filterCookies($cookieString) {
         $acrolinxCookies = array();
         $cookies =  explode(";", $cookieString);
+
         foreach ($cookies as &$cookie) {
             $trimedCookie = trim($cookie, " ");
             if (strpos($trimedCookie, 'X-Acrolinx-') === 0) {
                 array_push($acrolinxCookies, $trimedCookie);
             }
         }
+
         return join(";", $acrolinxCookies);
     }
 
@@ -197,7 +200,6 @@ class Proxy
         $pos = strpos($baseURL, $part);
         $baseURL = substr_replace($baseURL, '', ($pos+strlen($part)));
         return $baseURL;
-
     }
 
     private function emulate_getallheaders()
@@ -212,6 +214,7 @@ class Proxy
                 $headers["Content-Length"] = $value;
             }
         }
+
         return $headers;
     }
 

@@ -83,9 +83,6 @@ Out of the box and HTTP clients might not be able to connect.
 Make sure that you configured your VM, operating system, and backend to allow connections with modern
 [TLS versions](https://en.wikipedia.org/wiki/Transport_Layer_Security).
 
-*Note:* [test-ssl.acrolinx.com](https://test-ssl.acrolinx.com) is configured to allow more TLS versions than typical
-production instances usually do.
-The reasoning behind this is to support older environments and simplify testing.
 Please make sure to test with an appropriate configuration before rollout.
 
 ## License
