@@ -2,7 +2,6 @@
 package com.acrolinx.proxy;
 
 import java.io.ByteArrayOutputStream;
-
 import javax.servlet.ServletOutputStream;
 import javax.servlet.WriteListener;
 

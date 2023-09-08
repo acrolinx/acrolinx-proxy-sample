@@ -3,7 +3,6 @@ package com.acrolinx.proxy;
 
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
-
 import javax.servlet.ReadListener;
 import javax.servlet.ServletInputStream;
 

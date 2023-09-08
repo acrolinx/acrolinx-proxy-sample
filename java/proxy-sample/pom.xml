@@ -121,9 +121,7 @@
 						<eclipse>
 							<file>${project.basedir}/spotless.eclipseformat.xml</file>
 						</eclipse>
-						<importOrder>
-							<file>${project.basedir}/spotless.importorder</file>
-						</importOrder>
+						<importOrder />
 						<removeUnusedImports />
 					</java>
 				</configuration>
