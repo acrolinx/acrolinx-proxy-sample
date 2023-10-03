@@ -150,11 +150,9 @@
 				<version>2.40.0</version>
 				<configuration>
 					<java>
-						<eclipse>
-							<file>${project.basedir}/spotless.eclipseformat.xml</file>
-						</eclipse>
 						<importOrder />
 						<removeUnusedImports />
+						<googleJavaFormat />
 					</java>
 				</configuration>
 				<executions>
