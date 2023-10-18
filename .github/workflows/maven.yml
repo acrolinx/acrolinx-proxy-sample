@@ -1,5 +1,4 @@
 name: Test Java Proxy 
-
 on:
   push:
     branches: [ main ]
