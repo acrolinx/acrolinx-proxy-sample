@@ -4,9 +4,9 @@
 <web-app>
 	<display-name>Acrolinx Proxy Sample</display-name>
 	<servlet>
-		<servlet-name>AcrolinxProxyServlet</servlet-name>
-		<display-name>AcrolinxProxyServlet</display-name>
-		<servlet-class>com.acrolinx.proxy.AcrolinxProxyServlet</servlet-class>
+		<servlet-name>AcrolinxProxyHttpServlet</servlet-name>
+		<display-name>AcrolinxProxyHttpServlet</display-name>
+		<servlet-class>com.acrolinx.proxy.AcrolinxProxyHttpServlet</servlet-class>
 
 		<init-param>
 			<param-name>username</param-name>
@@ -23,7 +23,7 @@
 	</servlet>
 
 	<servlet-mapping>
-		<servlet-name>AcrolinxProxyServlet</servlet-name>
+		<servlet-name>AcrolinxProxyHttpServlet</servlet-name>
 		<url-pattern>/proxy/*</url-pattern>
 	</servlet-mapping>
 </web-app>

@@ -60,10 +60,6 @@ See also:
 
 [Acrolinx Java Proxy Servlet](java/servlet/README.md)
 
-#### PHP
-
-[Acrolinx PHP Proxy](php/README.md)
-
 ### Security
 
 Make sure to implement the proxy in a [secure way](https://github.com/acrolinx/acrolinx-coding-guidance/blob/main/topics/security-safety.md#security).

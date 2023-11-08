@@ -37,8 +37,8 @@ import org.slf4j.LoggerFactory;
  * This servlet acts as a reverse proxy. The Acrolinx plug-in uses this servlet to communicate with
  * the Acrolinx core server.
  */
-public class AcrolinxProxyServlet extends HttpServlet {
-  private static final Logger logger = LoggerFactory.getLogger(AcrolinxProxyServlet.class);
+public class AcrolinxProxyHttpServlet extends HttpServlet {
+  private static final Logger logger = LoggerFactory.getLogger(AcrolinxProxyHttpServlet.class);
   private static final long serialVersionUID = 1L;
 
   // TODO: Set this path in context of your servlet's reverse proxy implementation
@@ -48,7 +48,7 @@ public class AcrolinxProxyServlet extends HttpServlet {
   private String acrolinxUrl;
   private String genericToken;
 
-  public AcrolinxProxyServlet() {
+  public AcrolinxProxyHttpServlet() {
     closeableHttpClient = createHttpClient();
   }
 
