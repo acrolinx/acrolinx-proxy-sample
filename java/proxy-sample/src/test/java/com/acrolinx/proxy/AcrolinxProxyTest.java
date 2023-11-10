@@ -57,15 +57,15 @@ class AcrolinxProxyTest {
   @Test
   void testCheckAndGetScoreCardThroughProxy()
       throws IOException, ServletException, InterruptedException {
-    AcrolinxProxyServlet acrolinxProxyServlet = createAndInitAcrolinxProxyServlet();
+    AcrolinxProxyHttpServlet acrolinxProxyHttpServlet = createAndInitAcrolinxHttpProxyServlet();
 
     String postData = createCheckBody(false);
-    String pollResponseBody = check(acrolinxProxyServlet, postData);
+    String pollResponseBody = check(acrolinxProxyHttpServlet, postData);
 
     if (pollResponseBody.contains("customFieldsIncorrect")) {
       assertTrue(pollResponseBody.contains("Name"), pollResponseBody);
       postData = createCheckBody(true);
-      pollResponseBody = check(acrolinxProxyServlet, postData);
+      pollResponseBody = check(acrolinxProxyHttpServlet, postData);
     }
 
     String scorecardUrl = getJsonValue(pollResponseBody, "Score Card\",\"link");
@@ -77,7 +77,7 @@ class AcrolinxProxyTest {
 
     Thread.sleep(1_000);
 
-    String scorecardResponseBody = doGet(acrolinxProxyServlet, scorecardUrlRequest);
+    String scorecardResponseBody = doGet(acrolinxProxyHttpServlet, scorecardUrlRequest);
     assertTrue(scorecardResponseBody.contains("<title>Scorecard</title>"), scorecardResponseBody);
   }
 
@@ -85,8 +85,9 @@ class AcrolinxProxyTest {
   void testFetchingSidebarHtml() throws IOException, ServletException {
     stubHttpServletRequest("/sidebar/v14/index.html");
 
-    final AcrolinxProxyServlet acrolinxProxyServlet = createAndInitAcrolinxProxyServlet();
-    acrolinxProxyServlet.doGet(httpServletRequest, httpServletResponse);
+    final AcrolinxProxyHttpServlet acrolinxProxyHttpServlet =
+        createAndInitAcrolinxHttpProxyServlet();
+    acrolinxProxyHttpServlet.doGet(httpServletRequest, httpServletResponse);
 
     final byte[] data = servletOutputStream.byteArrayOutputStream.toByteArray();
     Assertions.assertTrue(data.length > 0);
@@ -99,9 +100,10 @@ class AcrolinxProxyTest {
   void testSignInSSO() throws IOException, ServletException {
     setRequestData("");
 
-    final AcrolinxProxyServlet acrolinxProxyServlet = createAndInitAcrolinxProxyServlet();
+    final AcrolinxProxyHttpServlet acrolinxProxyHttpServlet =
+        createAndInitAcrolinxHttpProxyServlet();
 
-    String signInResult = doPost(acrolinxProxyServlet, "/api/v1/auth/sign-ins", "");
+    String signInResult = doPost(acrolinxProxyHttpServlet, "/api/v1/auth/sign-ins", "");
 
     assertTrue(signInResult.contains("ACROLINX_SSO"), signInResult);
     assertTrue(signInResult.contains("getUser"), signInResult);
@@ -113,8 +115,9 @@ class AcrolinxProxyTest {
   void testSimpleGet() throws IOException, ServletException {
     stubHttpServletRequest("/api/v1");
 
-    final AcrolinxProxyServlet acrolinxProxyServlet = createAndInitAcrolinxProxyServlet();
-    acrolinxProxyServlet.doGet(httpServletRequest, httpServletResponse);
+    final AcrolinxProxyHttpServlet acrolinxProxyHttpServlet =
+        createAndInitAcrolinxHttpProxyServlet();
+    acrolinxProxyHttpServlet.doGet(httpServletRequest, httpServletResponse);
 
     final byte[] data = servletOutputStream.byteArrayOutputStream.toByteArray();
     Assertions.assertTrue(data.length > 0);
@@ -125,9 +128,10 @@ class AcrolinxProxyTest {
       throws IOException, ServletException, InterruptedException {
     setRequestData("");
 
-    final AcrolinxProxyServlet acrolinxProxyServlet = createAndInitAcrolinxProxyServlet();
+    final AcrolinxProxyHttpServlet acrolinxProxyHttpServlet =
+        createAndInitAcrolinxHttpProxyServlet();
 
-    String signInResult = doPost(acrolinxProxyServlet, "/api/v1/auth/sign-ins", "");
+    String signInResult = doPost(acrolinxProxyHttpServlet, "/api/v1/auth/sign-ins", "");
 
     assertTrue(signInResult.contains("ACROLINX_SSO"), signInResult);
     assertTrue(signInResult.contains("accessToken"), signInResult);
@@ -135,12 +139,12 @@ class AcrolinxProxyTest {
     stubRequestResponse(getJsonValue(signInResult, "accessToken"));
 
     String postData = createCheckBody(false);
-    String pollResponseBody = check(acrolinxProxyServlet, postData);
+    String pollResponseBody = check(acrolinxProxyHttpServlet, postData);
 
     if (pollResponseBody.contains("customFieldsIncorrect")) {
       assertTrue(pollResponseBody.contains("Name"), pollResponseBody);
       postData = createCheckBody(true); // Set hard coded custom field called "Name"
-      pollResponseBody = check(acrolinxProxyServlet, postData);
+      pollResponseBody = check(acrolinxProxyHttpServlet, postData);
     }
 
     String scorecardUrl = getJsonValue(pollResponseBody, "Score Card\",\"link");
@@ -152,13 +156,13 @@ class AcrolinxProxyTest {
 
     Thread.sleep(1_000);
 
-    String scorecardResponseBody = doGet(acrolinxProxyServlet, scorecardUrlRequest);
+    String scorecardResponseBody = doGet(acrolinxProxyHttpServlet, scorecardUrlRequest);
     assertTrue(scorecardResponseBody.contains("<title>Scorecard</title>"), scorecardResponseBody);
   }
 
   @Test
   void testSubmitCheck() throws IOException, ServletException {
-    AcrolinxProxyServlet acrolinxProxyServlet = createAndInitAcrolinxProxyServlet();
+    AcrolinxProxyHttpServlet acrolinxProxyHttpServlet = createAndInitAcrolinxHttpProxyServlet();
 
     String postData =
         "{\"content\": \"Test content\", \"document\" : {\"reference\" : \"test.txt\""
@@ -166,17 +170,19 @@ class AcrolinxProxyTest {
             + "}";
 
     stubRequestResponse(true);
-    String resultResponseBody = doPost(acrolinxProxyServlet, "/api/v1/checking/checks", postData);
+    String resultResponseBody =
+        doPost(acrolinxProxyHttpServlet, "/api/v1/checking/checks", postData);
 
     String trimmedResultResponseBody = resultResponseBody.trim();
     assertTrue(trimmedResultResponseBody.startsWith("{"), trimmedResultResponseBody);
     assertTrue(trimmedResultResponseBody.endsWith("}"), trimmedResultResponseBody);
   }
 
-  private String check(AcrolinxProxyServlet acrolinxProxyServlet, String postData)
+  private String check(AcrolinxProxyHttpServlet acrolinxProxyHttpServlet, String postData)
       throws IOException, InterruptedException {
     stubRequestResponse(true);
-    String resultResponseBody = doPost(acrolinxProxyServlet, "/api/v1/checking/checks", postData);
+    String resultResponseBody =
+        doPost(acrolinxProxyHttpServlet, "/api/v1/checking/checks", postData);
 
     String pollingUri = getJsonValue(resultResponseBody, "result");
 
@@ -186,31 +192,31 @@ class AcrolinxProxyTest {
     String pollingUrlRequest =
         pollingUri.substring(pollingUri.indexOf(PROXY_PATH) + PROXY_PATH.length());
 
-    return doGet(acrolinxProxyServlet, pollingUrlRequest);
+    return doGet(acrolinxProxyHttpServlet, pollingUrlRequest);
   }
 
-  private AcrolinxProxyServlet createAndInitAcrolinxProxyServlet() throws ServletException {
-    final AcrolinxProxyServlet acrolinxProxyServlet = new AcrolinxProxyServlet();
-    acrolinxProxyServlet.init(servletConfig);
-    return acrolinxProxyServlet;
+  private AcrolinxProxyHttpServlet createAndInitAcrolinxHttpProxyServlet() throws ServletException {
+    final AcrolinxProxyHttpServlet acrolinxProxyHttpServlet = new AcrolinxProxyHttpServlet();
+    acrolinxProxyHttpServlet.init(servletConfig);
+    return acrolinxProxyHttpServlet;
   }
 
-  private String doGet(AcrolinxProxyServlet acrolinxProxyServlet, String pathString)
+  private String doGet(AcrolinxProxyHttpServlet acrolinxProxyHttpServlet, String pathString)
       throws IOException {
     stubHttpServletRequest(pathString);
 
-    acrolinxProxyServlet.doGet(httpServletRequest, httpServletResponse);
+    acrolinxProxyHttpServlet.doGet(httpServletRequest, httpServletResponse);
     return readBody();
   }
 
   private String doPost(
-      AcrolinxProxyServlet acrolinxProxyServlet, String pathString, String postData)
+      AcrolinxProxyHttpServlet acrolinxProxyHttpServlet, String pathString, String postData)
       throws IOException {
     stubHttpServletRequest(pathString);
 
     setRequestData(postData);
 
-    acrolinxProxyServlet.doPost(httpServletRequest, httpServletResponse);
+    acrolinxProxyHttpServlet.doPost(httpServletRequest, httpServletResponse);
     return readBody();
   }
 

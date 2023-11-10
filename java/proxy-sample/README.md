@@ -26,7 +26,7 @@ Alternatively export a `.war`-file and deploy it to your tomcat server.
 Deploy to a Web container like Apache Tomcat:
 
 ```bash
-cd java/servlet
+cd java/proxy-sample
 mvn package
 cp target/proxy-sample.war <WEBCONTAINER>/webapps/
 ```
@@ -66,5 +66,5 @@ Restart your Web server.
 
 ## Java Class Overview
 
-The servlet `com.acrolinx.proxy.AcrolinxProxyServlet` acts as a reverse proxy.
+The servlet `com.acrolinx.proxy.AcrolinxProxyHttpServlet` acts as a reverse proxy.
 The Acrolinx Integration uses this servlet to communicate with the Acrolinx Core Platform.
