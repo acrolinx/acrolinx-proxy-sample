@@ -11,4 +11,4 @@
 **/target/
 
 # Other files
-/java/proxy-sample/.env
+.env
