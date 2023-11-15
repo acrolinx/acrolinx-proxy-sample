@@ -31,7 +31,7 @@ jobs:
           ACROLINX_API_TOKEN: ${{ secrets.TEST_SERVER_API_TOKEN_STABLE }}
           ACROLINX_DEV_SIGNATURE: ${{ secrets.ACROLINX_DEV_SIGNATURE }}
           SONAR_TOKEN: ${{ secrets.SONARCLOUD_TOKEN }}
-        run: mvn --file java/proxy-sample/pom.xml clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=acrolinx_acrolinx-proxy-sample
+        run: mvn clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=acrolinx_acrolinx-proxy-sample
 
   build:
     runs-on: ubuntu-latest
@@ -52,4 +52,4 @@ jobs:
           ACROLINX_URL: ${{ secrets.TEST_SERVER_URL_STABLE }}
           ACROLINX_API_TOKEN: ${{ secrets.TEST_SERVER_API_TOKEN_STABLE }}
           ACROLINX_DEV_SIGNATURE: ${{ secrets.ACROLINX_DEV_SIGNATURE }}
-        run: mvn --file java/proxy-sample/pom.xml clean verify
+        run: mvn clean verify

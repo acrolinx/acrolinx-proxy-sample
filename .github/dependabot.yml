@@ -7,7 +7,7 @@ updates:
     reviewers:
       - /acrolinx/integrationdevs-java
   - package-ecosystem: "maven"
-    directory: "/java/proxy-sample/"
+    directory: "/"
     schedule:
       interval: "daily"
     reviewers:

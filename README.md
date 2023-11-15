@@ -1,6 +1,6 @@
-# Acrolinx Single Sign-On Proxy Sample
+# Acrolinx Single Sign-On Proxy Java Servlet Sample
 
-Demo code for implementing a proxy in a single sign-on environment for [Acrolinx](https://www.acrolinx.com/) Sidebar integrations.
+Demo code for implementing a proxy in a single sign-on environment in Java.
 
 ## Prerequisites
 
@@ -58,7 +58,26 @@ See also:
 
 #### Java Servlet
 
-[Acrolinx Java Proxy Servlet](java/servlet/README.md)
+Configure the Acrolinx URL, username, and single sign-on password in the file [`web.xml`](src/main/webapp/WEB-INF/web.xml).
+The parameter names are `acrolinxURL`, `username`, and `genericToken`.
+
+## Build and Deploy
+
+Deploy to a Web container like Apache Tomcat:
+
+```bash
+cd java/proxy-sample
+mvn package
+cp target/proxy-sample.war <WEBCONTAINER>/webapps/
+```
+
+### Test the Proxy
+
+The given sample demonstrates consuming the rest call `api/v1/auth/sign-ins` for Acrolinx authentication.
+
+If you open `http://<WEBCONTAINER>/proxy-sample/`, like [http://localhost:8080/proxy-sample/](http://localhost:8080/proxy-sample/)
+then press the sign-in button and it will either give you the interactive URL to the complete sign-in,
+or a success message with details.
 
 ### Security
 
@@ -80,6 +99,10 @@ Make sure that you configured your VM, operating system, and backend to allow co
 [TLS versions](https://en.wikipedia.org/wiki/Transport_Layer_Security).
 
 Please make sure to test with an appropriate configuration before rollout.
+
+##### See Also
+
+* [Acrolinx Secure Tunnel](https://github.com/acrolinx/secure-tunnel)
 
 ## License
 
