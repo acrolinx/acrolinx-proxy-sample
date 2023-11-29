@@ -1,5 +1,4 @@
-/* Copyright (c) 2016 Acrolinx GmbH */
-
+/* Copyright (c) 2023 Acrolinx GmbH */
 package com.acrolinx.proxy;
 
 import org.apache.http.HttpRequest;
