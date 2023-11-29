@@ -1,3 +1,4 @@
+/* Copyright (c) 2023 Acrolinx GmbH */
 package com.acrolinx.proxy;
 
 import java.io.ByteArrayInputStream;

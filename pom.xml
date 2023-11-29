@@ -73,6 +73,9 @@
             <importOrder/>
             <removeUnusedImports/>
             <googleJavaFormat/>
+            <licenseHeader>
+              <content>/* Copyright (c) $YEAR Acrolinx GmbH */</content>
+            </licenseHeader>
           </java>
           <pom>
             <sortPom>
