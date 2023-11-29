@@ -4,8 +4,8 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.acrolinx</groupId>
-  <artifactId>proxy-sample</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <artifactId>acrolinx-proxy-sample</artifactId>
+  <version>0.1.0-SNAPSHOT</version>
   <packaging>war</packaging>
 
   <properties>
@@ -61,7 +61,7 @@
   </dependencies>
 
   <build>
-    <finalName>proxy-sample</finalName>
+    <finalName>acrolinx-proxy-sample</finalName>
 
     <plugins>
       <plugin>
