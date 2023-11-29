@@ -20,7 +20,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 class AcrolinxProxyTest {
-  private static final String PROXY_PATH = "proxy-sample/proxy";
+  private static final String PROXY_PATH = "acrolinx-proxy-sample/proxy";
 
   private static String createCheckBody(boolean withCustomFields) {
     return "{\"content\": \"Test content\", \"document\" : {\"reference\" : \"test.txt\""
@@ -234,7 +234,8 @@ class AcrolinxProxyTest {
 
   private void stubHttpServletRequest(String pathString) {
     Mockito.when(httpServletRequest.getRequestURL())
-        .thenReturn(new StringBuffer("http://localhost:8080/proxy-sample/proxy" + pathString));
+        .thenReturn(
+            new StringBuffer("http://localhost:8080/acrolinx-proxy-sample/proxy" + pathString));
     Mockito.when(httpServletRequest.getPathInfo()).thenReturn(pathString);
   }
 

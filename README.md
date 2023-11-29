@@ -42,7 +42,7 @@ In the [`config.js`](https://github.com/acrolinx/acrolinx-sidebar-demo/blob/main
 set the Acrolinx URL to point to the relative proxy path as follows:
 
 ```javascript
-serverAddress: '/proxy-sample/proxy'
+serverAddress: '/acrolinx-proxy-sample/proxy'
 ```
 
 Make sure:
@@ -66,16 +66,15 @@ The parameter names are `acrolinxURL`, `username`, and `genericToken`.
 Deploy to a Web container like Apache Tomcat:
 
 ```bash
-cd java/proxy-sample
 mvn package
-cp target/proxy-sample.war <WEBCONTAINER>/webapps/
+cp target/acrolinx-proxy-sample.war <WEBCONTAINER>/webapps/
 ```
 
 ### Test the Proxy
 
 The given sample demonstrates consuming the rest call `api/v1/auth/sign-ins` for Acrolinx authentication.
 
-If you open `http://<WEBCONTAINER>/proxy-sample/`, like [http://localhost:8080/proxy-sample/](http://localhost:8080/proxy-sample/)
+If you open `http://<WEBCONTAINER>/acrolinx-proxy-sample/`, like [http://localhost:8080/acrolinx-proxy-sample/](http://localhost:8080/acrolinx-proxy-sample/)
 then press the sign-in button and it will either give you the interactive URL to the complete sign-in,
 or a success message with details.
 

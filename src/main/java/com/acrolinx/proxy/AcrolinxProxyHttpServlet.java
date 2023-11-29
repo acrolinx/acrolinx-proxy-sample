@@ -42,7 +42,7 @@ public class AcrolinxProxyHttpServlet extends HttpServlet {
   private static final long serialVersionUID = 1L;
 
   // TODO: Set this path in context of your servlet's reverse proxy implementation
-  private static final String PROXY_PATH = "proxy-sample/proxy";
+  private static final String PROXY_PATH = "acrolinx-proxy-sample/proxy";
 
   private final CloseableHttpClient closeableHttpClient;
   private String acrolinxUrl;
