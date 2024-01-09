@@ -19,7 +19,7 @@ Before you start developing your own integration, you might benefit from looking
 
 ## Overview
 
-![Architecture Diagram](images/sidebarArchitectureDiagram14.3.1.png)
+See: [Architecture Diagrams](https://support.acrolinx.com/hc/en-us/articles/10210859500818-Architecture-Diagrams)
 
 ## Configuration of the Sample
 
@@ -31,7 +31,7 @@ To enable single sign-on, add the following example properties to the `coreserve
 singleSignOn.genericPassword=secret
 ```
 
-See: [ About Single Sign-On with Acrolinx ](https://support.acrolinx.com/hc/en-us/articles/10306041280274-About-Single-Sign-On-with-Acrolinx).
+See: [About Single Sign-On with Acrolinx](https://support.acrolinx.com/hc/en-us/articles/10306041280274-About-Single-Sign-On-with-Acrolinx).
 
 *Note: Make sure that you use a proper secret for the `genericPassword`.*
 *Note: Older Acrolinx Platform versions might require more configuration properties to be set.*
