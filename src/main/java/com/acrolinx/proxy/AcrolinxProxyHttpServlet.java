@@ -37,18 +37,27 @@ import org.slf4j.LoggerFactory;
  * the Acrolinx core server.
  */
 public class AcrolinxProxyHttpServlet extends HttpServlet {
+  public static final int BUFFER_SIZE = 8_192;
+  // TODO: Set this path in context of your servlet's reverse proxy implementation
+  public static final String PROXY_PATH = "acrolinx-proxy-sample/proxy";
+  private static final String ACROLINX_BASE_URL_HEADER = "X-Acrolinx-Base-Url";
   private static final Logger logger = LoggerFactory.getLogger(AcrolinxProxyHttpServlet.class);
   private static final long serialVersionUID = 1L;
 
-  // TODO: Set this path in context of your servlet's reverse proxy implementation
-  private static final String PROXY_PATH = "acrolinx-proxy-sample/proxy";
+  private static void copyHeaders(
+      final HttpServletRequest httpServletRequest, final HttpRequestBase httpRequestBase) {
+    final Enumeration<String> headerNames = httpServletRequest.getHeaderNames();
 
-  private final CloseableHttpClient closeableHttpClient;
-  private String acrolinxUrl;
-  private String genericToken;
+    while (headerNames.hasMoreElements()) {
+      final String headerName = headerNames.nextElement();
+      String headerValue = httpServletRequest.getHeader(headerName);
 
-  public AcrolinxProxyHttpServlet() {
-    closeableHttpClient = createHttpClient();
+      if (headerName.equalsIgnoreCase("cookie")) {
+        headerValue = filterCookies(headerValue);
+      }
+
+      httpRequestBase.addHeader(headerName, headerValue);
+    }
   }
 
   private static CloseableHttpClient createHttpClient() {
@@ -66,22 +75,40 @@ public class AcrolinxProxyHttpServlet extends HttpServlet {
         .build();
   }
 
-  @Override
-  public void init() {
-    // Properties can be configured by init parameters in the web.xml.
-    acrolinxUrl =
-        getInitParameterOrDefaultValue("acrolinxURL", "http://localhost:8031/")
-            .replaceAll("/$", "");
-    genericToken = getInitParameterOrDefaultValue("genericToken", "secret");
+  private static String filterCookies(String headerValue) {
+    return Arrays.stream(headerValue.split(";"))
+        .filter(
+            rawCookieNameAndValue -> rawCookieNameAndValue.toUpperCase().startsWith("X-ACROLINX-"))
+        .collect(Collectors.joining(";"));
   }
 
-  private String getInitParameterOrDefaultValue(final String name, final String defaultValue) {
-    String parameterValue = getInitParameter(name);
-    return parameterValue != null ? parameterValue : defaultValue;
+  private static void setRequestHeader(
+      final HttpRequestBase httpRequestBase, final String headerName, final String headerValue) {
+    httpRequestBase.removeHeaders(headerName);
+    httpRequestBase.setHeader(headerName, headerValue);
+  }
+
+  private static void transferTo(InputStream inputStream, OutputStream outputStream)
+      throws IOException {
+    final byte[] buffer = new byte[BUFFER_SIZE];
+    int bytesRead;
+
+    while ((bytesRead = inputStream.read(buffer)) >= 0) {
+      outputStream.write(buffer, 0, bytesRead);
+    }
+  }
+
+  private String acrolinxUrl;
+  private final CloseableHttpClient closeableHttpClient;
+  private String genericToken;
+  private String username;
+
+  public AcrolinxProxyHttpServlet() {
+    closeableHttpClient = createHttpClient();
   }
 
   @Override
-  protected void doDelete(
+  public void doDelete(
       final HttpServletRequest httpServletRequest, final HttpServletResponse httpServletResponse)
       throws IOException {
     final HttpDelete httpDelete = new HttpDelete();
@@ -90,7 +117,16 @@ public class AcrolinxProxyHttpServlet extends HttpServlet {
   }
 
   @Override
-  protected void doPost(
+  public void doGet(
+      final HttpServletRequest httpServletRequest, final HttpServletResponse httpServletResponse)
+      throws IOException {
+    final HttpGet httpGet = new HttpGet();
+    logger.debug("Processing get");
+    proxyRequest(httpServletRequest, httpServletResponse, httpGet);
+  }
+
+  @Override
+  public void doPost(
       final HttpServletRequest httpServletRequest, final HttpServletResponse httpServletResponse)
       throws IOException {
     final HttpPost httpPost = new HttpPost();
@@ -100,7 +136,7 @@ public class AcrolinxProxyHttpServlet extends HttpServlet {
   }
 
   @Override
-  protected void doPut(
+  public void doPut(
       final HttpServletRequest httpServletRequest, final HttpServletResponse httpServletResponse)
       throws IOException {
     final HttpPut httpPut = new HttpPut();
@@ -110,12 +146,66 @@ public class AcrolinxProxyHttpServlet extends HttpServlet {
   }
 
   @Override
-  protected void doGet(
-      final HttpServletRequest httpServletRequest, final HttpServletResponse httpServletResponse)
+  public void init() {
+    // Properties can be configured by init parameters in the web.xml.
+    acrolinxUrl =
+        getInitParameterOrDefaultValue("acrolinxURL", "http://localhost:8031/")
+            .replaceAll("/$", "");
+    genericToken = getInitParameterOrDefaultValue("genericToken", "secret");
+    username = getUsernameFromApplicationSession();
+  }
+
+  private void addSingleSignOnHeaders(final HttpRequestBase httpRequestBase) {
+    setRequestHeader(httpRequestBase, "username", username);
+    setRequestHeader(httpRequestBase, "password", genericToken);
+  }
+
+  private String getInitParameterOrDefaultValue(final String name, final String defaultValue) {
+    String parameterValue = getInitParameter(name);
+    return parameterValue != null ? parameterValue : defaultValue;
+  }
+
+  private URI getTargetUri(final HttpServletRequest httpServletRequest) throws IOException {
+    final String queryPart =
+        httpServletRequest.getQueryString() != null
+            ? "?" + httpServletRequest.getQueryString()
+            : "";
+    final String uriString = acrolinxUrl + httpServletRequest.getPathInfo() + queryPart;
+
+    try {
+      URI targetUri = new URI(uriString);
+      logger.debug("Request URI: {}", targetUri);
+      return targetUri;
+    } catch (final URISyntaxException e) {
+      throw new IOException(e);
+    }
+  }
+
+  private String getUsernameFromApplicationSession() {
+    return getInitParameterOrDefaultValue("username", "username");
+    // TODO: Set user name from the current applications session. This is just an
+    // example code the user name comes from web.xml.
+  }
+
+  private void modifyRequest(
+      final HttpServletRequest httpServletRequest, final HttpRequestBase httpRequestBase)
       throws IOException {
-    final HttpGet httpGet = new HttpGet();
-    logger.debug("Processing get");
-    proxyRequest(httpServletRequest, httpServletResponse, httpGet);
+    final URI targetUri = getTargetUri(httpServletRequest);
+    httpRequestBase.setURI(targetUri);
+    setRequestHeader(httpRequestBase, "User-Agent", "Acrolinx Proxy");
+    setRequestHeader(httpRequestBase, "Host", targetUri.getHost());
+    setRequestHeader(httpRequestBase, "X-Acrolinx-Integration-Proxy-Version", "2");
+
+    // add an extra header which is needed for acrolinx to support client's reverse proxy
+    String acrolinxUrl = httpServletRequest.getHeader(ACROLINX_BASE_URL_HEADER);
+
+    if (acrolinxUrl == null
+        || acrolinxUrl.isEmpty()) { // means we never copied it or it was never there
+      String requestUrlString = httpServletRequest.getRequestURL().toString();
+      String baseUrl =
+          requestUrlString.substring(0, requestUrlString.indexOf(PROXY_PATH) + PROXY_PATH.length());
+      httpRequestBase.setHeader(ACROLINX_BASE_URL_HEADER, baseUrl);
+    }
   }
 
   private void proxyRequest(
@@ -154,7 +244,7 @@ public class AcrolinxProxyHttpServlet extends HttpServlet {
           httpServletResponse.setContentType(httpResponse.getEntity().getContentType().getValue());
           httpServletResponse.setContentLength((int) httpResponse.getEntity().getContentLength());
 
-          inputStream.transferTo(outputStream);
+          transferTo(inputStream, outputStream);
           logger.debug("Forwarded response to client");
         }
       }
@@ -163,77 +253,6 @@ public class AcrolinxProxyHttpServlet extends HttpServlet {
       logger.error("Error while processing proxy request", e);
     } finally {
       httpRequestBase.releaseConnection();
-    }
-  }
-
-  private void modifyRequest(
-      final HttpServletRequest httpServletRequest, final HttpRequestBase httpRequestBase)
-      throws IOException {
-    final URI targetUri = getTargetUri(httpServletRequest);
-    httpRequestBase.setURI(targetUri);
-    setRequestHeader(httpRequestBase, "User-Agent", "Acrolinx Proxy");
-    setRequestHeader(httpRequestBase, "Host", targetUri.getHost());
-    setRequestHeader(httpRequestBase, "X-Acrolinx-Integration-Proxy-Version", "2");
-
-    // add an extra header which is needed for acrolinx to support client's reverse proxy
-    String baseUrl = httpServletRequest.getRequestURL().toString();
-    baseUrl = baseUrl.substring(0, baseUrl.indexOf(PROXY_PATH) + PROXY_PATH.length());
-    httpRequestBase.setHeader("X-Acrolinx-Base-Url", baseUrl);
-  }
-
-  private static void setRequestHeader(
-      final HttpRequestBase httpRequestBase, final String headerName, final String headerValue) {
-    httpRequestBase.removeHeaders(headerName);
-    httpRequestBase.setHeader(headerName, headerValue);
-  }
-
-  private void addSingleSignOnHeaders(final HttpRequestBase httpRequestBase) {
-    setRequestHeader(httpRequestBase, "username", getUsernameFromApplicationSession());
-    setRequestHeader(httpRequestBase, "password", genericToken);
-  }
-
-  private String getUsernameFromApplicationSession() {
-    return getInitParameterOrDefaultValue("username", "username");
-    // TODO: Set user name from the current applications session. This is just an
-    // example code the user name comes from web.xml.
-  }
-
-  private static void copyHeaders(
-      final HttpServletRequest httpServletRequest, final HttpRequestBase httpRequestBase) {
-    final Enumeration<String> headerNames = httpServletRequest.getHeaderNames();
-
-    while (headerNames.hasMoreElements()) {
-      final String headerName = headerNames.nextElement();
-      String headerValue = httpServletRequest.getHeader(headerName);
-
-      if (headerName.equalsIgnoreCase("cookie")) {
-        headerValue = filterCookies(headerValue);
-      }
-
-      httpRequestBase.addHeader(headerName, headerValue);
-    }
-  }
-
-  private static String filterCookies(String headerValue) {
-    return Arrays.stream(headerValue.split(";"))
-        .filter(
-            rawCookieNameAndValue -> rawCookieNameAndValue.toUpperCase().startsWith("X-ACROLINX-"))
-        .collect(Collectors.joining(";"));
-  }
-
-  private URI getTargetUri(final HttpServletRequest httpServletRequest) throws IOException {
-    final String queryPart =
-        httpServletRequest.getQueryString() != null
-            ? "?" + httpServletRequest.getQueryString()
-            : "";
-    final String uriString = acrolinxUrl + httpServletRequest.getPathInfo() + queryPart;
-
-    try {
-      URI targetUri = new URI(uriString);
-      logger.debug("Request URI: {}", targetUri);
-      return targetUri;
-    } catch (final URISyntaxException e) {
-      throw new IOException(e);
     }
   }
 }
