@@ -7,7 +7,7 @@ import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.junit.jupiter.api.Assertions;
+import org.apache.commons.lang3.NotImplementedException;
 
 public enum HttpMethod {
   DELETE,
@@ -40,7 +40,7 @@ public enum HttpMethod {
         acrolinxProxy.doPut(httpServletRequest, httpServletResponse);
         break;
       default:
-        Assertions.fail("Unknown HTTP method: " + this);
+        throw new NotImplementedException("Unknown HTTP method: " + this);
     }
   }
 }
