@@ -3,6 +3,7 @@ package com.acrolinx.proxy;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.acrolinx.proxy.util.DotenvUtil;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
