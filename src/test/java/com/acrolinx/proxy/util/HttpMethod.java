@@ -7,7 +7,6 @@ import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.apache.commons.lang3.NotImplementedException;
 
 public enum HttpMethod {
   DELETE,
