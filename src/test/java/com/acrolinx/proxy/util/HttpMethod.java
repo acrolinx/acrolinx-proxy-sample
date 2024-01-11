@@ -22,7 +22,7 @@ public enum HttpMethod {
       HttpServletRequest httpServletRequest,
       HttpServletResponse httpServletResponse,
       ServletConfig servletConfig)
-      throws IOException, ServletException {
+      throws IllegalArgumentException, ServletException, IOException {
     AcrolinxProxyHttpServlet acrolinxProxy = new AcrolinxProxyHttpServlet();
     acrolinxProxy.init(servletConfig);
 
@@ -40,7 +40,7 @@ public enum HttpMethod {
         acrolinxProxy.doPut(httpServletRequest, httpServletResponse);
         break;
       default:
-        throw new NotImplementedException("Unknown HTTP method: " + this);
+        throw new IllegalArgumentException("Unknown HTTP method: " + this);
     }
   }
 }
