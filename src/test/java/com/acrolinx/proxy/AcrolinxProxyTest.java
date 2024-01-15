@@ -4,6 +4,7 @@ package com.acrolinx.proxy;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.acrolinx.proxy.util.DotenvUtil;
+import com.acrolinx.proxy.util.HttpServletTimeoutsConfig;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -198,7 +199,8 @@ class AcrolinxProxyTest {
   }
 
   private AcrolinxProxyHttpServlet createAndInitAcrolinxHttpProxyServlet() throws ServletException {
-    final AcrolinxProxyHttpServlet acrolinxProxyHttpServlet = new AcrolinxProxyHttpServlet();
+    final AcrolinxProxyHttpServlet acrolinxProxyHttpServlet =
+        new AcrolinxProxyHttpServlet(new HttpServletTimeoutsConfig());
     acrolinxProxyHttpServlet.init(servletConfig);
     return acrolinxProxyHttpServlet;
   }

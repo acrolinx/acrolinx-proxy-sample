@@ -27,7 +27,6 @@ import org.mockito.Mockito;
 
 public class OkResponseTestHelper {
   private static final String ACROLINX_BASE_URL = "X-Acrolinx-Base-Url";
-  private static final String CHECK_URL = "/api/v1/checking/checks";
   private static final int END_OF_INPUT_STREAM = -1;
   private static final byte[] RESPONSE_BODY = new byte[] {1, 2, 3};
   private static final String RESPONSE_CONTENT_TYPE = "application/json";
@@ -78,14 +77,6 @@ public class OkResponseTestHelper {
     return servletConfig;
   }
 
-  public ServletInputStream getServletInputStream() {
-    return servletInputStream;
-  }
-
-  public ServletOutputStream getServletOutputStream() {
-    return servletOutputStream;
-  }
-
   public void verifyInteraction() throws IOException {
     verifyInteractionWithServletInputStream();
     verifyInteractionWithServletOutputStream();
@@ -101,11 +92,10 @@ public class OkResponseTestHelper {
     stubWireMock();
 
     stubServletInputStream();
-    stubServletConfig();
     stubHttpServletRequest();
     stubHttpServletResponse();
 
-    //  PluginWorkspaceUtil.mockPluginWorkspace(mockWsOptionsStorage());
+    ServletConfigUtil.stubServletConfig(servletConfig, urlString);
   }
 
   private void stubHttpServletRequest() throws IOException {
@@ -117,17 +107,12 @@ public class OkResponseTestHelper {
     Mockito.when(httpServletRequest.getRequestURL())
         .thenReturn(new StringBuffer(urlString + '/' + AcrolinxProxyHttpServlet.PROXY_PATH));
     Mockito.when(httpServletRequest.getQueryString()).thenReturn("");
-    Mockito.when(httpServletRequest.getPathInfo()).thenReturn(CHECK_URL);
+    Mockito.when(httpServletRequest.getPathInfo())
+        .thenReturn(AcrolinxProxyTestCommonConstants.CHECK_URL);
   }
 
   private void stubHttpServletResponse() throws IOException {
     Mockito.when(httpServletResponse.getOutputStream()).thenReturn(servletOutputStream);
-  }
-
-  private void stubServletConfig() {
-    Mockito.when(servletConfig.getInitParameter("acrolinxURL")).thenReturn(urlString);
-    Mockito.when(servletConfig.getInitParameter("genericToken")).thenReturn("token");
-    Mockito.when(servletConfig.getInitParameter("username")).thenReturn("username");
   }
 
   private void stubServletInputStream() throws IOException {
@@ -136,7 +121,7 @@ public class OkResponseTestHelper {
 
   private void stubWireMock() {
     wireMockServer.stubFor(
-        WireMock.request(httpMethod.name(), urlEqualTo(CHECK_URL))
+        WireMock.request(httpMethod.name(), urlEqualTo(AcrolinxProxyTestCommonConstants.CHECK_URL))
             .withHeader(ACROLINX_BASE_URL, equalTo(createHeaderValue()))
             .withRequestBody(AbsentPattern.ABSENT)
             .willReturn(
@@ -178,7 +163,8 @@ public class OkResponseTestHelper {
   private void verifyInteractionWithWireMock() {
     wireMockServer.verify(
         new RequestPatternBuilder(
-                RequestMethod.fromString(httpMethod.name()), urlEqualTo(CHECK_URL))
+                RequestMethod.fromString(httpMethod.name()),
+                urlEqualTo(AcrolinxProxyTestCommonConstants.CHECK_URL))
             .withHeader(ACROLINX_BASE_URL, equalTo(createHeaderValue()))
             .withRequestBody(AbsentPattern.ABSENT));
 
