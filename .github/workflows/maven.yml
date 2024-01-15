@@ -25,11 +25,6 @@ jobs:
 
       - name: Sonar analysis
         env:
-          ACROLINX_API_USERNAME: ${{ secrets.TEST_SERVER_USERNAME }}
-          ACROLINX_API_SSO_TOKEN: ${{ secrets.TEST_SERVER_SSO_TOKEN }}
-          ACROLINX_URL: ${{ secrets.TEST_SERVER_URL_STABLE }}
-          ACROLINX_API_TOKEN: ${{ secrets.TEST_SERVER_API_TOKEN_STABLE }}
-          ACROLINX_DEV_SIGNATURE: ${{ secrets.ACROLINX_DEV_SIGNATURE }}
           SONAR_TOKEN: ${{ secrets.SONARCLOUD_TOKEN }}
         run: mvn clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=acrolinx_acrolinx-proxy-sample
 
