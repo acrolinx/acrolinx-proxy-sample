@@ -43,11 +43,9 @@ import org.slf4j.LoggerFactory;
  */
 public class AcrolinxProxyHttpServlet extends HttpServlet {
   public static final int BUFFER_SIZE = 8_192;
-  public static final String DEFAULT_CONNECT_TIMEOUT_MILLIS_STRING = "-1";
   // TODO: Set this path in context of your servlet's reverse proxy implementation
   public static final String PROXY_PATH = "acrolinx-proxy-sample/proxy";
   private static final String ACROLINX_BASE_URL_HEADER = "X-Acrolinx-Base-Url";
-  private static final Logger LOGGER = LoggerFactory.getLogger(AcrolinxProxyHttpServlet.class);
   private static final Logger logger = LoggerFactory.getLogger(AcrolinxProxyHttpServlet.class);
   private static final long serialVersionUID = 1L;
 
@@ -97,7 +95,7 @@ public class AcrolinxProxyHttpServlet extends HttpServlet {
   private static void logExceptionAndSendError(
       HttpServletResponse httpServletResponse, Exception exception, int statusCode)
       throws IOException {
-    LOGGER.error("", exception);
+    logger.error("", exception);
     httpServletResponse.sendError(statusCode, exception.toString());
   }
 
