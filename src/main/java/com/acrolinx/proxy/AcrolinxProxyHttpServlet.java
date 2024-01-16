@@ -105,16 +105,6 @@ public class AcrolinxProxyHttpServlet extends HttpServlet {
     httpRequestBase.setHeader(headerName, headerValue);
   }
 
-  private static void transferTo(InputStream inputStream, OutputStream outputStream)
-      throws IOException {
-    final byte[] buffer = new byte[BUFFER_SIZE];
-    int bytesRead;
-
-    while ((bytesRead = inputStream.read(buffer)) >= 0) {
-      outputStream.write(buffer, 0, bytesRead);
-    }
-  }
-
   private String acrolinxUrl;
   private final CloseableHttpClient closeableHttpClient;
   private String genericToken;
@@ -261,7 +251,7 @@ public class AcrolinxProxyHttpServlet extends HttpServlet {
           httpServletResponse.setContentType(httpResponse.getEntity().getContentType().getValue());
           httpServletResponse.setContentLength((int) httpResponse.getEntity().getContentLength());
 
-          transferTo(inputStream, outputStream);
+          inputStream.transferTo(outputStream);
           logger.debug("Forwarded response to client");
         }
       }
