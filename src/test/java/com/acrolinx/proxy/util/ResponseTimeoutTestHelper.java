@@ -21,8 +21,6 @@ public class ResponseTimeoutTestHelper {
 
   private final HttpServletRequest httpServletRequest = Mockito.mock(HttpServletRequest.class);
   private final HttpServletResponse httpServletResponse = Mockito.mock(HttpServletResponse.class);
-  private final HttpServletTimeoutsConfig httpServletTimeoutsConfig =
-      Mockito.mock(HttpServletTimeoutsConfig.class);
   private final ServerSocket serverSocket;
   private final ServletConfig servletConfig = Mockito.mock(ServletConfig.class);
 
@@ -42,20 +40,16 @@ public class ResponseTimeoutTestHelper {
     return servletConfig;
   }
 
-  public HttpServletTimeoutsConfig getServletTimeoutsConfig() {
-    return httpServletTimeoutsConfig;
-  }
-
   public void verifyInteraction(String expectedExceptionMessage) throws IOException {
     verifyInteractionWithHttpServletResponse(expectedExceptionMessage);
   }
 
   private void setupTestEnvironment() {
     stubHttpServletRequest();
-    stubServletTimeoutsConfig();
 
-    ServletConfigUtil.stubServletConfig(
+    ServletConfigUtil.stubServletConfigBase(
         servletConfig, "http://localhost:" + serverSocket.getLocalPort());
+    ServletConfigUtil.stubServletConfigSocketTimeout(servletConfig, "1");
   }
 
   private void stubHttpServletRequest() {
@@ -70,10 +64,6 @@ public class ResponseTimeoutTestHelper {
     Mockito.when(httpServletRequest.getQueryString()).thenReturn("");
     Mockito.when(httpServletRequest.getPathInfo())
         .thenReturn(AcrolinxProxyTestCommonConstants.CHECK_URL);
-  }
-
-  private void stubServletTimeoutsConfig() {
-    Mockito.when(httpServletTimeoutsConfig.getSocketTimeoutInMillis()).thenReturn(1);
   }
 
   private void verifyInteractionWithHttpServletResponse(String expectedExceptionMessage)

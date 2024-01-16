@@ -22,8 +22,6 @@ public class ConnectionFailureTestHelper {
 
   private final HttpServletRequest httpServletRequest = Mockito.mock(HttpServletRequest.class);
   private final HttpServletResponse httpServletResponse = Mockito.mock(HttpServletResponse.class);
-  private final HttpServletTimeoutsConfig httpServletTimeoutsConfig =
-      Mockito.mock(HttpServletTimeoutsConfig.class);
   private final ServletConfig servletConfig = Mockito.mock(ServletConfig.class);
   private final ServletInputStream servletInputStream = Mockito.mock(ServletInputStream.class);
 
@@ -41,10 +39,6 @@ public class ConnectionFailureTestHelper {
     return servletConfig;
   }
 
-  public HttpServletTimeoutsConfig getServletTimeoutsConfig() {
-    return httpServletTimeoutsConfig;
-  }
-
   public void verifyInteraction() throws IOException {
     verifyInteractionWithHttpServletResponse();
 
@@ -55,9 +49,9 @@ public class ConnectionFailureTestHelper {
 
   private void setUpTestEnvironment(String acrolinxUrlString) throws IOException {
     stubHttpServletRequest(acrolinxUrlString);
-    stubServletTimeoutsConfig();
 
-    ServletConfigUtil.stubServletConfig(servletConfig, acrolinxUrlString);
+    ServletConfigUtil.stubServletConfigBase(servletConfig, acrolinxUrlString);
+    ServletConfigUtil.stubServletConfigConnectTimeout(servletConfig, "1");
   }
 
   private void stubHttpServletRequest(String acrolinxUrlString) throws IOException {
@@ -69,10 +63,6 @@ public class ConnectionFailureTestHelper {
     Mockito.when(httpServletRequest.getQueryString()).thenReturn("");
     Mockito.when(httpServletRequest.getPathInfo())
         .thenReturn(AcrolinxProxyTestCommonConstants.CHECK_URL);
-  }
-
-  private void stubServletTimeoutsConfig() {
-    Mockito.when(httpServletTimeoutsConfig.getConnectTimeoutInMillis()).thenReturn(1);
   }
 
   private void verifyInteractionWithHttpServletRequest() throws IOException {

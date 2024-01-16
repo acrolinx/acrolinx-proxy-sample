@@ -20,11 +20,9 @@ public enum HttpMethod {
   public void callAcrolinxProxyMethod(
       HttpServletRequest httpServletRequest,
       HttpServletResponse httpServletResponse,
-      ServletConfig servletConfig,
-      HttpServletTimeoutsConfig httpServletTimeoutsConfig)
+      ServletConfig servletConfig)
       throws IllegalArgumentException, ServletException, IOException {
-    AcrolinxProxyHttpServlet acrolinxProxy =
-        new AcrolinxProxyHttpServlet(httpServletTimeoutsConfig);
+    AcrolinxProxyHttpServlet acrolinxProxy = new AcrolinxProxyHttpServlet();
     acrolinxProxy.init(servletConfig);
 
     switch (this) {

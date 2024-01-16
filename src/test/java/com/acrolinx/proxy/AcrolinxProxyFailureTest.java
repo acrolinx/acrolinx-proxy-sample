@@ -4,7 +4,6 @@ package com.acrolinx.proxy;
 import com.acrolinx.proxy.util.CommunicationFailureTestHelper;
 import com.acrolinx.proxy.util.ConnectionFailureTestHelper;
 import com.acrolinx.proxy.util.HttpMethod;
-import com.acrolinx.proxy.util.HttpServletTimeoutsConfig;
 import com.acrolinx.proxy.util.InvalidResponseTestHelper;
 import com.acrolinx.proxy.util.ResponseTimeoutTestHelper;
 import com.acrolinx.proxy.util.WireMockServerWrapper;
@@ -30,8 +29,7 @@ class AcrolinxProxyFailureTest {
     httpMethod.callAcrolinxProxyMethod(
         connectionFailureTestHelper.getHttpServletRequest(),
         connectionFailureTestHelper.getHttpServletResponse(),
-        connectionFailureTestHelper.getServletConfig(),
-        connectionFailureTestHelper.getServletTimeoutsConfig());
+        connectionFailureTestHelper.getServletConfig());
 
     connectionFailureTestHelper.verifyInteraction();
   }
@@ -49,8 +47,7 @@ class AcrolinxProxyFailureTest {
       HttpMethod.GET.callAcrolinxProxyMethod(
           communicationFailureTestHelper.getHttpServletRequest(),
           communicationFailureTestHelper.getHttpServletResponse(),
-          communicationFailureTestHelper.getServletConfig(),
-          new HttpServletTimeoutsConfig());
+          communicationFailureTestHelper.getServletConfig());
 
       communicationFailureTestHelper.verifyInteraction(expectedExceptionMessage);
     }
@@ -65,8 +62,7 @@ class AcrolinxProxyFailureTest {
       HttpMethod.GET.callAcrolinxProxyMethod(
           invalidResponseTestHelper.getHttpServletRequest(),
           invalidResponseTestHelper.getHttpServletResponse(),
-          invalidResponseTestHelper.getServletConfig(),
-          new HttpServletTimeoutsConfig());
+          invalidResponseTestHelper.getServletConfig());
 
       invalidResponseTestHelper.verifyInteraction();
     }
@@ -80,8 +76,7 @@ class AcrolinxProxyFailureTest {
       HttpMethod.GET.callAcrolinxProxyMethod(
           responseTimeoutTestHelper.getHttpServletRequest(),
           responseTimeoutTestHelper.getHttpServletResponse(),
-          responseTimeoutTestHelper.getServletConfig(),
-          responseTimeoutTestHelper.getServletTimeoutsConfig());
+          responseTimeoutTestHelper.getServletConfig());
 
       responseTimeoutTestHelper.verifyInteraction(
           "java.net.SocketTimeoutException: Read timed out");

@@ -72,7 +72,7 @@ public class InvalidResponseTestHelper {
   private void setupTestEnvironment() {
     stubHttpServletRequest();
 
-    ServletConfigUtil.stubServletConfig(
+    ServletConfigUtil.stubServletConfigBase(
         servletConfig, "http://localhost:" + serverSocket.getLocalPort());
   }
 

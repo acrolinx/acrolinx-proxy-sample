@@ -2,7 +2,6 @@
 package com.acrolinx.proxy;
 
 import com.acrolinx.proxy.util.HttpMethod;
-import com.acrolinx.proxy.util.HttpServletTimeoutsConfig;
 import com.acrolinx.proxy.util.OkResponseTestHelper;
 import com.acrolinx.proxy.util.WireMockServerWrapper;
 import com.github.tomakehurst.wiremock.WireMockServer;
@@ -28,8 +27,7 @@ class AcrolinxProxySuccessTest {
       httpMethod.callAcrolinxProxyMethod(
           okResponseTestHelper.getHttpServletRequest(),
           okResponseTestHelper.getHttpServletResponse(),
-          okResponseTestHelper.getServletConfig(),
-          new HttpServletTimeoutsConfig());
+          okResponseTestHelper.getServletConfig());
 
       okResponseTestHelper.verifyInteraction();
     }

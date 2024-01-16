@@ -51,7 +51,7 @@ public class CommunicationFailureTestHelper {
   private void setUpTestEnvironment(String urlString) {
     stubHttpServletRequest(urlString);
 
-    ServletConfigUtil.stubServletConfig(servletConfig, urlString);
+    ServletConfigUtil.stubServletConfigBase(servletConfig, urlString);
   }
 
   private void stubHttpServletRequest(String urlString) {

@@ -95,7 +95,7 @@ public class OkResponseTestHelper {
     stubHttpServletRequest();
     stubHttpServletResponse();
 
-    ServletConfigUtil.stubServletConfig(servletConfig, urlString);
+    ServletConfigUtil.stubServletConfigBase(servletConfig, urlString);
   }
 
   private void stubHttpServletRequest() throws IOException {

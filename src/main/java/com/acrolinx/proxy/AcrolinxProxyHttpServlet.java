@@ -1,7 +1,6 @@
 /* Copyright (c) 2023 Acrolinx GmbH */
 package com.acrolinx.proxy;
 
-import com.acrolinx.proxy.util.HttpServletTimeoutsConfig;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -65,16 +64,11 @@ public class AcrolinxProxyHttpServlet extends HttpServlet {
     }
   }
 
-  private static CloseableHttpClient createHttpClient(
-      HttpServletTimeoutsConfig httpServletTimeoutsConfig) {
+  private static CloseableHttpClient createHttpClient() {
     HttpClientConnectionManager httpClientConnectionManager =
         new PoolingHttpClientConnectionManager();
     RequestConfig requestConfig =
-        RequestConfig.custom()
-            .setCookieSpec(CookieSpecs.STANDARD)
-            .setConnectTimeout(httpServletTimeoutsConfig.getConnectTimeoutInMillis())
-            .setSocketTimeout(httpServletTimeoutsConfig.getSocketTimeoutInMillis())
-            .build();
+        RequestConfig.custom().setCookieSpec(CookieSpecs.STANDARD).build();
 
     return HttpClientBuilder.create()
         .setConnectionManager(httpClientConnectionManager)
@@ -108,11 +102,13 @@ public class AcrolinxProxyHttpServlet extends HttpServlet {
 
   private String acrolinxUrl;
   private final CloseableHttpClient closeableHttpClient;
+  private int connectTimeoutInMillis;
   private String genericToken;
+  private int socketTimeoutInMillis;
   private String username;
 
-  public AcrolinxProxyHttpServlet(HttpServletTimeoutsConfig httpServletTimeoutsConfig) {
-    closeableHttpClient = createHttpClient(httpServletTimeoutsConfig);
+  public AcrolinxProxyHttpServlet() {
+    closeableHttpClient = createHttpClient();
   }
 
   @Override
@@ -161,11 +157,23 @@ public class AcrolinxProxyHttpServlet extends HttpServlet {
             .replaceAll("/$", "");
     genericToken = getInitParameterOrDefaultValue("genericToken", "secret");
     username = getUsernameFromApplicationSession();
+    connectTimeoutInMillis =
+        stringInitParameterToInt(getInitParameterOrDefaultValue("connectTimeoutInMillis", "-1"));
+    socketTimeoutInMillis =
+        stringInitParameterToInt(getInitParameterOrDefaultValue("socketTimeoutInMillis", "-1"));
   }
 
   private void addSingleSignOnHeaders(final HttpRequestBase httpRequestBase) {
     setRequestHeader(httpRequestBase, "username", username);
     setRequestHeader(httpRequestBase, "password", genericToken);
+  }
+
+  private void configureTimeouts(HttpRequestBase httpRequestBase) {
+    httpRequestBase.setConfig(
+        RequestConfig.custom()
+            .setConnectTimeout(connectTimeoutInMillis)
+            .setSocketTimeout(socketTimeoutInMillis)
+            .build());
   }
 
   private String getInitParameterOrDefaultValue(final String name, final String defaultValue) {
@@ -225,6 +233,8 @@ public class AcrolinxProxyHttpServlet extends HttpServlet {
 
     modifyRequest(httpServletRequest, httpRequestBase);
 
+    configureTimeouts(httpRequestBase);
+
     // TODO: Make sure not to call the following line in case a user is not
     // authenticated to the application.
     addSingleSignOnHeaders(httpRequestBase);
@@ -263,5 +273,9 @@ public class AcrolinxProxyHttpServlet extends HttpServlet {
     } finally {
       httpRequestBase.releaseConnection();
     }
+  }
+
+  private int stringInitParameterToInt(String initParameterString) {
+    return Integer.parseInt(initParameterString);
   }
 }
