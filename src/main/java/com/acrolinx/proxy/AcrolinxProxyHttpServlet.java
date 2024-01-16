@@ -73,7 +73,7 @@ public class AcrolinxProxyHttpServlet extends HttpServlet {
     return HttpClientBuilder.create()
         .setConnectionManager(httpClientConnectionManager)
         .setDefaultRequestConfig(requestConfig)
-        .disableRedirectHandling()
+       // .disableRedirectHandling()
         .disableAutomaticRetries()
         .addInterceptorFirst(ContentLengthHeaderRemover.INSTANCE)
         .useSystemProperties()
