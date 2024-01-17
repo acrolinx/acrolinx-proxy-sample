@@ -26,6 +26,7 @@ import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 
 public class OkResponseTestHelper {
+  public static final int BUFFER_SIZE = 8_192;
   private static final String ACROLINX_BASE_URL = "X-Acrolinx-Base-Url";
   private static final int END_OF_INPUT_STREAM = -1;
   private static final byte[] RESPONSE_BODY = new byte[] {1, 2, 3};
@@ -153,7 +154,7 @@ public class OkResponseTestHelper {
   }
 
   private void verifyInteractionWithServletOutputStream() throws IOException {
-    byte[] bytes = Arrays.copyOf(RESPONSE_BODY, AcrolinxProxyHttpServlet.BUFFER_SIZE);
+    byte[] bytes = Arrays.copyOf(RESPONSE_BODY, BUFFER_SIZE);
 
     Mockito.verify(servletOutputStream, Mockito.atMostOnce()).write(bytes, 0, RESPONSE_BODY.length);
     Mockito.verify(servletOutputStream).close();

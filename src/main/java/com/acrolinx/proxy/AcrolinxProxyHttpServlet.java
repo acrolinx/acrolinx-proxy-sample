@@ -41,7 +41,6 @@ import org.slf4j.LoggerFactory;
  * the Acrolinx core server.
  */
 public class AcrolinxProxyHttpServlet extends HttpServlet {
-  public static final int BUFFER_SIZE = 8_192;
   // TODO: Set this path in context of your servlet's reverse proxy implementation
   public static final String PROXY_PATH = "acrolinx-proxy-sample/proxy";
   private static final String ACROLINX_BASE_URL_HEADER = "X-Acrolinx-Base-Url";
@@ -97,6 +96,10 @@ public class AcrolinxProxyHttpServlet extends HttpServlet {
       final HttpRequestBase httpRequestBase, final String headerName, final String headerValue) {
     httpRequestBase.removeHeaders(headerName);
     httpRequestBase.setHeader(headerName, headerValue);
+  }
+
+  private static int stringInitParameterToInt(String initParameterString) {
+    return Integer.parseInt(initParameterString);
   }
 
   private String acrolinxUrl;
@@ -212,10 +215,10 @@ public class AcrolinxProxyHttpServlet extends HttpServlet {
     setRequestHeader(httpRequestBase, "X-Acrolinx-Integration-Proxy-Version", "2");
 
     // add an extra header which is needed for acrolinx to support client's reverse proxy
-    String acrolinxUrl = httpServletRequest.getHeader(ACROLINX_BASE_URL_HEADER);
+    String acrolinxBaseUrl = httpServletRequest.getHeader(ACROLINX_BASE_URL_HEADER);
 
-    if (acrolinxUrl == null
-        || acrolinxUrl.isEmpty()) { // means we never copied it or it was never there
+    if (acrolinxBaseUrl == null
+        || acrolinxBaseUrl.isEmpty()) { // means we never copied it or it was never there
       String requestUrlString = httpServletRequest.getRequestURL().toString();
       String baseUrl =
           requestUrlString.substring(0, requestUrlString.indexOf(PROXY_PATH) + PROXY_PATH.length());
@@ -272,9 +275,5 @@ public class AcrolinxProxyHttpServlet extends HttpServlet {
     } finally {
       httpRequestBase.releaseConnection();
     }
-  }
-
-  private int stringInitParameterToInt(String initParameterString) {
-    return Integer.parseInt(initParameterString);
   }
 }
