@@ -26,8 +26,8 @@ import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 
 public class OkResponseTestHelper {
-  public static final int BUFFER_SIZE = 8_192;
   private static final String ACROLINX_BASE_URL = "X-Acrolinx-Base-Url";
+  private static final int BUFFER_SIZE = 8_192;
   private static final int END_OF_INPUT_STREAM = -1;
   private static final byte[] RESPONSE_BODY = new byte[] {1, 2, 3};
   private static final String RESPONSE_CONTENT_TYPE = "application/json";
