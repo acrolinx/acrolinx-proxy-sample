@@ -33,6 +33,7 @@ public class InvalidResponseTestHelper {
     return () -> {
       try (Socket socket = serverSocket.accept()) {
         socket.getOutputStream().write('\n');
+        socket.setSoTimeout(1000);
       } catch (IOException e) {
         throw new IllegalStateException(e);
       }
