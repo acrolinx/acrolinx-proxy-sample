@@ -32,7 +32,6 @@ public class InvalidResponseTestHelper {
   private static Runnable createRunnable(ServerSocket serverSocket) {
     return () -> {
       try (Socket socket = serverSocket.accept()) {
-        socket.setSoTimeout(30000);
         socket.getOutputStream().write('\n');
       } catch (IOException e) {
         throw new IllegalStateException(e);
