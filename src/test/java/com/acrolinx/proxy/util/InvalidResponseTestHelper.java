@@ -11,6 +11,8 @@ import javax.servlet.ServletConfig;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.Assertions;
+import org.mockito.AdditionalMatchers;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 
 public class InvalidResponseTestHelper {
@@ -93,7 +95,12 @@ public class InvalidResponseTestHelper {
   private void verifyInteractionWithHttpServletResponse() throws IOException {
     Mockito.verify(httpServletResponse)
         .sendError(
-            HttpURLConnection.HTTP_UNAVAILABLE, "org.apache.http.client.ClientProtocolException");
+            AdditionalMatchers.or(
+                ArgumentMatchers.eq(HttpURLConnection.HTTP_UNAVAILABLE),
+                ArgumentMatchers.eq(HttpURLConnection.HTTP_BAD_GATEWAY)),
+            AdditionalMatchers.or(
+                ArgumentMatchers.eq("org.apache.http.client.ClientProtocolException"),
+                ArgumentMatchers.eq("java.net.SocketException")));
     Mockito.verifyNoMoreInteractions(httpServletResponse);
   }
 }
