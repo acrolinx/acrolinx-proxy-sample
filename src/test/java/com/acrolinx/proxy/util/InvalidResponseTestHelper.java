@@ -100,7 +100,7 @@ public class InvalidResponseTestHelper {
                 ArgumentMatchers.eq(HttpURLConnection.HTTP_BAD_GATEWAY)),
             AdditionalMatchers.or(
                 ArgumentMatchers.eq("org.apache.http.client.ClientProtocolException"),
-                ArgumentMatchers.eq("java.net.SocketException")));
+                ArgumentMatchers.eq("java.net.SocketException: Connection reset")));
     Mockito.verifyNoMoreInteractions(httpServletResponse);
   }
 }
