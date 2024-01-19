@@ -56,6 +56,7 @@ class AcrolinxProxyFailureTest {
   private static void verifyProtocolInvalidResponseError()
       throws IOException, InterruptedException, ServletException {
     try (ServerSocket serverSocket = new ServerSocket(5500)) {
+      serverSocket.setSoTimeout(30000);
       InvalidResponseTestHelper invalidResponseTestHelper =
           InvalidResponseTestHelper.createAndSetUpTestEnvironment(serverSocket);
 
