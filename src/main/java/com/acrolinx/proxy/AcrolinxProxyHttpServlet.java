@@ -4,18 +4,22 @@ package com.acrolinx.proxy;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.ConnectException;
 import java.net.HttpURLConnection;
+import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.stream.Collectors;
+import javax.net.ssl.SSLHandshakeException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -24,6 +28,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.http.conn.HttpClientConnectionManager;
 import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -37,7 +42,6 @@ import org.slf4j.LoggerFactory;
  * the Acrolinx core server.
  */
 public class AcrolinxProxyHttpServlet extends HttpServlet {
-  public static final int BUFFER_SIZE = 8_192;
   // TODO: Set this path in context of your servlet's reverse proxy implementation
   public static final String PROXY_PATH = "acrolinx-proxy-sample/proxy";
   private static final String ACROLINX_BASE_URL_HEADER = "X-Acrolinx-Base-Url";
@@ -70,6 +74,7 @@ public class AcrolinxProxyHttpServlet extends HttpServlet {
         .setConnectionManager(httpClientConnectionManager)
         .setDefaultRequestConfig(requestConfig)
         .disableRedirectHandling()
+        .disableAutomaticRetries()
         .addInterceptorFirst(ContentLengthHeaderRemover.INSTANCE)
         .useSystemProperties()
         .build();
@@ -82,25 +87,28 @@ public class AcrolinxProxyHttpServlet extends HttpServlet {
         .collect(Collectors.joining(";"));
   }
 
+  private static void logExceptionAndSendError(
+      HttpServletResponse httpServletResponse, Exception exception, int statusCode)
+      throws IOException {
+    logger.error("", exception);
+    httpServletResponse.sendError(statusCode, exception.toString());
+  }
+
   private static void setRequestHeader(
       final HttpRequestBase httpRequestBase, final String headerName, final String headerValue) {
     httpRequestBase.removeHeaders(headerName);
     httpRequestBase.setHeader(headerName, headerValue);
   }
 
-  private static void transferTo(InputStream inputStream, OutputStream outputStream)
-      throws IOException {
-    final byte[] buffer = new byte[BUFFER_SIZE];
-    int bytesRead;
-
-    while ((bytesRead = inputStream.read(buffer)) >= 0) {
-      outputStream.write(buffer, 0, bytesRead);
-    }
+  private static int stringInitParameterToInt(String initParameterString) {
+    return Integer.parseInt(initParameterString);
   }
 
   private String acrolinxUrl;
   private final CloseableHttpClient closeableHttpClient;
+  private int connectTimeoutInMillis;
   private String genericToken;
+  private int socketTimeoutInMillis;
   private String username;
 
   public AcrolinxProxyHttpServlet() {
@@ -153,11 +161,23 @@ public class AcrolinxProxyHttpServlet extends HttpServlet {
             .replaceAll("/$", "");
     genericToken = getInitParameterOrDefaultValue("genericToken", "secret");
     username = getUsernameFromApplicationSession();
+    connectTimeoutInMillis =
+        stringInitParameterToInt(getInitParameterOrDefaultValue("connectTimeoutInMillis", "-1"));
+    socketTimeoutInMillis =
+        stringInitParameterToInt(getInitParameterOrDefaultValue("socketTimeoutInMillis", "-1"));
   }
 
   private void addSingleSignOnHeaders(final HttpRequestBase httpRequestBase) {
     setRequestHeader(httpRequestBase, "username", username);
     setRequestHeader(httpRequestBase, "password", genericToken);
+  }
+
+  private void configureTimeouts(HttpRequestBase httpRequestBase) {
+    httpRequestBase.setConfig(
+        RequestConfig.custom()
+            .setConnectTimeout(connectTimeoutInMillis)
+            .setSocketTimeout(socketTimeoutInMillis)
+            .build());
   }
 
   private String getInitParameterOrDefaultValue(final String name, final String defaultValue) {
@@ -197,10 +217,10 @@ public class AcrolinxProxyHttpServlet extends HttpServlet {
     setRequestHeader(httpRequestBase, "X-Acrolinx-Integration-Proxy-Version", "2");
 
     // add an extra header which is needed for acrolinx to support client's reverse proxy
-    String acrolinxUrl = httpServletRequest.getHeader(ACROLINX_BASE_URL_HEADER);
+    String acrolinxBaseUrl = httpServletRequest.getHeader(ACROLINX_BASE_URL_HEADER);
 
-    if (acrolinxUrl == null
-        || acrolinxUrl.isEmpty()) { // means we never copied it or it was never there
+    if (acrolinxBaseUrl == null
+        || acrolinxBaseUrl.isEmpty()) { // means we never copied it or it was never there
       String requestUrlString = httpServletRequest.getRequestURL().toString();
       String baseUrl =
           requestUrlString.substring(0, requestUrlString.indexOf(PROXY_PATH) + PROXY_PATH.length());
@@ -216,6 +236,8 @@ public class AcrolinxProxyHttpServlet extends HttpServlet {
     copyHeaders(httpServletRequest, httpRequestBase);
 
     modifyRequest(httpServletRequest, httpRequestBase);
+
+    configureTimeouts(httpRequestBase);
 
     // TODO: Make sure not to call the following line in case a user is not
     // authenticated to the application.
@@ -244,13 +266,17 @@ public class AcrolinxProxyHttpServlet extends HttpServlet {
           httpServletResponse.setContentType(httpResponse.getEntity().getContentType().getValue());
           httpServletResponse.setContentLength((int) httpResponse.getEntity().getContentLength());
 
-          transferTo(inputStream, outputStream);
+          inputStream.transferTo(outputStream);
           logger.debug("Forwarded response to client");
         }
       }
-    } catch (final ConnectException e) {
-      httpServletResponse.sendError(HttpURLConnection.HTTP_BAD_GATEWAY, e.getClass().getName());
-      logger.error("Error while processing proxy request", e);
+    } catch (ConnectTimeoutException
+        | SocketTimeoutException
+        | SocketException
+        | UnknownHostException e) {
+      logExceptionAndSendError(httpServletResponse, e, HttpURLConnection.HTTP_BAD_GATEWAY);
+    } catch (SSLHandshakeException | ClientProtocolException e) {
+      logExceptionAndSendError(httpServletResponse, e, HttpURLConnection.HTTP_UNAVAILABLE);
     } finally {
       httpRequestBase.releaseConnection();
     }
