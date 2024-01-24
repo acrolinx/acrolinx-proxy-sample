@@ -29,7 +29,6 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.conn.ConnectTimeoutException;
-import org.apache.http.conn.HttpClientConnectionManager;
 import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -65,14 +64,9 @@ public class AcrolinxProxyHttpServlet extends HttpServlet {
   }
 
   private static CloseableHttpClient createHttpClient() {
-    HttpClientConnectionManager httpClientConnectionManager =
-        new PoolingHttpClientConnectionManager();
-    RequestConfig requestConfig =
-        RequestConfig.custom().setCookieSpec(CookieSpecs.STANDARD).build();
-
     return HttpClientBuilder.create()
-        .setConnectionManager(httpClientConnectionManager)
-        .setDefaultRequestConfig(requestConfig)
+        .setConnectionManager(new PoolingHttpClientConnectionManager())
+        .setDefaultRequestConfig(RequestConfig.custom().setCookieSpec(CookieSpecs.STANDARD).build())
         .disableRedirectHandling()
         .disableAutomaticRetries()
         .addInterceptorFirst(ContentLengthHeaderRemover.INSTANCE)
@@ -98,10 +92,6 @@ public class AcrolinxProxyHttpServlet extends HttpServlet {
       final HttpRequestBase httpRequestBase, final String headerName, final String headerValue) {
     httpRequestBase.removeHeaders(headerName);
     httpRequestBase.setHeader(headerName, headerValue);
-  }
-
-  private static int stringInitParameterToInt(String initParameterString) {
-    return Integer.parseInt(initParameterString);
   }
 
   private String acrolinxUrl;
@@ -157,14 +147,14 @@ public class AcrolinxProxyHttpServlet extends HttpServlet {
   public void init() {
     // Properties can be configured by init parameters in the web.xml.
     acrolinxUrl =
-        getInitParameterOrDefaultValue("acrolinxURL", "http://localhost:8031/")
+        getInitParameterOrDefaultValue("acrolinxUrl", "http://localhost:8031/")
             .replaceAll("/$", "");
     genericToken = getInitParameterOrDefaultValue("genericToken", "secret");
     username = getUsernameFromApplicationSession();
     connectTimeoutInMillis =
-        stringInitParameterToInt(getInitParameterOrDefaultValue("connectTimeoutInMillis", "-1"));
+        Integer.parseInt(getInitParameterOrDefaultValue("connectTimeoutInMillis", "-1"));
     socketTimeoutInMillis =
-        stringInitParameterToInt(getInitParameterOrDefaultValue("socketTimeoutInMillis", "-1"));
+        Integer.parseInt(getInitParameterOrDefaultValue("socketTimeoutInMillis", "-1"));
   }
 
   private void addSingleSignOnHeaders(final HttpRequestBase httpRequestBase) {
@@ -251,10 +241,12 @@ public class AcrolinxProxyHttpServlet extends HttpServlet {
       httpServletResponse.setStatus(status);
 
       for (Header header : httpResponse.getAllHeaders()) {
-        if (!(header.getName().startsWith("Transfer-Encoding")
-            || header.getName().startsWith("Content-Length")
-            || header.getName().startsWith("Content-Type"))) {
-          httpServletResponse.setHeader(header.getName(), header.getValue());
+        final String headerName = header.getName();
+
+        if (!(headerName.startsWith("Transfer-Encoding")
+            || headerName.startsWith("Content-Length")
+            || headerName.startsWith("Content-Type"))) {
+          httpServletResponse.setHeader(headerName, header.getValue());
         }
       }
 

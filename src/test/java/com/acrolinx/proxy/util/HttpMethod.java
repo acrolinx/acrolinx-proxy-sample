@@ -22,21 +22,21 @@ public enum HttpMethod {
       HttpServletResponse httpServletResponse,
       ServletConfig servletConfig)
       throws IllegalArgumentException, ServletException, IOException {
-    AcrolinxProxyHttpServlet acrolinxProxy = new AcrolinxProxyHttpServlet();
-    acrolinxProxy.init(servletConfig);
+    AcrolinxProxyHttpServlet acrolinxProxyHttpServlet = new AcrolinxProxyHttpServlet();
+    acrolinxProxyHttpServlet.init(servletConfig);
 
     switch (this) {
       case DELETE:
-        acrolinxProxy.doDelete(httpServletRequest, httpServletResponse);
+        acrolinxProxyHttpServlet.doDelete(httpServletRequest, httpServletResponse);
         break;
       case GET:
-        acrolinxProxy.doGet(httpServletRequest, httpServletResponse);
+        acrolinxProxyHttpServlet.doGet(httpServletRequest, httpServletResponse);
         break;
       case POST:
-        acrolinxProxy.doPost(httpServletRequest, httpServletResponse);
+        acrolinxProxyHttpServlet.doPost(httpServletRequest, httpServletResponse);
         break;
       case PUT:
-        acrolinxProxy.doPut(httpServletRequest, httpServletResponse);
+        acrolinxProxyHttpServlet.doPut(httpServletRequest, httpServletResponse);
         break;
       default:
         throw new IllegalArgumentException("Unknown HTTP method: " + this);
