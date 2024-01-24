@@ -4,5 +4,7 @@ package com.acrolinx.proxy.util;
 final class AcrolinxProxyTestCommonConstants {
   static final String CHECK_URL = "/api/v1/checking/checks";
 
-  private AcrolinxProxyTestCommonConstants() {}
+  private AcrolinxProxyTestCommonConstants() {
+    throw new IllegalStateException();
+  }
 }

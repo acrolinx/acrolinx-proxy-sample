@@ -21,10 +21,10 @@ class AcrolinxProxyFailureTest {
    */
   private static final String UNRESOLVABLE_URL_STRING = "http://0.42.42.42:80";
 
-  private static void verifyConnectionFailure(HttpMethod httpMethod, String urlString)
+  private static void verifyConnectionFailure(HttpMethod httpMethod, String acrolinxUrlString)
       throws IOException, ServletException {
     ConnectionFailureTestHelper connectionFailureTestHelper =
-        ConnectionFailureTestHelper.createAndSetUpTestEnvironment(urlString);
+        ConnectionFailureTestHelper.createAndSetUpTestEnvironment(acrolinxUrlString);
 
     httpMethod.callAcrolinxProxyMethod(
         connectionFailureTestHelper.getHttpServletRequest(),

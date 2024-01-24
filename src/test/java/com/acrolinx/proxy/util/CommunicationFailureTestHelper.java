@@ -15,10 +15,10 @@ import org.mockito.Mockito;
 
 public class CommunicationFailureTestHelper {
   public static CommunicationFailureTestHelper createAndSetUpTestEnvironment(
-      WireMockServer wireMockServer, String urlString) {
+      WireMockServer wireMockServer, String acrolinxUrlString) {
     CommunicationFailureTestHelper communicationFailureTestHelper =
         new CommunicationFailureTestHelper(wireMockServer);
-    communicationFailureTestHelper.setUpTestEnvironment(urlString);
+    communicationFailureTestHelper.setUpTestEnvironment(acrolinxUrlString);
     return communicationFailureTestHelper;
   }
 
@@ -48,16 +48,17 @@ public class CommunicationFailureTestHelper {
     verifyInteractionWithHttpServletResponse(expectedExceptionMessage);
   }
 
-  private void setUpTestEnvironment(String urlString) {
-    stubHttpServletRequest(urlString);
+  private void setUpTestEnvironment(String acrolinxUrlString) {
+    stubHttpServletRequest(acrolinxUrlString);
 
-    ServletConfigUtil.stubServletConfigBase(servletConfig, urlString);
+    ServletConfigUtil.stubServletConfigBase(servletConfig, acrolinxUrlString);
   }
 
-  private void stubHttpServletRequest(String urlString) {
+  private void stubHttpServletRequest(String acrolinxUrlString) {
     Mockito.when(httpServletRequest.getHeaderNames()).thenReturn(Collections.emptyEnumeration());
     Mockito.when(httpServletRequest.getRequestURL())
-        .thenReturn(new StringBuffer(urlString + '/' + AcrolinxProxyHttpServlet.PROXY_PATH));
+        .thenReturn(
+            new StringBuffer(acrolinxUrlString + '/' + AcrolinxProxyHttpServlet.PROXY_PATH));
     Mockito.when(httpServletRequest.getQueryString()).thenReturn("");
     Mockito.when(httpServletRequest.getPathInfo())
         .thenReturn(AcrolinxProxyTestCommonConstants.CHECK_URL);

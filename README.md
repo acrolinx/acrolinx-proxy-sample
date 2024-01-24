@@ -58,8 +58,8 @@ See also:
 
 #### Java Servlet
 
-Configure the Acrolinx URL, username, and single sign-on password in the file [`web.xml`](src/main/webapp/WEB-INF/web.xml).
-The parameter names are `acrolinxURL`, `username`, and `genericToken`.
+Configure the Acrolinx URL, username, and single sign-on password in the [web.xml](src/main/webapp/WEB-INF/web.xml) file.
+The parameter names are `acrolinxUrl`, `username`, and `genericToken`.
 
 ## Build and Deploy
 

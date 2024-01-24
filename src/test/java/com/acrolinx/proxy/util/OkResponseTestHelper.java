@@ -37,10 +37,11 @@ public class OkResponseTestHelper {
       WireMockServer wireMockServer,
       Optional<String> acrolinxBaseUrlHeaderValue,
       HttpMethod httpMethod,
-      String urlString)
+      String acrolinxUrlString)
       throws IOException {
     OkResponseTestHelper okResponseTestHelper =
-        new OkResponseTestHelper(acrolinxBaseUrlHeaderValue, httpMethod, urlString, wireMockServer);
+        new OkResponseTestHelper(
+            acrolinxBaseUrlHeaderValue, httpMethod, acrolinxUrlString, wireMockServer);
     okResponseTestHelper.setUpTestEnvironment();
     return okResponseTestHelper;
   }
@@ -52,17 +53,17 @@ public class OkResponseTestHelper {
   private final ServletConfig servletConfig = Mockito.mock(ServletConfig.class);
   private final ServletInputStream servletInputStream = Mockito.mock(ServletInputStream.class);
   private final ServletOutputStream servletOutputStream = Mockito.mock(ServletOutputStream.class);
-  private final String urlString;
+  private final String acrolinxUrlString;
   private final WireMockServer wireMockServer;
 
   private OkResponseTestHelper(
       Optional<String> acrolinxBaseUrlHeaderValue,
       HttpMethod httpMethod,
-      String urlString,
+      String acrolinxUrlString,
       WireMockServer wireMockServer) {
     this.acrolinxBaseUrlHeaderValue = acrolinxBaseUrlHeaderValue;
     this.httpMethod = httpMethod;
-    this.urlString = urlString;
+    this.acrolinxUrlString = acrolinxUrlString;
     this.wireMockServer = wireMockServer;
   }
 
@@ -86,7 +87,8 @@ public class OkResponseTestHelper {
   }
 
   private String createHeaderValue() {
-    return acrolinxBaseUrlHeaderValue.orElse(urlString + '/' + AcrolinxProxyHttpServlet.PROXY_PATH);
+    return acrolinxBaseUrlHeaderValue.orElse(
+        acrolinxUrlString + '/' + AcrolinxProxyHttpServlet.PROXY_PATH);
   }
 
   private void setUpTestEnvironment() throws IOException {
@@ -96,7 +98,7 @@ public class OkResponseTestHelper {
     stubHttpServletRequest();
     stubHttpServletResponse();
 
-    ServletConfigUtil.stubServletConfigBase(servletConfig, urlString);
+    ServletConfigUtil.stubServletConfigBase(servletConfig, acrolinxUrlString);
   }
 
   private void stubHttpServletRequest() throws IOException {
@@ -106,7 +108,8 @@ public class OkResponseTestHelper {
     Mockito.when(httpServletRequest.getHeader(ACROLINX_BASE_URL))
         .thenReturn(acrolinxBaseUrlHeaderValue.orElse(null));
     Mockito.when(httpServletRequest.getRequestURL())
-        .thenReturn(new StringBuffer(urlString + '/' + AcrolinxProxyHttpServlet.PROXY_PATH));
+        .thenReturn(
+            new StringBuffer(acrolinxUrlString + '/' + AcrolinxProxyHttpServlet.PROXY_PATH));
     Mockito.when(httpServletRequest.getQueryString()).thenReturn("");
     Mockito.when(httpServletRequest.getPathInfo())
         .thenReturn(AcrolinxProxyTestCommonConstants.CHECK_URL);
