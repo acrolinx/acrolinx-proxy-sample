@@ -28,7 +28,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONARCLOUD_TOKEN }}
         run: mvn clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=acrolinx_acrolinx-proxy-sample
 
-  build:
+  Build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
