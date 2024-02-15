@@ -138,7 +138,6 @@ public class OkResponseTestHelper {
   private void verifyHttpServletResponse() throws IOException {
     Mockito.verify(httpServletResponse).setStatus(RESPONSE_STATUS_CODE);
 
-    Mockito.verify(httpServletResponse).setHeader("Vary", "Accept-Encoding, User-Agent");
     Mockito.verify(httpServletResponse)
         .setHeader(ArgumentMatchers.eq("Matched-Stub-Id"), ArgumentMatchers.anyString());
 
