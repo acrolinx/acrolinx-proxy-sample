@@ -35,14 +35,15 @@ class AcrolinxProxyFailureTest {
   }
 
   private static void verifyFailedNetworkCommunication(
-      String urlString, String expectedExceptionMessage) throws Exception {
+      String acrolinxUrlString, String expectedExceptionMessage)
+      throws IOException, ServletException {
     try (WireMockServerWrapper wireMockServerWrapper =
         WireMockServerWrapper.startOnRandomHttpsPort()) {
       final WireMockServer wireMockServer = wireMockServerWrapper.getWireMockServer();
 
       CommunicationFailureTestHelper communicationFailureTestHelper =
           CommunicationFailureTestHelper.createAndSetUpTestEnvironment(
-              wireMockServer, urlString + wireMockServer.httpsPort());
+              wireMockServer, acrolinxUrlString + wireMockServer.httpsPort());
 
       HttpMethod.GET.callAcrolinxProxyMethod(
           communicationFailureTestHelper.getHttpServletRequest(),
@@ -104,14 +105,14 @@ class AcrolinxProxyFailureTest {
   }
 
   @Test
-  void failedSslVerificationTest() throws Exception {
+  void failedSslVerificationTest() throws IOException, ServletException {
     verifyFailedNetworkCommunication(
         "https://localhost:",
         "javax.net.ssl.SSLHandshakeException: PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target");
   }
 
   @Test
-  void httpToHttpsTest() throws Exception {
+  void httpToHttpsTest() throws IOException, ServletException {
     verifyFailedNetworkCommunication(
         "http://localhost:", "org.apache.http.client.ClientProtocolException");
   }
@@ -127,7 +128,7 @@ class AcrolinxProxyFailureTest {
   }
 
   @Test
-  void unknownHostTest() throws Exception {
+  void unknownHostTest() throws IOException, ServletException {
     verifyConnectionFailure(HttpMethod.GET, "http://something.invalid");
   }
 }

@@ -13,6 +13,8 @@ import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 
 public class ConnectionFailureTestHelper {
+  private static final String CHECK_URL = "/api/v1/checking/checks";
+
   public static ConnectionFailureTestHelper createAndSetUpTestEnvironment(String acrolinxUrlString)
       throws IOException {
     ConnectionFailureTestHelper connectionFailureTestHelper = new ConnectionFailureTestHelper();
@@ -61,8 +63,7 @@ public class ConnectionFailureTestHelper {
             new StringBuffer(acrolinxUrlString + '/' + AcrolinxProxyHttpServlet.PROXY_PATH));
     Mockito.when(httpServletRequest.getInputStream()).thenReturn(servletInputStream);
     Mockito.when(httpServletRequest.getQueryString()).thenReturn("");
-    Mockito.when(httpServletRequest.getPathInfo())
-        .thenReturn(AcrolinxProxyTestCommonConstants.CHECK_URL);
+    Mockito.when(httpServletRequest.getPathInfo()).thenReturn(CHECK_URL);
   }
 
   private void verifyInteractionWithHttpServletRequest() throws IOException {
