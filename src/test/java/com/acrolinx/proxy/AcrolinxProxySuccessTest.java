@@ -1,16 +1,33 @@
 /* Copyright (c) 2024 Acrolinx GmbH */
 package com.acrolinx.proxy;
 
+import com.acrolinx.proxy.util.ChunkedResponseTestHelper;
 import com.acrolinx.proxy.util.HttpMethod;
 import com.acrolinx.proxy.util.OkResponseTestHelper;
 import com.acrolinx.proxy.util.WireMockServerWrapper;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import java.io.IOException;
+import java.net.ServerSocket;
 import java.util.Optional;
 import javax.servlet.ServletException;
 import org.junit.jupiter.api.Test;
 
 class AcrolinxProxySuccessTest {
+  private static void verifyChunkedHttpResponse()
+      throws IOException, InterruptedException, ServletException {
+    try (ServerSocket serverSocket = new ServerSocket(0)) {
+      ChunkedResponseTestHelper chunkedResponseTestHelper =
+          ChunkedResponseTestHelper.createAndSetUpTestEnvironment(serverSocket);
+
+      HttpMethod.GET.callAcrolinxProxyMethod(
+          chunkedResponseTestHelper.getHttpServletRequest(),
+          chunkedResponseTestHelper.getHttpServletResponse(),
+          chunkedResponseTestHelper.getServletConfig());
+
+      chunkedResponseTestHelper.verifyInteraction();
+    }
+  }
+
   private static void verifyOkResponse(
       HttpMethod httpMethod, Optional<String> acrolinxBaseUrlHeaderValue)
       throws IOException, ServletException {
@@ -41,6 +58,12 @@ class AcrolinxProxySuccessTest {
   @Test
   void doDeleteWithNoAcrolinxBaseUrlHeaderTest() throws IOException, ServletException {
     verifyOkResponse(HttpMethod.DELETE, Optional.empty());
+  }
+
+  @Test
+  void doGetWithAcrolinxBaseUrlForChunkedData()
+      throws IOException, InterruptedException, ServletException {
+    verifyChunkedHttpResponse();
   }
 
   @Test

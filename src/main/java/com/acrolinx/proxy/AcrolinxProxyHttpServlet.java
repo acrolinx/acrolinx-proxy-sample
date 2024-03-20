@@ -1,6 +1,7 @@
 /* Copyright (c) 2023 Acrolinx GmbH */
 package com.acrolinx.proxy;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -19,6 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
@@ -92,6 +94,42 @@ public class AcrolinxProxyHttpServlet extends HttpServlet {
       final HttpRequestBase httpRequestBase, final String headerName, final String headerValue) {
     httpRequestBase.removeHeaders(headerName);
     httpRequestBase.setHeader(headerName, headerValue);
+  }
+
+  private static void transferResponseBodyWitAdditionalHeaders(
+      HttpServletResponse httpServletResponse, HttpEntity httpEntity) throws IOException {
+    try (InputStream inputStream = httpEntity.getContent();
+        OutputStream outputStream = httpServletResponse.getOutputStream()) {
+      Header contentTypeHeader = httpEntity.getContentType();
+
+      if (contentTypeHeader != null) {
+        httpServletResponse.setContentType(contentTypeHeader.getValue());
+      }
+
+      try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
+        long numberOfTransferredBytes = inputStream.transferTo(byteArrayOutputStream);
+        httpServletResponse.setContentLength((int) numberOfTransferredBytes);
+
+        // all response headers must be set before writing to the OutputStream
+        outputStream.write(byteArrayOutputStream.toByteArray());
+      }
+
+      logger.debug("Forwarded response to client");
+    }
+  }
+
+  private static void transferResponseHeaders(
+      HttpServletResponse httpServletResponse, HttpResponse httpResponse) {
+    for (Header header : httpResponse.getAllHeaders()) {
+      final String headerName = header.getName();
+
+      if (!(headerName.startsWith("Transfer-Encoding")
+          || headerName.startsWith("Content-Length")
+          || headerName.startsWith("Content-Type")
+          || headerName.equalsIgnoreCase("Transfer-Encoding"))) {
+        httpServletResponse.setHeader(headerName, header.getValue());
+      }
+    }
   }
 
   private String acrolinxUrl;
@@ -240,27 +278,12 @@ public class AcrolinxProxyHttpServlet extends HttpServlet {
       logger.debug("Response received: {}", status);
       httpServletResponse.setStatus(status);
 
-      for (Header header : httpResponse.getAllHeaders()) {
-        final String headerName = header.getName();
-
-        if (!(headerName.startsWith("Transfer-Encoding")
-            || headerName.startsWith("Content-Length")
-            || headerName.startsWith("Content-Type"))) {
-          httpServletResponse.setHeader(headerName, header.getValue());
-        }
-      }
+      transferResponseHeaders(httpServletResponse, httpResponse);
 
       HttpEntity httpEntity = httpResponse.getEntity();
 
       if (httpEntity != null) {
-        try (InputStream inputStream = httpEntity.getContent();
-            OutputStream outputStream = httpServletResponse.getOutputStream()) {
-          httpServletResponse.setContentType(httpResponse.getEntity().getContentType().getValue());
-          httpServletResponse.setContentLength((int) httpResponse.getEntity().getContentLength());
-
-          inputStream.transferTo(outputStream);
-          logger.debug("Forwarded response to client");
-        }
+        transferResponseBodyWitAdditionalHeaders(httpServletResponse, httpEntity);
       }
     } catch (ConnectTimeoutException
         | SocketTimeoutException
