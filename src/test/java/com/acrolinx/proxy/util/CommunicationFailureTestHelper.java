@@ -14,6 +14,8 @@ import org.junit.jupiter.api.Assertions;
 import org.mockito.Mockito;
 
 public class CommunicationFailureTestHelper {
+  private static final String CHECK_URL = "/api/v1/checking/checks";
+
   public static CommunicationFailureTestHelper createAndSetUpTestEnvironment(
       WireMockServer wireMockServer, String acrolinxUrlString) {
     CommunicationFailureTestHelper communicationFailureTestHelper =
@@ -60,8 +62,7 @@ public class CommunicationFailureTestHelper {
         .thenReturn(
             new StringBuffer(acrolinxUrlString + '/' + AcrolinxProxyHttpServlet.PROXY_PATH));
     Mockito.when(httpServletRequest.getQueryString()).thenReturn("");
-    Mockito.when(httpServletRequest.getPathInfo())
-        .thenReturn(AcrolinxProxyTestCommonConstants.CHECK_URL);
+    Mockito.when(httpServletRequest.getPathInfo()).thenReturn(CHECK_URL);
   }
 
   private void verifyInteractionWithHttpServletResponse(String expectedExceptionMessage)

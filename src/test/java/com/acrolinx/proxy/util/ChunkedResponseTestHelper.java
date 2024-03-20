@@ -20,14 +20,15 @@ import org.mockito.Mockito;
 
 public class ChunkedResponseTestHelper {
   private static final String ACROLINX_BASE_URL = "X-Acrolinx-Base-Url";
+  private static final String CHECK_URL = "/api/v1/checking/checks";
   private static final int END_OF_INPUT_STREAM = -1;
 
   public static ChunkedResponseTestHelper createAndSetUpTestEnvironment(ServerSocket serverSocket)
       throws IOException {
-    final String urlString = "http://localhost:" + serverSocket.getLocalPort();
+    final String acrolinxUrlString = "http://localhost:" + serverSocket.getLocalPort();
     ChunkedResponseTestHelper chunkedResponseTestHelper =
         new ChunkedResponseTestHelper(
-            createAndStartThread(createRunnable(serverSocket)), urlString);
+            createAndStartThread(createRunnable(serverSocket)), acrolinxUrlString);
     chunkedResponseTestHelper.setupTestEnvironment();
 
     return chunkedResponseTestHelper;
@@ -59,17 +60,17 @@ public class ChunkedResponseTestHelper {
     };
   }
 
+  private final String acrolinxUrlString;
   private final HttpServletRequest httpServletRequest = Mockito.mock(HttpServletRequest.class);
   private final HttpServletResponse httpServletResponse = Mockito.mock(HttpServletResponse.class);
   private final ServletConfig servletConfig = Mockito.mock(ServletConfig.class);
   private final ServletInputStream servletInputStream = Mockito.mock(ServletInputStream.class);
   private final ServletOutputStream servletOutputStream = Mockito.mock(ServletOutputStream.class);
   private final Thread thread;
-  private final String urlString;
 
-  private ChunkedResponseTestHelper(Thread thread, String urlString) {
+  private ChunkedResponseTestHelper(Thread thread, String acrolinxUrlString) {
     this.thread = thread;
-    this.urlString = urlString;
+    this.acrolinxUrlString = acrolinxUrlString;
   }
 
   public HttpServletRequest getHttpServletRequest() {
@@ -87,8 +88,8 @@ public class ChunkedResponseTestHelper {
   public void verifyInteraction() throws IOException, InterruptedException {
     verifyInteractionWithServletInputStream();
     verifyInteractionWithServletOutputStream();
-    verifyHttpServletResponse();
     verifyHttpServletRequest();
+    verifyHttpServletResponse();
 
     thread.join(1_000);
     Assertions.assertSame(Thread.State.TERMINATED, thread.getState());
@@ -100,19 +101,19 @@ public class ChunkedResponseTestHelper {
     stubHttpServletRequest();
     stubHttpServletResponse();
 
-    ServletConfigUtil.stubServletConfigBase(servletConfig, urlString);
+    ServletConfigUtil.stubServletConfigBase(servletConfig, acrolinxUrlString);
   }
 
   private void stubHttpServletRequest() throws IOException {
     Mockito.when(httpServletRequest.getInputStream()).thenReturn(servletInputStream);
     Mockito.when(httpServletRequest.getHeaderNames())
         .thenReturn(Collections.enumeration(Collections.singleton(ACROLINX_BASE_URL)));
-    Mockito.when(httpServletRequest.getHeader(ACROLINX_BASE_URL)).thenReturn(urlString);
+    Mockito.when(httpServletRequest.getHeader(ACROLINX_BASE_URL)).thenReturn(acrolinxUrlString);
     Mockito.when(httpServletRequest.getRequestURL())
-        .thenReturn(new StringBuffer(urlString + '/' + AcrolinxProxyHttpServlet.PROXY_PATH));
+        .thenReturn(
+            new StringBuffer(acrolinxUrlString + '/' + AcrolinxProxyHttpServlet.PROXY_PATH));
     Mockito.when(httpServletRequest.getQueryString()).thenReturn("");
-    Mockito.when(httpServletRequest.getPathInfo())
-        .thenReturn(AcrolinxProxyTestCommonConstants.CHECK_URL);
+    Mockito.when(httpServletRequest.getPathInfo()).thenReturn(CHECK_URL);
   }
 
   private void stubHttpServletResponse() throws IOException {
@@ -127,10 +128,9 @@ public class ChunkedResponseTestHelper {
     InOrder inOrder = Mockito.inOrder(httpServletRequest);
 
     inOrder.verify(httpServletRequest).getHeaderNames();
-    inOrder.verify(httpServletRequest).getHeader(ACROLINX_BASE_URL);
+    inOrder.verify(httpServletRequest, Mockito.times(2)).getHeader(ACROLINX_BASE_URL);
     inOrder.verify(httpServletRequest, Mockito.times(2)).getQueryString();
     inOrder.verify(httpServletRequest).getPathInfo();
-    inOrder.verify(httpServletRequest).getHeader(ACROLINX_BASE_URL);
 
     Mockito.verifyNoMoreInteractions(httpServletRequest);
   }

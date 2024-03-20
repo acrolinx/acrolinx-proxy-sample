@@ -14,7 +14,7 @@ final class ContentLengthHeaderRemover implements HttpRequestInterceptor {
   }
 
   @Override
-  public void process(final HttpRequest httpRequest, final HttpContext httpContext) {
+  public void process(HttpRequest httpRequest, HttpContext httpContext) {
     httpRequest.removeHeaders(HTTP.CONTENT_LEN);
   }
 }

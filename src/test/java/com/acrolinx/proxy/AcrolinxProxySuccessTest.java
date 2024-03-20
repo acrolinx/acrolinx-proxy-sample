@@ -13,6 +13,30 @@ import javax.servlet.ServletException;
 import org.junit.jupiter.api.Test;
 
 class AcrolinxProxySuccessTest {
+  private static void callAcrolinxProxyMethod(
+      HttpMethod httpMethod, OkResponseTestHelper okResponseTestHelper)
+      throws IOException, ServletException {
+    httpMethod.callAcrolinxProxyMethod(
+        okResponseTestHelper.getHttpServletRequest(),
+        okResponseTestHelper.getHttpServletResponse(),
+        okResponseTestHelper.getServletConfig());
+  }
+
+  private static OkResponseTestHelper createOkResponseTestHelper(
+      HttpMethod httpMethod,
+      Optional<String> acrolinxBaseUrlHeaderValue,
+      WireMockServer wireMockServer,
+      boolean addContentTypeResponseHeader)
+      throws IOException {
+    if (addContentTypeResponseHeader) {
+      return OkResponseTestHelper.createAndSetUpTestEnvironmentWithContentTypeResponseHeader(
+          wireMockServer, acrolinxBaseUrlHeaderValue, httpMethod);
+    }
+
+    return OkResponseTestHelper.createAndSetUpTestEnvironmentWithoutContentTypeResponseHeader(
+        wireMockServer, acrolinxBaseUrlHeaderValue, httpMethod);
+  }
+
   private static void verifyChunkedHttpResponse()
       throws IOException, InterruptedException, ServletException {
     try (ServerSocket serverSocket = new ServerSocket(0)) {
@@ -28,36 +52,46 @@ class AcrolinxProxySuccessTest {
     }
   }
 
-  private static void verifyOkResponse(
+  private static void verifyOkResponseWithContentTypeHeader(
       HttpMethod httpMethod, Optional<String> acrolinxBaseUrlHeaderValue)
       throws IOException, ServletException {
     try (WireMockServerWrapper wireMockServerWrapper =
         WireMockServerWrapper.startOnRandomHttpPort()) {
       final WireMockServer wireMockServer = wireMockServerWrapper.getWireMockServer();
       OkResponseTestHelper okResponseTestHelper =
-          OkResponseTestHelper.createAndSetUpTestEnvironment(
-              wireMockServer,
-              acrolinxBaseUrlHeaderValue,
-              httpMethod,
-              "http://localhost:" + wireMockServer.port());
+          createOkResponseTestHelper(httpMethod, acrolinxBaseUrlHeaderValue, wireMockServer, true);
+      callAcrolinxProxyMethod(httpMethod, okResponseTestHelper);
+      okResponseTestHelper.verifyInteractionWithContentTypeHeader();
+    }
+  }
 
-      httpMethod.callAcrolinxProxyMethod(
-          okResponseTestHelper.getHttpServletRequest(),
-          okResponseTestHelper.getHttpServletResponse(),
-          okResponseTestHelper.getServletConfig());
-
-      okResponseTestHelper.verifyInteraction();
+  private static void verifyOkResponseWithoutContentTypeHeader(
+      HttpMethod httpMethod, Optional<String> acrolinxBaseUrlHeaderValue)
+      throws IOException, ServletException {
+    try (WireMockServerWrapper wireMockServerWrapper =
+        WireMockServerWrapper.startOnRandomHttpPort()) {
+      final WireMockServer wireMockServer = wireMockServerWrapper.getWireMockServer();
+      OkResponseTestHelper okResponseTestHelper =
+          createOkResponseTestHelper(httpMethod, acrolinxBaseUrlHeaderValue, wireMockServer, false);
+      callAcrolinxProxyMethod(httpMethod, okResponseTestHelper);
+      okResponseTestHelper.verifyInteractionWithoutContentTypeHeader();
     }
   }
 
   @Test
+  void doDeleteWithAcrolinxBaseUrlHeaderAndNoContentTypeHeaderTest()
+      throws IOException, ServletException {
+    verifyOkResponseWithoutContentTypeHeader(HttpMethod.DELETE, Optional.of("http://example.com/"));
+  }
+
+  @Test
   void doDeleteWithAcrolinxBaseUrlHeaderTest() throws IOException, ServletException {
-    verifyOkResponse(HttpMethod.DELETE, Optional.of("http://example.com/"));
+    verifyOkResponseWithContentTypeHeader(HttpMethod.DELETE, Optional.of("http://example.com/"));
   }
 
   @Test
   void doDeleteWithNoAcrolinxBaseUrlHeaderTest() throws IOException, ServletException {
-    verifyOkResponse(HttpMethod.DELETE, Optional.empty());
+    verifyOkResponseWithContentTypeHeader(HttpMethod.DELETE, Optional.empty());
   }
 
   @Test
@@ -67,32 +101,38 @@ class AcrolinxProxySuccessTest {
   }
 
   @Test
+  void doGetWithAcrolinxBaseUrlHeaderAndNoContentTypeHeaderTest()
+      throws IOException, ServletException {
+    verifyOkResponseWithoutContentTypeHeader(HttpMethod.GET, Optional.of("http://example.com/"));
+  }
+
+  @Test
   void doGetWithAcrolinxBaseUrlHeaderTest() throws IOException, ServletException {
-    verifyOkResponse(HttpMethod.GET, Optional.of("http://example.com/"));
+    verifyOkResponseWithContentTypeHeader(HttpMethod.GET, Optional.of("http://example.com/"));
   }
 
   @Test
   void doGetWithNoAcrolinxBaseUrlHeaderTest() throws IOException, ServletException {
-    verifyOkResponse(HttpMethod.GET, Optional.empty());
+    verifyOkResponseWithContentTypeHeader(HttpMethod.GET, Optional.empty());
   }
 
   @Test
   void doPostWithAcrolinxBaseUrlHeaderTest() throws IOException, ServletException {
-    verifyOkResponse(HttpMethod.POST, Optional.of("http://example.com/"));
+    verifyOkResponseWithContentTypeHeader(HttpMethod.POST, Optional.of("http://example.com/"));
   }
 
   @Test
   void doPostWithNoAcrolinxBaseUrlHeaderTest() throws IOException, ServletException {
-    verifyOkResponse(HttpMethod.POST, Optional.empty());
+    verifyOkResponseWithContentTypeHeader(HttpMethod.POST, Optional.empty());
   }
 
   @Test
   void doPutWithAcrolinxBaseUrlHeaderTest() throws IOException, ServletException {
-    verifyOkResponse(HttpMethod.PUT, Optional.of("http://example.com/"));
+    verifyOkResponseWithContentTypeHeader(HttpMethod.PUT, Optional.of("http://example.com/"));
   }
 
   @Test
   void doPutWithNoAcrolinxBaseUrlHeaderTest() throws IOException, ServletException {
-    verifyOkResponse(HttpMethod.PUT, Optional.empty());
+    verifyOkResponseWithContentTypeHeader(HttpMethod.PUT, Optional.empty());
   }
 }

@@ -16,10 +16,13 @@ import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 
 public class InvalidResponseTestHelper {
+  private static final String CHECK_URL = "/api/v1/checking/checks";
+
   public static InvalidResponseTestHelper createAndSetUpTestEnvironment(ServerSocket serverSocket) {
+    final String acrolinxUrlString = "http://localhost:" + serverSocket.getLocalPort();
     InvalidResponseTestHelper invalidResponseTestHelper =
         new InvalidResponseTestHelper(
-            createAndStartThread(createRunnable(serverSocket)), serverSocket);
+            createAndStartThread(createRunnable(serverSocket)), acrolinxUrlString);
     invalidResponseTestHelper.setupTestEnvironment();
 
     return invalidResponseTestHelper;
@@ -41,15 +44,15 @@ public class InvalidResponseTestHelper {
     };
   }
 
+  private final String acrolinxUrlString;
   private final HttpServletRequest httpServletRequest = Mockito.mock(HttpServletRequest.class);
   private final HttpServletResponse httpServletResponse = Mockito.mock(HttpServletResponse.class);
-  private final ServerSocket serverSocket;
   private final ServletConfig servletConfig = Mockito.mock(ServletConfig.class);
   private final Thread thread;
 
-  private InvalidResponseTestHelper(Thread thread, ServerSocket serverSocket) {
+  private InvalidResponseTestHelper(Thread thread, String acrolinxUrlString) {
     this.thread = thread;
-    this.serverSocket = serverSocket;
+    this.acrolinxUrlString = acrolinxUrlString;
   }
 
   public HttpServletRequest getHttpServletRequest() {
@@ -74,22 +77,16 @@ public class InvalidResponseTestHelper {
   private void setupTestEnvironment() {
     stubHttpServletRequest();
 
-    ServletConfigUtil.stubServletConfigBase(
-        servletConfig, "http://localhost:" + serverSocket.getLocalPort());
+    ServletConfigUtil.stubServletConfigBase(servletConfig, acrolinxUrlString);
   }
 
   private void stubHttpServletRequest() {
     Mockito.when(httpServletRequest.getHeaderNames()).thenReturn(Collections.emptyEnumeration());
     Mockito.when(httpServletRequest.getRequestURL())
         .thenReturn(
-            new StringBuffer(
-                "http://localhost:"
-                    + serverSocket.getLocalPort()
-                    + '/'
-                    + AcrolinxProxyHttpServlet.PROXY_PATH));
+            new StringBuffer(acrolinxUrlString + '/' + AcrolinxProxyHttpServlet.PROXY_PATH));
     Mockito.when(httpServletRequest.getQueryString()).thenReturn("");
-    Mockito.when(httpServletRequest.getPathInfo())
-        .thenReturn(AcrolinxProxyTestCommonConstants.CHECK_URL);
+    Mockito.when(httpServletRequest.getPathInfo()).thenReturn(CHECK_URL);
   }
 
   private void verifyInteractionWithHttpServletResponse() throws IOException {

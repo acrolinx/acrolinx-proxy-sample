@@ -21,7 +21,7 @@ public enum HttpMethod {
       HttpServletRequest httpServletRequest,
       HttpServletResponse httpServletResponse,
       ServletConfig servletConfig)
-      throws IllegalArgumentException, ServletException, IOException {
+      throws IOException, ServletException {
     AcrolinxProxyHttpServlet acrolinxProxyHttpServlet = new AcrolinxProxyHttpServlet();
     acrolinxProxyHttpServlet.init(servletConfig);
 

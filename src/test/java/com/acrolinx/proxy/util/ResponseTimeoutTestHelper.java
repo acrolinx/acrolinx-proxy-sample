@@ -12,6 +12,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.mockito.Mockito;
 
 public class ResponseTimeoutTestHelper {
+  private static final String CHECK_URL = "/api/v1/checking/checks";
+
   public static ResponseTimeoutTestHelper createAndSetUpTestEnvironment(ServerSocket serverSocket) {
     ResponseTimeoutTestHelper responseTimeoutTestHelper =
         new ResponseTimeoutTestHelper(serverSocket);
@@ -62,8 +64,7 @@ public class ResponseTimeoutTestHelper {
                     + '/'
                     + AcrolinxProxyHttpServlet.PROXY_PATH));
     Mockito.when(httpServletRequest.getQueryString()).thenReturn("");
-    Mockito.when(httpServletRequest.getPathInfo())
-        .thenReturn(AcrolinxProxyTestCommonConstants.CHECK_URL);
+    Mockito.when(httpServletRequest.getPathInfo()).thenReturn(CHECK_URL);
   }
 
   private void verifyInteractionWithHttpServletResponse(String expectedExceptionMessage)
