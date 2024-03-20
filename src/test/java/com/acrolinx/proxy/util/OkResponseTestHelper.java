@@ -144,7 +144,7 @@ public class OkResponseTestHelper {
     Mockito.verify(httpServletResponse).getOutputStream();
 
     Mockito.verify(httpServletResponse).setContentType(RESPONSE_CONTENT_TYPE);
-    Mockito.verify(httpServletResponse).setContentLength(-1);
+    Mockito.verify(httpServletResponse).setContentLength(RESPONSE_BODY.length);
 
     Mockito.verifyNoMoreInteractions(httpServletResponse);
   }
@@ -158,7 +158,7 @@ public class OkResponseTestHelper {
   private void verifyInteractionWithServletOutputStream() throws IOException {
     byte[] bytes = Arrays.copyOf(RESPONSE_BODY, BUFFER_SIZE);
 
-    Mockito.verify(servletOutputStream, Mockito.atMostOnce()).write(bytes, 0, RESPONSE_BODY.length);
+    Mockito.verify(servletOutputStream, Mockito.atMostOnce()).write(RESPONSE_BODY);
     Mockito.verify(servletOutputStream).close();
     Mockito.verifyNoMoreInteractions(servletOutputStream);
   }
