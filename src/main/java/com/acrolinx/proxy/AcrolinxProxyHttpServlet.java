@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
@@ -118,7 +119,7 @@ public class AcrolinxProxyHttpServlet extends HttpServlet {
   }
 
   private static void transferResponseHeaders(
-      HttpServletResponse httpServletResponse, CloseableHttpResponse httpResponse) {
+      HttpServletResponse httpServletResponse, HttpResponse httpResponse) {
     for (Header header : httpResponse.getAllHeaders()) {
       final String headerName = header.getName();
 
