@@ -7,6 +7,7 @@ import com.github.tomakehurst.wiremock.matching.RequestPatternBuilder;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.Collections;
+import java.util.List;
 import javax.servlet.ServletConfig;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -74,6 +75,6 @@ public class CommunicationFailureTestHelper {
 
   private void verifyInteractionWithWireMock() {
     wireMockServer.verify(0, RequestPatternBuilder.allRequests());
-    Assertions.assertEquals(Collections.emptyList(), wireMockServer.findAllUnmatchedRequests());
+    Assertions.assertEquals(List.of(), wireMockServer.findAllUnmatchedRequests());
   }
 }
