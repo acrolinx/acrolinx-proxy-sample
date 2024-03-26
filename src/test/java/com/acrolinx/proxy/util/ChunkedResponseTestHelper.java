@@ -9,6 +9,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
+import java.util.List;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletInputStream;
 import javax.servlet.ServletOutputStream;
@@ -107,7 +108,7 @@ public class ChunkedResponseTestHelper {
   private void stubHttpServletRequest() throws IOException {
     Mockito.when(httpServletRequest.getInputStream()).thenReturn(servletInputStream);
     Mockito.when(httpServletRequest.getHeaderNames())
-        .thenReturn(Collections.enumeration(Collections.singleton(ACROLINX_BASE_URL)));
+        .thenReturn(Collections.enumeration(List.of(ACROLINX_BASE_URL)));
     Mockito.when(httpServletRequest.getHeader(ACROLINX_BASE_URL)).thenReturn(acrolinxUrlString);
     Mockito.when(httpServletRequest.getRequestURL())
         .thenReturn(

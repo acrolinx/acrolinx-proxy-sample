@@ -14,6 +14,7 @@ import com.github.tomakehurst.wiremock.matching.AbsentPattern;
 import com.github.tomakehurst.wiremock.matching.RequestPatternBuilder;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletInputStream;
@@ -136,7 +137,7 @@ public class OkResponseTestHelper {
   private void stubHttpServletRequest() throws IOException {
     Mockito.when(httpServletRequest.getInputStream()).thenReturn(servletInputStream);
     Mockito.when(httpServletRequest.getHeaderNames())
-        .thenReturn(Collections.enumeration(Collections.singleton(ACROLINX_BASE_URL)));
+        .thenReturn(Collections.enumeration(List.of(ACROLINX_BASE_URL)));
     Mockito.when(httpServletRequest.getHeader(ACROLINX_BASE_URL))
         .thenReturn(acrolinxBaseUrlHeaderValue.orElse(null));
     Mockito.when(httpServletRequest.getRequestURL())
