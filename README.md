@@ -6,9 +6,6 @@ Demo code for implementing a proxy in a single sign-on environment in Java.
 
 Please contact [Acrolinx SDK support](https://github.com/acrolinx/acrolinx-coding-guidance/blob/main/topics/sdk-support.md)
 for consulting and getting your integration certified.
-This sample works with a test license on an internal Acrolinx URL.
-This license is only meant for demonstration and developing purposes.
-Once you finished your integration, you'll have to get a license for your integration from Acrolinx.
   
 Acrolinx offers different other SDKs, and examples for developing integrations.
 
@@ -34,7 +31,6 @@ singleSignOn.genericPassword=secret
 See: [About Single Sign-On with Acrolinx](https://support.acrolinx.com/hc/en-us/articles/10306041280274-About-Single-Sign-On-with-Acrolinx).
 
 *Note: Make sure that you use a proper secret for the `genericPassword`.*
-*Note: Older Acrolinx Platform versions might require more configuration properties to be set.*
 
 ### Configure the Integration
 
@@ -102,21 +98,3 @@ Please make sure to test with an appropriate configuration before rollout.
 ##### See Also
 
 * [Acrolinx Secure Tunnel](https://github.com/acrolinx/secure-tunnel)
-
-## License
-
-Copyright 2015-present Acrolinx GmbH
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at:
-
-[https://www.apache.org/licenses/LICENSE-2.0](https://www.apache.org/licenses/LICENSE-2.0)
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-
-For more information visit: [https://www.acrolinx.com](https://www.acrolinx.com)
