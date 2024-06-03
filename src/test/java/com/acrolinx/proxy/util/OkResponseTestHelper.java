@@ -159,6 +159,7 @@ public class OkResponseTestHelper {
     wireMockServer.stubFor(
         WireMock.request(httpMethod.name(), urlEqualTo(CHECK_URL))
             .withHeader(ACROLINX_BASE_URL, equalTo(createHeaderValue()))
+            .withHeader("X-Acrolinx-Integration-Proxy-Version", equalTo("2"))
             .withRequestBody(AbsentPattern.ABSENT)
             .willReturn(responseDefinitionBuilder));
   }
