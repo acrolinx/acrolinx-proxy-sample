@@ -150,7 +150,6 @@ public class AcrolinxProxyHttpServlet extends HttpServlet {
   private int connectTimeoutInMillis;
   private String genericToken;
   private int socketTimeoutInMillis;
-
   private String username;
 
   public AcrolinxProxyHttpServlet() {
@@ -248,6 +247,7 @@ public class AcrolinxProxyHttpServlet extends HttpServlet {
     httpRequestBase.setURI(targetUri);
     setRequestHeader(httpRequestBase, "User-Agent", "Acrolinx Proxy");
     setRequestHeader(httpRequestBase, "Host", targetUri.getHost());
+    setRequestHeader(httpRequestBase, "X-Acrolinx-Integration-Proxy-Version", "2");
   }
 
   private void proxyRequest(
