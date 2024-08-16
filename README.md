@@ -94,7 +94,3 @@ Make sure that you configured your VM, operating system, and backend to allow co
 [TLS versions](https://en.wikipedia.org/wiki/Transport_Layer_Security).
 
 Please make sure to test with an appropriate configuration before rollout.
-
-##### See Also
-
-* [Acrolinx Secure Tunnel](https://github.com/acrolinx/secure-tunnel)
