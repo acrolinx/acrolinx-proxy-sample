@@ -16,7 +16,7 @@
     <sonar.host.url>https://sonarcloud.io</sonar.host.url>
 
     <httpclient.version>4.5.14</httpclient.version>
-    <junit.version>5.11.0</junit.version>
+    <junit.version>5.11.1</junit.version>
     <logback.version>1.5.8</logback.version>
     <mockito.version>5.13.0</mockito.version>
     <servlet-api.version>4.0.1</servlet-api.version>
