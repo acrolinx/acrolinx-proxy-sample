@@ -1,6 +1,9 @@
 /* Copyright (c) 2023 Acrolinx GmbH */
 package com.acrolinx.proxy;
 
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,9 +18,6 @@ import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.stream.Collectors;
 import javax.net.ssl.SSLHandshakeException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.ClientProtocolException;

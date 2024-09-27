@@ -6,10 +6,10 @@ import com.acrolinx.proxy.util.HttpMethod;
 import com.acrolinx.proxy.util.OkResponseTestHelper;
 import com.acrolinx.proxy.util.WireMockServerWrapper;
 import com.github.tomakehurst.wiremock.WireMockServer;
+import jakarta.servlet.ServletException;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.Optional;
-import javax.servlet.ServletException;
 import org.junit.jupiter.api.Test;
 
 class AcrolinxProxySuccessTest {

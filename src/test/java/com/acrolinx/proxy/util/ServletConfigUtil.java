@@ -1,7 +1,7 @@
 /* Copyright (c) 2024 Acrolinx GmbH */
 package com.acrolinx.proxy.util;
 
-import javax.servlet.ServletConfig;
+import jakarta.servlet.ServletConfig;
 import org.mockito.Mockito;
 
 class ServletConfigUtil {

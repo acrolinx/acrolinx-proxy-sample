@@ -12,15 +12,15 @@ import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.http.RequestMethod;
 import com.github.tomakehurst.wiremock.matching.AbsentPattern;
 import com.github.tomakehurst.wiremock.matching.RequestPatternBuilder;
+import jakarta.servlet.ServletConfig;
+import jakarta.servlet.ServletInputStream;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletInputStream;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.Assertions;
 import org.mockito.ArgumentMatchers;
 import org.mockito.InOrder;
@@ -152,7 +152,7 @@ public class OkResponseTestHelper {
   }
 
   private void stubServletInputStream() throws IOException {
-    Mockito.when(servletInputStream.read(any())).thenReturn(END_OF_INPUT_STREAM);
+    Mockito.when(servletInputStream.read(any(byte[].class))).thenReturn(END_OF_INPUT_STREAM);
   }
 
   private void stubWireMock(ResponseDefinitionBuilder responseDefinitionBuilder) {
@@ -203,7 +203,7 @@ public class OkResponseTestHelper {
   }
 
   private void verifyInteractionWithServletInputStream() throws IOException {
-    Mockito.verify(servletInputStream, Mockito.atMostOnce()).read(any());
+    Mockito.verify(servletInputStream, Mockito.atMostOnce()).read(any(byte[].class));
     Mockito.verify(servletInputStream, Mockito.atMostOnce()).close();
     Mockito.verifyNoMoreInteractions(servletInputStream);
   }
