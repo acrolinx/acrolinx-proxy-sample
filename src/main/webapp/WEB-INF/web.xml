@@ -13,7 +13,7 @@
 			<param-value>testuser</param-value>
 		</init-param>
 		<init-param>
-			<param-name>acrolinxURL</param-name>
+			<param-name>acrolinxUrl</param-name>
 			<param-value>http://localhost:8031/</param-value>
 		</init-param>
 		<init-param>
@@ -24,6 +24,6 @@
 
 	<servlet-mapping>
 		<servlet-name>AcrolinxProxyHttpServlet</servlet-name>
-		<url-pattern>/proxy/*</url-pattern>
+		<url-pattern>/acrolinx-proxy-sample/proxy/*</url-pattern>
 	</servlet-mapping>
 </web-app>

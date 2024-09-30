@@ -11,7 +11,7 @@
     <script>
         async function PostFunction() {
             try {
-                const response = await postData('proxy/api/v1/auth/sign-ins');
+                const response = await postData('acrolinx-proxy-sample/proxy/api/v1/auth/sign-ins');
                 if (response.status === 200) {
                     const respJson = await response.json();
                     document.getElementById("singinResult").innerText = "Signin success\n" + JSON.stringify(respJson);
