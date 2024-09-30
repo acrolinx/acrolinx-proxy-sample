@@ -4,7 +4,7 @@ Demo code for implementing a proxy in a single sign-on environment in Java.
 
 ## Prerequisites
 
-Please contact [Acrolinx support](https://github.com/acrolinx/acrolinx-coding-guidance/blob/main/topics/sdk-support.md)
+Please contact [Acrolinx Support](https://github.com/acrolinx/acrolinx-coding-guidance/blob/main/topics/sdk-support.md)
 for consulting and getting your integration certified.
   
 Acrolinx offers different other SDKs, and examples for developing integrations.
@@ -22,7 +22,7 @@ See: [Architecture Diagrams](https://support.acrolinx.com/hc/en-us/articles/1021
 
 ### Configure the Acrolinx Platform
 
-To enable usage of proxy, please reach out to [Acrolinx support](https://github.com/acrolinx/acrolinx-coding-guidance/blob/main/topics/sdk-support.md) and get the secret from them.
+To enable usage of proxy, contact [Acrolinx Support](https://github.com/acrolinx/acrolinx-coding-guidance/blob/main/topics/sdk-support.md) and get the generic token from them.
 
 ### Configure the Sidebar Integration
 
@@ -51,7 +51,7 @@ The parameter names are `acrolinxUrl`, `username`, and `genericToken`.
 
 ### Test the Sample Proxy
 
-To run sample
+To run a sample
 ```bash
 mvn jetty:run-war
 ```
