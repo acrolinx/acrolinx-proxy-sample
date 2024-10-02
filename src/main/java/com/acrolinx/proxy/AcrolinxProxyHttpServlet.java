@@ -190,10 +190,8 @@ public class AcrolinxProxyHttpServlet extends HttpServlet {
   @Override
   public void init() {
     // Properties can be configured by init parameters in the web.xml.
-    acrolinxUrl =
-        getInitParameterOrDefaultValue("acrolinxUrl", "http://localhost:8031/")
-            .replaceAll("/$", "");
-    genericToken = getInitParameterOrDefaultValue("genericToken", "secret");
+    acrolinxUrl = getInitParameterOrDefaultValue("acrolinxUrl").replaceAll("/$", "");
+    genericToken = getInitParameterOrDefaultValue("genericToken");
     username = getUsernameFromApplicationSession();
     connectTimeoutInMillis =
         Integer.parseInt(getInitParameterOrDefaultValue("connectTimeoutInMillis", "-1"));
@@ -214,9 +212,19 @@ public class AcrolinxProxyHttpServlet extends HttpServlet {
             .build());
   }
 
-  private String getInitParameterOrDefaultValue(final String name, final String defaultValue) {
+  private String getInitParameterOrDefaultValue(String name, String defaultValue) {
     String parameterValue = getInitParameter(name);
-    return parameterValue != null ? parameterValue : defaultValue;
+    return parameterValue == null ? defaultValue : parameterValue;
+  }
+
+  private String getInitParameterOrDefaultValue(final String name) {
+    String parameterValue = getInitParameter(name);
+
+    if (parameterValue == null) {
+      throw new IllegalArgumentException("Missing parameter: " + name);
+    }
+
+    return parameterValue;
   }
 
   private URI getTargetUri(final HttpServletRequest httpServletRequest) throws IOException {
@@ -236,7 +244,7 @@ public class AcrolinxProxyHttpServlet extends HttpServlet {
   }
 
   private String getUsernameFromApplicationSession() {
-    return getInitParameterOrDefaultValue("username", "username");
+    return getInitParameterOrDefaultValue("username");
     // TODO: Set user name from the current applications session. This is just an
     // example code the user name comes from web.xml.
   }
