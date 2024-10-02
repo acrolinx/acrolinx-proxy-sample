@@ -6,7 +6,7 @@
         <button class="btnSSO" onclick="PostFunction()">SIGN IN</button>
     </div>
     <br />
-    <div id="singinResult"></div>
+    <div id="signInResult"></div>
     <br />
     <script>
         async function PostFunction() {
@@ -14,13 +14,13 @@
                 const response = await postData('acrolinx-proxy-sample/proxy/api/v1/auth/sign-ins');
                 if (response.status === 200) {
                     const respJson = await response.json();
-                    document.getElementById("singinResult").innerText = "Signin success\n" + JSON.stringify(respJson);
+                    document.getElementById("signInResult").innerText = "Signin success\n" + JSON.stringify(respJson);
                 }
                 else if (response.status === 201) {
                     const respJson = await response.json();
                     const interactiveURL = respJson.links.interactive;
-                    document.getElementById("singinResult").innerText = "Complete Signin by accessing interactive url & poll platform for success.";
-                    document.getElementById('singinResult').innerHTML = '<br/><a href="' + interactiveURL + '" target="_blank">Click here to complete sigin</a>';
+                    document.getElementById("signInResult").innerText = "Complete Signin by accessing interactive url & poll platform for success.";
+                    document.getElementById('signInResult').innerHTML = '<br/><a href="' + interactiveURL + '" target="_blank">Click here to complete sigin</a>';
                 }
             } catch (error) {
                 console.error(error);
