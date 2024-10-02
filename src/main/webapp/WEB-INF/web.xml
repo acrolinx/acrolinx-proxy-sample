@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
 
-<web-app>
+<web-app xmlns="https://jakarta.ee/xml/ns/jakartaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd"
+         metadata-complete="false"
+         version="6.0">
 	<display-name>Acrolinx Proxy Sample</display-name>
 	<servlet>
 		<servlet-name>AcrolinxProxyHttpServlet</servlet-name>
@@ -13,7 +16,7 @@
 			<param-value>testuser</param-value>
 		</init-param>
 		<init-param>
-			<param-name>acrolinxURL</param-name>
+			<param-name>acrolinxUrl</param-name>
 			<param-value>http://localhost:8031/</param-value>
 		</init-param>
 		<init-param>
@@ -24,6 +27,6 @@
 
 	<servlet-mapping>
 		<servlet-name>AcrolinxProxyHttpServlet</servlet-name>
-		<url-pattern>/proxy/*</url-pattern>
+		<url-pattern>/acrolinx-proxy-sample/proxy/*</url-pattern>
 	</servlet-mapping>
 </web-app>

@@ -16,10 +16,10 @@
     <sonar.host.url>https://sonarcloud.io</sonar.host.url>
 
     <httpclient.version>4.5.14</httpclient.version>
+    <jakarta.servlet-api.version>6.1.0</jakarta.servlet-api.version>
     <junit.version>5.11.1</junit.version>
     <logback.version>1.5.8</logback.version>
     <mockito.version>5.14.1</mockito.version>
-    <servlet-api.version>4.0.1</servlet-api.version>
     <slf4j.version>2.0.16</slf4j.version>
     <wiremock.version>3.9.1</wiremock.version>
   </properties>
@@ -36,9 +36,9 @@
       <version>${slf4j.version}</version>
     </dependency>
     <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
-      <version>${servlet-api.version}</version>
+      <groupId>jakarta.servlet</groupId>
+      <artifactId>jakarta.servlet-api</artifactId>
+      <version>${jakarta.servlet-api.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -177,6 +177,11 @@
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>versions-maven-plugin</artifactId>
         <version>2.17.1</version>
+      </plugin>
+      <plugin>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-maven-plugin</artifactId>
+        <version>11.0.24</version>
       </plugin>
       <plugin>
         <groupId>org.jacoco</groupId>

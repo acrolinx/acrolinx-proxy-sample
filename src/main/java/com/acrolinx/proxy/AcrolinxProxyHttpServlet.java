@@ -1,6 +1,9 @@
 /* Copyright (c) 2023 Acrolinx GmbH */
 package com.acrolinx.proxy;
 
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,9 +18,6 @@ import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.stream.Collectors;
 import javax.net.ssl.SSLHandshakeException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.ClientProtocolException;
@@ -190,10 +190,8 @@ public class AcrolinxProxyHttpServlet extends HttpServlet {
   @Override
   public void init() {
     // Properties can be configured by init parameters in the web.xml.
-    acrolinxUrl =
-        getInitParameterOrDefaultValue("acrolinxUrl", "http://localhost:8031/")
-            .replaceAll("/$", "");
-    genericToken = getInitParameterOrDefaultValue("genericToken", "secret");
+    acrolinxUrl = getInitParameterOrThrowException("acrolinxUrl").replaceAll("/$", "");
+    genericToken = getInitParameterOrThrowException("genericToken");
     username = getUsernameFromApplicationSession();
     connectTimeoutInMillis =
         Integer.parseInt(getInitParameterOrDefaultValue("connectTimeoutInMillis", "-1"));
@@ -214,9 +212,19 @@ public class AcrolinxProxyHttpServlet extends HttpServlet {
             .build());
   }
 
-  private String getInitParameterOrDefaultValue(final String name, final String defaultValue) {
+  private String getInitParameterOrDefaultValue(String name, String defaultValue) {
     String parameterValue = getInitParameter(name);
-    return parameterValue != null ? parameterValue : defaultValue;
+    return parameterValue == null ? defaultValue : parameterValue;
+  }
+
+  private String getInitParameterOrThrowException(final String name) {
+    String parameterValue = getInitParameter(name);
+
+    if (parameterValue == null || parameterValue.isBlank()) {
+      throw new IllegalArgumentException("Missing parameter: " + name);
+    }
+
+    return parameterValue;
   }
 
   private URI getTargetUri(final HttpServletRequest httpServletRequest) throws IOException {
@@ -236,7 +244,7 @@ public class AcrolinxProxyHttpServlet extends HttpServlet {
   }
 
   private String getUsernameFromApplicationSession() {
-    return getInitParameterOrDefaultValue("username", "username");
+    return getInitParameterOrThrowException("username");
     // TODO: Set user name from the current applications session. This is just an
     // example code the user name comes from web.xml.
   }

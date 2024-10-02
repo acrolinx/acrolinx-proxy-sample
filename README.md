@@ -4,7 +4,7 @@ Demo code for implementing a proxy in a single sign-on environment in Java.
 
 ## Prerequisites
 
-Please contact [Acrolinx SDK support](https://github.com/acrolinx/acrolinx-coding-guidance/blob/main/topics/sdk-support.md)
+Please contact [Acrolinx Support](https://github.com/acrolinx/acrolinx-coding-guidance/blob/main/topics/sdk-support.md)
 for consulting and getting your integration certified.
   
 Acrolinx offers different other SDKs, and examples for developing integrations.
@@ -22,17 +22,9 @@ See: [Architecture Diagrams](https://support.acrolinx.com/hc/en-us/articles/1021
 
 ### Configure the Acrolinx Platform
 
-To enable single sign-on, add the following example properties to the `coreserver.properties` file:
+To enable usage of proxy, contact [Acrolinx Support](https://github.com/acrolinx/acrolinx-coding-guidance/blob/main/topics/sdk-support.md) and get the generic token from them.
 
-```properties
-singleSignOn.genericPassword=secret
-```
-
-See: [About Single Sign-On with Acrolinx](https://support.acrolinx.com/hc/en-us/articles/10306041280274-About-Single-Sign-On-with-Acrolinx).
-
-*Note: Make sure that you use a proper secret for the `genericPassword`.*
-
-### Configure the Integration
+### Configure the Sidebar Integration
 
 In the [`config.js`](https://github.com/acrolinx/acrolinx-sidebar-demo/blob/main/samples/config.js) of your Acrolinx Integration,
 set the Acrolinx URL to point to the relative proxy path as follows:
@@ -54,23 +46,19 @@ See also:
 
 #### Java Servlet
 
-Configure the Acrolinx URL, username, and single sign-on password in the [web.xml](src/main/webapp/WEB-INF/web.xml) file.
+Configure the Acrolinx URL, username, and generic token in the [web.xml](src/main/webapp/WEB-INF/web.xml) file.
 The parameter names are `acrolinxUrl`, `username`, and `genericToken`.
 
-## Build and Deploy
+### Test the Sample Proxy
 
-Deploy to a Web container like Apache Tomcat:
-
+To run a sample
 ```bash
-mvn package
-cp target/acrolinx-proxy-sample.war <WEBCONTAINER>/webapps/
+mvn jetty:run-war
 ```
-
-### Test the Proxy
 
 The given sample demonstrates consuming the rest call `api/v1/auth/sign-ins` for Acrolinx authentication.
 
-If you open `http://<WEBCONTAINER>/acrolinx-proxy-sample/`, like [http://localhost:8080/acrolinx-proxy-sample/](http://localhost:8080/acrolinx-proxy-sample/)
+If you open `http://<WEBCONTAINER>/`, like [http://localhost:8080/](http://localhost:8080/acrolinx-proxy-sample/)
 then press the sign-in button and it will either give you the interactive URL to the complete sign-in,
 or a success message with details.
 
@@ -81,8 +69,8 @@ Especially take care of:
 
 * The entire authentication is checked in the proxy layer.
 * The username is already authenticated in the system you integrate.
-* The proxy adds the username header and the SSO token header.
-* The SSO token is kept secret between the system's backend and the Acrolinx Platform.
+* The proxy adds the username header and the generic token header.
+* The generic token is kept secret between the system's backend and the Acrolinx Platform.
 * It's impossible to fake a request to the proxy and obtain an authentication token
   for a different user than the authenticated user.
 

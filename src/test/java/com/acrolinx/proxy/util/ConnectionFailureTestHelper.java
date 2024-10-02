@@ -2,13 +2,13 @@
 package com.acrolinx.proxy.util;
 
 import com.acrolinx.proxy.AcrolinxProxyHttpServlet;
+import jakarta.servlet.ServletConfig;
+import jakarta.servlet.ServletInputStream;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.Collections;
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletInputStream;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 

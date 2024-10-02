@@ -4,17 +4,17 @@ package com.acrolinx.proxy.util;
 import static org.mockito.ArgumentMatchers.any;
 
 import com.acrolinx.proxy.AcrolinxProxyHttpServlet;
+import jakarta.servlet.ServletConfig;
+import jakarta.servlet.ServletInputStream;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletInputStream;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.Assertions;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
@@ -122,7 +122,7 @@ public class ChunkedResponseTestHelper {
   }
 
   private void stubServletInputStream() throws IOException {
-    Mockito.when(servletInputStream.read(any())).thenReturn(END_OF_INPUT_STREAM);
+    Mockito.when(servletInputStream.read(any(byte[].class))).thenReturn(END_OF_INPUT_STREAM);
   }
 
   private void verifyHttpServletRequest() {

@@ -8,9 +8,9 @@ import com.acrolinx.proxy.util.InvalidResponseTestHelper;
 import com.acrolinx.proxy.util.ResponseTimeoutTestHelper;
 import com.acrolinx.proxy.util.WireMockServerWrapper;
 import com.github.tomakehurst.wiremock.WireMockServer;
+import jakarta.servlet.ServletException;
 import java.io.IOException;
 import java.net.ServerSocket;
-import javax.servlet.ServletException;
 import org.junit.jupiter.api.Test;
 
 class AcrolinxProxyFailureTest {
