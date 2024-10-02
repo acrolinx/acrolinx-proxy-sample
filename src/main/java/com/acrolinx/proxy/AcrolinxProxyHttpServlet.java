@@ -190,8 +190,8 @@ public class AcrolinxProxyHttpServlet extends HttpServlet {
   @Override
   public void init() {
     // Properties can be configured by init parameters in the web.xml.
-    acrolinxUrl = getInitParameterOrDefaultValue("acrolinxUrl").replaceAll("/$", "");
-    genericToken = getInitParameterOrDefaultValue("genericToken");
+    acrolinxUrl = getInitParameterOrThrowException("acrolinxUrl").replaceAll("/$", "");
+    genericToken = getInitParameterOrThrowException("genericToken");
     username = getUsernameFromApplicationSession();
     connectTimeoutInMillis =
         Integer.parseInt(getInitParameterOrDefaultValue("connectTimeoutInMillis", "-1"));
@@ -217,10 +217,10 @@ public class AcrolinxProxyHttpServlet extends HttpServlet {
     return parameterValue == null ? defaultValue : parameterValue;
   }
 
-  private String getInitParameterOrDefaultValue(final String name) {
+  private String getInitParameterOrThrowException(final String name) {
     String parameterValue = getInitParameter(name);
 
-    if (parameterValue == null) {
+    if (parameterValue == null || parameterValue.isBlank()) {
       throw new IllegalArgumentException("Missing parameter: " + name);
     }
 
@@ -244,7 +244,7 @@ public class AcrolinxProxyHttpServlet extends HttpServlet {
   }
 
   private String getUsernameFromApplicationSession() {
-    return getInitParameterOrDefaultValue("username");
+    return getInitParameterOrThrowException("username");
     // TODO: Set user name from the current applications session. This is just an
     // example code the user name comes from web.xml.
   }
