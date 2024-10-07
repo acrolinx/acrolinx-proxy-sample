@@ -11,12 +11,12 @@ Acrolinx has different SDKs and examples for developing integrations.
 
 Before you start developing your own integration, you might benefit from reading:
 
-* [Build with Acrolinx](https://support.acrolinx.com/hc/en-us/categories/10209837818770-Build-With-Acrolinx), and
+* [Build with Acrolinx](https://support.acrolinx.com/hc/en-us/categories/10209837818770-Build-With-Acrolinx)
 * the [How to integrate with Acrolinx](https://github.com/acrolinx/acrolinx-coding-guidance).
 
 ## Overview
 
-See: [Architecture Diagrams](https://support.acrolinx.com/hc/en-us/articles/10210859500818-Architecture-Diagrams)
+See [Architecture diagrams](https://support.acrolinx.com/hc/en-us/articles/10210859500818-Architecture-Diagrams)
 
 ## Configure the sample
 
@@ -26,7 +26,7 @@ To enable the proxy, contact [Acrolinx Support](https://github.com/acrolinx/acro
 
 ### Configure the Sidebar integration
 
-In the [`config.js`](https://github.com/acrolinx/acrolinx-sidebar-demo/blob/main/samples/config.js) of your Acrolinx Integration,
+In the [`config.js`](https://github.com/acrolinx/acrolinx-sidebar-demo/blob/main/samples/config.js),
 set the Acrolinx URL to point to the relative proxy path as follows:
 
 ```javascript
