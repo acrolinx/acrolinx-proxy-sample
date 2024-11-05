@@ -7,6 +7,10 @@ import com.github.tomakehurst.wiremock.core.Options;
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 
 public final class WireMockServerWrapper implements AutoCloseable {
+  public static WireMockServerWrapper startOnHttpPort(int portNumber) {
+    return createAndStart(createWireMockConfiguration().port(portNumber));
+  }
+
   public static WireMockServerWrapper startOnRandomHttpPort() {
     return createAndStart(createWireMockConfiguration().dynamicPort());
   }
