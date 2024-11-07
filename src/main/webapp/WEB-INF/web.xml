@@ -1,32 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="https://jakarta.ee/xml/ns/jakartaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd"
+  metadata-complete="false" version="6.0">
+  <display-name>Acrolinx Proxy Sample</display-name>
 
-<web-app xmlns="https://jakarta.ee/xml/ns/jakartaee"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd"
-         metadata-complete="false"
-         version="6.0">
-	<display-name>Acrolinx Proxy Sample</display-name>
-	<servlet>
-		<servlet-name>AcrolinxProxyHttpServlet</servlet-name>
-		<display-name>AcrolinxProxyHttpServlet</display-name>
-		<servlet-class>com.acrolinx.proxy.AcrolinxProxyHttpServlet</servlet-class>
+  <servlet>
+    <servlet-name>AcrolinxProxyHttpServlet</servlet-name>
+    <servlet-class>com.acrolinx.proxy.AcrolinxProxyHttpServlet</servlet-class>
 
-		<init-param>
-			<param-name>username</param-name>
-			<param-value>testuser</param-value>
-		</init-param>
-		<init-param>
-			<param-name>acrolinxUrl</param-name>
-			<param-value>http://localhost:8031/</param-value>
-		</init-param>
-		<init-param>
-			<param-name>genericToken</param-name>
-			<param-value>secret</param-value>
-		</init-param>
-	</servlet>
+    <init-param>
+      <param-name>username</param-name>
+      <param-value>testuser</param-value>
+    </init-param>
+    <init-param>
+      <param-name>acrolinxUrl</param-name>
+      <param-value>http://localhost:8031/</param-value>
+    </init-param>
+    <init-param>
+      <param-name>genericToken</param-name>
+      <param-value>secret</param-value>
+    </init-param>
+  </servlet>
 
-	<servlet-mapping>
-		<servlet-name>AcrolinxProxyHttpServlet</servlet-name>
-		<url-pattern>/acrolinx-proxy-sample/proxy/*</url-pattern>
-	</servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>AcrolinxProxyHttpServlet</servlet-name>
+    <url-pattern>/acrolinx-proxy-sample/proxy/*</url-pattern>
+  </servlet-mapping>
 </web-app>

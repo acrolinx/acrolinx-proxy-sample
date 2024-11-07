@@ -1,47 +1,41 @@
-<html>
-
-<body>
-    <h2>Acrolinx Proxy Sample</h2>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Acrolinx Proxy Sample</title>
+  </head>
+  <body>
+    <h1>Acrolinx Proxy Sample</h1>
     <div>
-        <button class="btnSSO" onclick="PostFunction()">SIGN IN</button>
+      <button onclick="postFunction()">Sign in</button>
     </div>
-    <br />
-    <div id="signInResult"></div>
-    <br />
+    <div id="signInResult" />
     <script>
-        async function PostFunction() {
-            try {
-                const response = await postData('acrolinx-proxy-sample/proxy/api/v1/auth/sign-ins');
-                if (response.status === 200) {
-                    const respJson = await response.json();
-                    document.getElementById("signInResult").innerText = "Signin success\n" + JSON.stringify(respJson);
-                }
-                else if (response.status === 201) {
-                    const respJson = await response.json();
-                    const interactiveURL = respJson.links.interactive;
-                    document.getElementById("signInResult").innerText = "Complete Signin by accessing interactive url & poll platform for success.";
-                    document.getElementById('signInResult').innerHTML = '<br/><a href="' + interactiveURL + '" target="_blank">Click here to complete sigin</a>';
-                }
-            } catch (error) {
-                console.error(error);
-            }
-        }
+      async function postFunction() {
+        const response = await postData('acrolinx-proxy-sample/proxy/api/v1/auth/sign-ins');
 
-        async function postData(url = '', data = {}) {
-            const response = await fetch(url, {
-                method: 'POST',
-                mode: 'cors',
-                cache: 'no-cache',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Acrolinx-Client': "SW50ZWdyYXRpb25EZXZlbG9wbWVudERlbW9Pbmx5" + "; " + "1.0"
-                },
-                redirect: 'follow',
-                body: JSON.stringify(data)
-            });
-            return response;
+        if (response.status === 200) {
+          const responseJson = await response.json();
+          document.getElementById("signInResult").innerText = "Sign in success\n" + JSON.stringify(responseJson);
+        } else if (response.status === 201) {
+          const responseJson = await response.json();
+          const interactiveURL = responseJson.links.interactive;
+          document.getElementById("signInResult").innerText = "Complete Sign in by accessing interactive url & poll platform for success.";
+          document.getElementById('signInResult').innerHTML = '<br/><a href="' + interactiveURL + '" target="_blank">Click here to complete sigin</a>';
         }
+      }
+  
+      function postData(url) {
+        return fetch(url, {
+          method: 'GET',
+          mode: 'cors',
+          cache: 'no-cache',
+          headers: {
+            'X-Acrolinx-Client': 'SW50ZWdyYXRpb25EZXZlbG9wbWVudERlbW9Pbmx5; 1.0'
+          },
+          redirect: 'follow'
+        });
+      }
     </script>
-</body>
-
+  </body>
 </html>
