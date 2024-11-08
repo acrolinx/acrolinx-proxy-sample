@@ -82,8 +82,7 @@ class AcrolinxProxyFailureTest {
           responseTimeoutTestHelper.getHttpServletResponse(),
           responseTimeoutTestHelper.getServletConfig());
 
-      responseTimeoutTestHelper.verifyInteraction(
-          "java.net.SocketTimeoutException: Read timed out");
+      responseTimeoutTestHelper.verifyInteraction();
     }
   }
 
@@ -111,13 +110,14 @@ class AcrolinxProxyFailureTest {
   void failedSslVerificationTest() throws IOException, ServletException {
     verifyFailedNetworkCommunication(
         "https://localhost:",
-        "javax.net.ssl.SSLHandshakeException: PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target");
+        "java.io.IOException: PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target");
   }
 
   @Test
   void httpToHttpsTest() throws IOException, ServletException {
     verifyFailedNetworkCommunication(
-        "http://localhost:", "org.apache.http.client.ClientProtocolException");
+        "http://localhost:",
+        "java.io.IOException: parsing HTTP/1.1 status line, receiving [\u0000P], parser state [STATUS_LINE]");
   }
 
   @Test

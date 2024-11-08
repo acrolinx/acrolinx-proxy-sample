@@ -8,32 +8,29 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.ConnectException;
 import java.net.HttpURLConnection;
-import java.net.SocketException;
-import java.net.SocketTimeoutException;
 import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.UnknownHostException;
+import java.net.http.HttpClient;
+import java.net.http.HttpClient.Redirect;
+import java.net.http.HttpClient.Version;
+import java.net.http.HttpHeaders;
+import java.net.http.HttpRequest;
+import java.net.http.HttpRequest.BodyPublisher;
+import java.net.http.HttpRequest.BodyPublishers;
+import java.net.http.HttpRequest.Builder;
+import java.net.http.HttpResponse;
+import java.net.http.HttpResponse.BodySubscribers;
+import java.net.http.HttpTimeoutException;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.Enumeration;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
-import javax.net.ssl.SSLHandshakeException;
-import org.apache.http.Header;
-import org.apache.http.HttpEntity;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.config.CookieSpecs;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpDelete;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpPut;
-import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.conn.ConnectTimeoutException;
-import org.apache.http.entity.InputStreamEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,11 +42,13 @@ public class AcrolinxProxyHttpServlet extends HttpServlet {
   // TODO: Set this path in context of your servlet's reverse proxy implementation
   public static final String PROXY_PATH = "acrolinx-proxy-sample/proxy";
   private static final String ACROLINX_BASE_URL_HEADER = "X-Acrolinx-Base-Url";
+  private static final Set<String> DISALLOWED_HEADER_NAMES =
+      Set.of("connection", "content-length", "expect", "host", "upgrade");
   private static final Logger LOGGER = LoggerFactory.getLogger(AcrolinxProxyHttpServlet.class);
   private static final long serialVersionUID = 1L;
 
-  private static void addAcrolinxUrlHeader(
-      HttpServletRequest httpServletRequest, HttpRequestBase httpRequestBase) {
+  private static void addAcrolinxBaseUrlHeader(
+      HttpServletRequest httpServletRequest, Builder httpRequestBuilder) {
     // add an extra header needed for acrolinx
     String acrolinxBaseUrl = httpServletRequest.getHeader(ACROLINX_BASE_URL_HEADER);
 
@@ -58,33 +57,42 @@ public class AcrolinxProxyHttpServlet extends HttpServlet {
       String requestUrlString = httpServletRequest.getRequestURL().toString();
       String baseUrl =
           requestUrlString.substring(0, requestUrlString.indexOf(PROXY_PATH) + PROXY_PATH.length());
-      httpRequestBase.setHeader(ACROLINX_BASE_URL_HEADER, baseUrl);
+      httpRequestBuilder.header(ACROLINX_BASE_URL_HEADER, baseUrl);
     }
   }
 
   private static void copyHeaders(
-      HttpServletRequest httpServletRequest, HttpRequestBase httpRequestBase) {
+      HttpServletRequest httpServletRequest, Builder httpRequestBuilder) {
     Enumeration<String> headerNames = httpServletRequest.getHeaderNames();
 
     while (headerNames.hasMoreElements()) {
       String headerName = headerNames.nextElement();
       String headerValue = httpServletRequest.getHeader(headerName);
 
-      if (headerName.equalsIgnoreCase("cookie")) {
+      if (isHeaderNameDisallowed(headerName)) {
+        continue;
+      }
+
+      if (headerValue == null) {
+        headerValue = "";
+      }
+
+      if ("cookie".equalsIgnoreCase(headerName)) {
         headerValue = filterCookies(headerValue);
       }
 
-      httpRequestBase.addHeader(headerName, headerValue);
+      httpRequestBuilder.header(headerName, headerValue);
     }
   }
 
-  private static CloseableHttpClient createHttpClient() {
-    return HttpClientBuilder.create()
-        .setConnectionManager(new PoolingHttpClientConnectionManager())
-        .setDefaultRequestConfig(RequestConfig.custom().setCookieSpec(CookieSpecs.STANDARD).build())
-        .disableRedirectHandling()
-        .disableAutomaticRetries()
-        .addInterceptorFirst(ContentLengthHeaderRemover.INSTANCE)
+  private static BodyPublisher createBodyPublisher(HttpServletRequest httpServletRequest) {
+    return BodyPublishers.ofInputStream(getInputStreamSupplier(httpServletRequest));
+  }
+
+  private static HttpClient createHttpClient() {
+    return HttpClient.newBuilder()
+        .followRedirects(Redirect.NEVER)
+        .version(Version.HTTP_1_1)
         .build();
   }
 
@@ -95,6 +103,27 @@ public class AcrolinxProxyHttpServlet extends HttpServlet {
         .collect(Collectors.joining(";"));
   }
 
+  private static Supplier<InputStream> getInputStreamSupplier(
+      HttpServletRequest httpServletRequest) {
+    return () -> {
+      try {
+        return httpServletRequest.getInputStream();
+      } catch (IOException e) {
+        throw new IllegalStateException(e);
+      }
+    };
+  }
+
+  private static boolean isHeaderNameDisallowed(String headerName) {
+    for (String disallowedHeaderName : DISALLOWED_HEADER_NAMES) {
+      if (disallowedHeaderName.equalsIgnoreCase(headerName)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
   private static void logExceptionAndSendError(
       HttpServletResponse httpServletResponse, Exception exception, int statusCode)
       throws IOException {
@@ -103,88 +132,87 @@ public class AcrolinxProxyHttpServlet extends HttpServlet {
   }
 
   private static void setRequestHeader(
-      HttpRequestBase httpRequestBase, String headerName, String headerValue) {
-    httpRequestBase.removeHeaders(headerName);
-    httpRequestBase.setHeader(headerName, headerValue);
+      Builder httpRequestBuilder, String headerName, String headerValue) {
+    httpRequestBuilder.setHeader(headerName, headerValue);
   }
 
   private static void transferResponseBodyWitAdditionalHeaders(
-      HttpServletResponse httpServletResponse, HttpEntity httpEntity) throws IOException {
-    try (InputStream inputStream = httpEntity.getContent();
-        OutputStream outputStream = httpServletResponse.getOutputStream()) {
-      Header contentTypeHeader = httpEntity.getContentType();
+      HttpServletResponse httpServletResponse, HttpResponse<InputStream> httpResponse)
+      throws IOException {
+    HttpHeaders httpHeaders = httpResponse.headers();
+    Optional<String> contentTypeHeader = httpHeaders.firstValue("Content-Type");
 
-      if (contentTypeHeader != null) {
-        httpServletResponse.setContentType(contentTypeHeader.getValue());
-      }
-
-      try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
-        long numberOfTransferredBytes = inputStream.transferTo(byteArrayOutputStream);
-        httpServletResponse.setContentLength((int) numberOfTransferredBytes);
-
-        // all response headers must be set before writing to the OutputStream
-        outputStream.write(byteArrayOutputStream.toByteArray());
-      }
-
-      LOGGER.debug("Forwarded response to client");
+    if (contentTypeHeader.isPresent()) {
+      httpServletResponse.setContentType(contentTypeHeader.get());
     }
+
+    try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        OutputStream outputStream = httpServletResponse.getOutputStream(); ) {
+      long numberOfTransferredBytes = httpResponse.body().transferTo(byteArrayOutputStream);
+      httpServletResponse.setContentLength((int) numberOfTransferredBytes);
+
+      // all response headers must be set before writing to the OutputStream
+      outputStream.write(byteArrayOutputStream.toByteArray());
+    }
+
+    LOGGER.debug("Forwarded response to client");
   }
 
   private static void transferResponseHeaders(
-      HttpServletResponse httpServletResponse, Header[] headers) {
-    for (Header header : headers) {
+      HttpServletResponse httpServletResponse, HttpHeaders httpHeaders) {
+    for (Map.Entry<String, List<String>> header : httpHeaders.map().entrySet()) {
       /* The Content-Length and Content-Type headers are copied via the corresponding setter
-      methods. The Transfer-Encoding header is filtered out since the Apache HttpClient automatically decompresses the response body. */
-      final String headerName = header.getName();
+      methods. The Transfer-Encoding header is filtered out since the HttpClient automatically decompresses the response body. */
+      final String headerName = header.getKey();
+      final String headerValue = header.getValue().get(0);
 
       if (!(headerName.equalsIgnoreCase("Content-Length")
           || headerName.equalsIgnoreCase("Content-Type")
           || headerName.equalsIgnoreCase("Transfer-Encoding"))) {
-        httpServletResponse.setHeader(headerName, header.getValue());
+        httpServletResponse.setHeader(headerName, headerValue);
       }
     }
   }
 
   private String acrolinxUrl;
-  private final CloseableHttpClient closeableHttpClient;
-  private int connectTimeoutInMillis;
   private String genericToken;
-  private int socketTimeoutInMillis;
+  private final HttpClient httpClient;
+  private Duration timeoutDuration;
   private String username;
 
   public AcrolinxProxyHttpServlet() {
-    closeableHttpClient = createHttpClient();
+    httpClient = createHttpClient();
   }
 
   @Override
   public void doDelete(
       HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse)
       throws IOException {
-    final HttpDelete httpDelete = new HttpDelete();
-    proxyRequest(httpServletRequest, httpServletResponse, httpDelete);
+    final Builder httpRequestBuilder = HttpRequest.newBuilder().DELETE();
+    proxyRequest(httpServletRequest, httpServletResponse, httpRequestBuilder);
   }
 
   @Override
   public void doGet(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse)
       throws IOException {
-    final HttpGet httpGet = new HttpGet();
-    proxyRequest(httpServletRequest, httpServletResponse, httpGet);
+    final Builder httpRequestBuilder = HttpRequest.newBuilder().GET();
+    proxyRequest(httpServletRequest, httpServletResponse, httpRequestBuilder);
   }
 
   @Override
   public void doPost(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse)
       throws IOException {
-    final HttpPost httpPost = new HttpPost();
-    httpPost.setEntity(new InputStreamEntity(httpServletRequest.getInputStream()));
-    proxyRequest(httpServletRequest, httpServletResponse, httpPost);
+    final Builder httpRequestBuilder =
+        HttpRequest.newBuilder().POST(createBodyPublisher(httpServletRequest));
+    proxyRequest(httpServletRequest, httpServletResponse, httpRequestBuilder);
   }
 
   @Override
   public void doPut(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse)
       throws IOException {
-    final HttpPut httpPut = new HttpPut();
-    httpPut.setEntity(new InputStreamEntity(httpServletRequest.getInputStream()));
-    proxyRequest(httpServletRequest, httpServletResponse, httpPut);
+    final Builder httpRequestBuilder =
+        HttpRequest.newBuilder().PUT(createBodyPublisher(httpServletRequest));
+    proxyRequest(httpServletRequest, httpServletResponse, httpRequestBuilder);
   }
 
   @Override
@@ -193,23 +221,12 @@ public class AcrolinxProxyHttpServlet extends HttpServlet {
     acrolinxUrl = getInitParameterOrThrowException("acrolinxUrl").replaceAll("/$", "");
     genericToken = getInitParameterOrThrowException("genericToken");
     username = getUsernameFromApplicationSession();
-    connectTimeoutInMillis =
-        Integer.parseInt(getInitParameterOrDefaultValue("connectTimeoutInMillis", "-1"));
-    socketTimeoutInMillis =
-        Integer.parseInt(getInitParameterOrDefaultValue("socketTimeoutInMillis", "-1"));
+    timeoutDuration = Duration.parse(getInitParameterOrDefaultValue("timeoutDuration", "PT1M"));
   }
 
-  private void addSingleSignOnHeaders(HttpRequestBase httpRequestBase) {
-    setRequestHeader(httpRequestBase, "username", username);
-    setRequestHeader(httpRequestBase, "password", genericToken);
-  }
-
-  private void configureTimeouts(HttpRequestBase httpRequestBase) {
-    httpRequestBase.setConfig(
-        RequestConfig.custom()
-            .setConnectTimeout(connectTimeoutInMillis)
-            .setSocketTimeout(socketTimeoutInMillis)
-            .build());
+  private void addSingleSignOnHeaders(Builder httpRequestBuilder) {
+    setRequestHeader(httpRequestBuilder, "username", username);
+    setRequestHeader(httpRequestBuilder, "password", genericToken);
   }
 
   private String getInitParameterOrDefaultValue(String name, String defaultValue) {
@@ -227,20 +244,13 @@ public class AcrolinxProxyHttpServlet extends HttpServlet {
     return parameterValue;
   }
 
-  private URI getTargetUri(final HttpServletRequest httpServletRequest) throws IOException {
+  private URI getTargetUri(final HttpServletRequest httpServletRequest) {
     final String queryPart =
         httpServletRequest.getQueryString() != null
             ? "?" + httpServletRequest.getQueryString()
             : "";
     final String uriString = acrolinxUrl + httpServletRequest.getPathInfo() + queryPart;
-
-    try {
-      URI targetUri = new URI(uriString);
-      LOGGER.debug("Request URI: {}", targetUri);
-      return targetUri;
-    } catch (final URISyntaxException e) {
-      throw new IOException(e);
-    }
+    return URI.create(uriString);
   }
 
   private String getUsernameFromApplicationSession() {
@@ -249,57 +259,48 @@ public class AcrolinxProxyHttpServlet extends HttpServlet {
     // example code the user name comes from web.xml.
   }
 
-  private void modifyRequest(HttpServletRequest httpServletRequest, HttpRequestBase httpRequestBase)
-      throws IOException {
-    final URI targetUri = getTargetUri(httpServletRequest);
-    httpRequestBase.setURI(targetUri);
-    setRequestHeader(httpRequestBase, "User-Agent", "Acrolinx Proxy");
-    setRequestHeader(httpRequestBase, "Host", targetUri.getHost());
-    setRequestHeader(httpRequestBase, "X-Acrolinx-Integration-Proxy-Version", "2");
+  private void modifyRequest(HttpServletRequest httpServletRequest, Builder httpRequestBuilder) {
+    httpRequestBuilder.uri(getTargetUri(httpServletRequest));
+    setRequestHeader(httpRequestBuilder, "User-Agent", "Acrolinx Proxy");
+    setRequestHeader(httpRequestBuilder, "X-Acrolinx-Integration-Proxy-Version", "2");
   }
 
   private void proxyRequest(
       HttpServletRequest httpServletRequest,
       HttpServletResponse httpServletResponse,
-      HttpRequestBase httpRequestBase)
+      Builder httpRequestBuilder)
       throws IOException {
-    copyHeaders(httpServletRequest, httpRequestBase);
+    copyHeaders(httpServletRequest, httpRequestBuilder);
 
-    addAcrolinxUrlHeader(httpServletRequest, httpRequestBase);
+    addAcrolinxBaseUrlHeader(httpServletRequest, httpRequestBuilder);
 
-    modifyRequest(httpServletRequest, httpRequestBase);
+    modifyRequest(httpServletRequest, httpRequestBuilder);
 
-    configureTimeouts(httpRequestBase);
+    httpRequestBuilder.timeout(timeoutDuration);
 
-    // TODO: Make sure not to call the following line in case a user is not
-    // authenticated to the application.
-    addSingleSignOnHeaders(httpRequestBase);
+    addSingleSignOnHeaders(httpRequestBuilder);
 
-    LOGGER.info("Performing HTTP request: {}", httpRequestBase);
+    LOGGER.info("Performing HTTP request: {}", httpRequestBuilder);
 
-    try (CloseableHttpResponse closeableHttpResponse =
-        closeableHttpClient.execute(httpRequestBase)) {
-      int status = closeableHttpResponse.getStatusLine().getStatusCode();
+    try {
+      HttpResponse<InputStream> httpResponse =
+          httpClient.send(
+              httpRequestBuilder.build(), responseInfo -> BodySubscribers.ofInputStream());
+      int status = httpResponse.statusCode();
       LOGGER.debug("Response received: {}", status);
 
       httpServletResponse.setStatus(status);
 
-      transferResponseHeaders(httpServletResponse, closeableHttpResponse.getAllHeaders());
+      transferResponseHeaders(httpServletResponse, httpResponse.headers());
 
-      HttpEntity httpEntity = closeableHttpResponse.getEntity();
-
-      if (httpEntity != null) {
-        transferResponseBodyWitAdditionalHeaders(httpServletResponse, httpEntity);
-      }
-    } catch (ConnectTimeoutException
-        | SocketException
-        | UnknownHostException
-        | SocketTimeoutException e) {
+      transferResponseBodyWitAdditionalHeaders(httpServletResponse, httpResponse);
+    } catch (ConnectException | HttpTimeoutException e) {
       logExceptionAndSendError(httpServletResponse, e, HttpURLConnection.HTTP_BAD_GATEWAY);
-    } catch (SSLHandshakeException | ClientProtocolException e) {
+    } catch (IOException e) {
       logExceptionAndSendError(httpServletResponse, e, HttpURLConnection.HTTP_UNAVAILABLE);
-    } finally {
-      httpRequestBase.releaseConnection();
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+      throw new IllegalStateException(e);
     }
   }
 }

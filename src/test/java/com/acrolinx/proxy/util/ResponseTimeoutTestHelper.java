@@ -8,7 +8,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.ServerSocket;
+import java.time.Duration;
 import java.util.Collections;
+import org.mockito.AdditionalMatchers;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 
 public class ResponseTimeoutTestHelper {
@@ -42,8 +45,8 @@ public class ResponseTimeoutTestHelper {
     return servletConfig;
   }
 
-  public void verifyInteraction(String expectedExceptionMessage) throws IOException {
-    verifyInteractionWithHttpServletResponse(expectedExceptionMessage);
+  public void verifyInteraction() throws IOException {
+    verifyInteractionWithHttpServletResponse();
   }
 
   private void setupTestEnvironment() {
@@ -51,7 +54,7 @@ public class ResponseTimeoutTestHelper {
 
     ServletConfigUtil.stubServletConfigBase(
         servletConfig, "http://localhost:" + serverSocket.getLocalPort());
-    ServletConfigUtil.stubServletConfigSocketTimeout(servletConfig, "1");
+    ServletConfigUtil.stubServletConfigTimeout(servletConfig, Duration.ofMillis(1));
   }
 
   private void stubHttpServletRequest() {
@@ -67,10 +70,14 @@ public class ResponseTimeoutTestHelper {
     Mockito.when(httpServletRequest.getPathInfo()).thenReturn(CHECK_URL);
   }
 
-  private void verifyInteractionWithHttpServletResponse(String expectedExceptionMessage)
-      throws IOException {
+  private void verifyInteractionWithHttpServletResponse() throws IOException {
     Mockito.verify(httpServletResponse)
-        .sendError(HttpURLConnection.HTTP_BAD_GATEWAY, expectedExceptionMessage);
+        .sendError(
+            ArgumentMatchers.eq(HttpURLConnection.HTTP_BAD_GATEWAY),
+            AdditionalMatchers.or(
+                ArgumentMatchers.eq(
+                    "java.net.http.HttpConnectTimeoutException: HTTP connect timed out"),
+                ArgumentMatchers.eq("java.net.http.HttpTimeoutException: request timed out")));
     Mockito.verifyNoMoreInteractions(httpServletResponse);
   }
 }

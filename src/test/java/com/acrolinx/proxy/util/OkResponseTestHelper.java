@@ -4,6 +4,7 @@ package com.acrolinx.proxy.util;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 
 import com.acrolinx.proxy.AcrolinxProxyHttpServlet;
 import com.github.tomakehurst.wiremock.WireMockServer;
@@ -152,7 +153,8 @@ public class OkResponseTestHelper {
   }
 
   private void stubServletInputStream() throws IOException {
-    Mockito.when(servletInputStream.read(any(byte[].class))).thenReturn(END_OF_INPUT_STREAM);
+    Mockito.when(servletInputStream.read(any(byte[].class), anyInt(), anyInt()))
+        .thenReturn(END_OF_INPUT_STREAM);
   }
 
   private void stubWireMock(ResponseDefinitionBuilder responseDefinitionBuilder) {
@@ -169,9 +171,9 @@ public class OkResponseTestHelper {
     inOrder.verify(httpServletResponse).setStatus(RESPONSE_STATUS_CODE);
     inOrder
         .verify(httpServletResponse)
-        .setHeader(ArgumentMatchers.eq("Matched-Stub-Id"), ArgumentMatchers.anyString());
-    inOrder.verify(httpServletResponse).getOutputStream();
+        .setHeader(ArgumentMatchers.eq("matched-stub-id"), ArgumentMatchers.anyString());
     inOrder.verify(httpServletResponse).setContentType(RESPONSE_CONTENT_TYPE);
+    inOrder.verify(httpServletResponse).getOutputStream();
     inOrder.verify(httpServletResponse).setContentLength(RESPONSE_BODY.length);
 
     Mockito.verifyNoMoreInteractions(httpServletResponse);
@@ -182,7 +184,7 @@ public class OkResponseTestHelper {
     inOrder.verify(httpServletResponse).setStatus(RESPONSE_STATUS_CODE);
     inOrder
         .verify(httpServletResponse)
-        .setHeader(ArgumentMatchers.eq("Matched-Stub-Id"), ArgumentMatchers.anyString());
+        .setHeader(ArgumentMatchers.eq("matched-stub-id"), ArgumentMatchers.anyString());
     inOrder.verify(httpServletResponse).getOutputStream();
     inOrder.verify(httpServletResponse).setContentLength(RESPONSE_BODY.length);
 
@@ -203,8 +205,9 @@ public class OkResponseTestHelper {
   }
 
   private void verifyInteractionWithServletInputStream() throws IOException {
-    Mockito.verify(servletInputStream, Mockito.atMostOnce()).read(any(byte[].class));
-    Mockito.verify(servletInputStream, Mockito.atMostOnce()).close();
+    Mockito.verify(servletInputStream, Mockito.atMost(2))
+        .read(any(byte[].class), anyInt(), anyInt());
+    Mockito.verify(servletInputStream, Mockito.atMost(2)).close();
     Mockito.verifyNoMoreInteractions(servletInputStream);
   }
 
