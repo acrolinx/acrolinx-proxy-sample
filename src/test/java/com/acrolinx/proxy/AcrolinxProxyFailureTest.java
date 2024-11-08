@@ -11,8 +11,11 @@ import com.github.tomakehurst.wiremock.WireMockServer;
 import jakarta.servlet.ServletException;
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 
+@Timeout(value = 5, unit = TimeUnit.SECONDS)
 class AcrolinxProxyFailureTest {
   /**
    * The first byte of the first octet of a Class A address cannot be 0 because 0 and 127 are
