@@ -103,7 +103,7 @@ class TomcatIT {
   }
 
   @Test
-  void integrationTest(@TempDir Path tempDirectory) throws Exception {
+  void embeddedTomcatIntegrationTest(@TempDir Path tempDirectory) throws Exception {
     try (WireMockServerWrapper wireMockServerWrapper = WireMockServerWrapper.startOnHttpPort(8031);
         TomcatWrapper tomcatWrapper = TomcatWrapper.startOnRandomHttpPort(tempDirectory)) {
       final WireMockServer wireMockServer = wireMockServerWrapper.getWireMockServer();
