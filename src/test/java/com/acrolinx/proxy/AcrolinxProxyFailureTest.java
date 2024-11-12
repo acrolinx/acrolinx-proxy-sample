@@ -110,7 +110,7 @@ class AcrolinxProxyFailureTest {
   void failedSslVerificationTest() throws IOException, ServletException {
     verifyFailedNetworkCommunication(
         "https://localhost:",
-        "java.io.IOException: PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target");
+        "PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target");
   }
 
   @Test
