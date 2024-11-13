@@ -26,6 +26,7 @@ import java.time.Duration;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -115,13 +116,7 @@ public class AcrolinxProxyHttpServlet extends HttpServlet {
   }
 
   private static boolean isHeaderNameDisallowed(String headerName) {
-    for (String disallowedHeaderName : DISALLOWED_HEADER_NAMES) {
-      if (disallowedHeaderName.equalsIgnoreCase(headerName)) {
-        return true;
-      }
-    }
-
-    return false;
+    return DISALLOWED_HEADER_NAMES.contains(headerName.toLowerCase(Locale.ENGLISH));
   }
 
   private static void logExceptionAndSendError(
