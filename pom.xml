@@ -15,7 +15,6 @@
     <sonar.organization>acrolinx</sonar.organization>
     <sonar.host.url>https://sonarcloud.io</sonar.host.url>
 
-    <httpclient.version>4.5.14</httpclient.version>
     <jakarta.servlet-api.version>6.1.0</jakarta.servlet-api.version>
     <junit.version>5.11.3</junit.version>
     <logback.version>1.5.12</logback.version>
@@ -25,11 +24,6 @@
   </properties>
 
   <dependencies>
-    <dependency>
-      <groupId>org.apache.httpcomponents</groupId>
-      <artifactId>httpclient</artifactId>
-      <version>${httpclient.version}</version>
-    </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>

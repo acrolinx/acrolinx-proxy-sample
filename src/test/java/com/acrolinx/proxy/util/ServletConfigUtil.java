@@ -2,6 +2,7 @@
 package com.acrolinx.proxy.util;
 
 import jakarta.servlet.ServletConfig;
+import java.time.Duration;
 import org.mockito.Mockito;
 
 class ServletConfigUtil {
@@ -11,14 +12,8 @@ class ServletConfigUtil {
     stubInitParameter(servletConfig, "username", "username");
   }
 
-  static void stubServletConfigConnectTimeout(
-      ServletConfig servletConfig, String connectTimeoutInMillis) {
-    stubInitParameter(servletConfig, "connectTimeoutInMillis", connectTimeoutInMillis);
-  }
-
-  static void stubServletConfigSocketTimeout(
-      ServletConfig servletConfig, String socketTimeoutInMillis) {
-    stubInitParameter(servletConfig, "socketTimeoutInMillis", socketTimeoutInMillis);
+  static void stubServletConfigTimeout(ServletConfig servletConfig, Duration duration) {
+    stubInitParameter(servletConfig, "timeoutDuration", duration.toString());
   }
 
   private static void stubInitParameter(

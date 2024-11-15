@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.time.Duration;
 import java.util.Collections;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
@@ -53,7 +54,7 @@ public class ConnectionFailureTestHelper {
     stubHttpServletRequest(acrolinxUrlString);
 
     ServletConfigUtil.stubServletConfigBase(servletConfig, acrolinxUrlString);
-    ServletConfigUtil.stubServletConfigConnectTimeout(servletConfig, "1");
+    ServletConfigUtil.stubServletConfigTimeout(servletConfig, Duration.ofMillis(1));
   }
 
   private void stubHttpServletRequest(String acrolinxUrlString) throws IOException {

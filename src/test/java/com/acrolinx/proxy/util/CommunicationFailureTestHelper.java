@@ -12,6 +12,7 @@ import java.net.HttpURLConnection;
 import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 
 public class CommunicationFailureTestHelper {
@@ -69,7 +70,9 @@ public class CommunicationFailureTestHelper {
   private void verifyInteractionWithHttpServletResponse(String expectedExceptionMessage)
       throws IOException {
     Mockito.verify(httpServletResponse)
-        .sendError(HttpURLConnection.HTTP_UNAVAILABLE, expectedExceptionMessage);
+        .sendError(
+            ArgumentMatchers.eq(HttpURLConnection.HTTP_UNAVAILABLE),
+            ArgumentMatchers.contains(expectedExceptionMessage));
     Mockito.verifyNoMoreInteractions(httpServletResponse);
   }
 
