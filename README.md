@@ -4,7 +4,7 @@ Demo code for implementing a proxy in a single sign-on environment in Java.
 
 ## Prerequisites
 
-Please contact [Acrolinx Support](https://github.com/acrolinx/acrolinx-coding-guidance/blob/main/topics/sdk-support.md)
+Please contact [Acrolinx Support](https://support.acrolinx.com/hc/en-us/requests/new)
 for consulting and getting your integration certified.
   
 Acrolinx offers different other SDKs, and examples for developing integrations.
@@ -22,7 +22,7 @@ See: [Architecture Diagrams](https://support.acrolinx.com/hc/en-us/articles/1021
 
 ### Configure the Acrolinx Platform
 
-To enable usage of proxy, contact [Acrolinx Support](https://github.com/acrolinx/acrolinx-coding-guidance/blob/main/topics/sdk-support.md) and get the generic token from them.
+To enable usage of proxy, contact [Acrolinx Support](https://support.acrolinx.com/hc/en-us/requests/new) and get the generic token from them.
 
 ### Configure the Sidebar Integration
 
@@ -51,21 +51,22 @@ The parameter names are `acrolinxUrl`, `username`, and `genericToken`.
 
 ### Test the Sample Proxy
 
-To run a sample
+The following command executes a Maven build of the project and then deploys the resulting `acrolinx-proxy-sample.war` file to a Jetty web server:
+
 ```bash
 mvn jetty:run-war
 ```
 
-The given sample demonstrates consuming the rest call `api/v1/auth/sign-ins` for Acrolinx authentication.
+Once Jetty is up and running, you can then make HTTP requests to test the `AcrolinxProxyHttpServlet`.
+The following is an example of such an HTTP request with the help of a curl command:
 
-If you open `http://<WEBCONTAINER>/`, like [http://localhost:8080/](http://localhost:8080/acrolinx-proxy-sample/)
-then press the sign-in button and it will either give you the interactive URL to the complete sign-in,
-or a success message with details.
+```bash
+curl -X POST http://localhost:8080/acrolinx-proxy-sample/proxy/api/v1/auth/sign-ins
+```
 
 ### Security
 
-Make sure to implement the proxy in a [secure way](https://github.com/acrolinx/acrolinx-coding-guidance/blob/main/topics/security-safety.md#security).
-Especially take care of:
+Make sure to implement the proxy in a secure way. Especially take care of:
 
 * The entire authentication is checked in the proxy layer.
 * The username is already authenticated in the system you integrate.
