@@ -6,10 +6,13 @@ import java.time.Duration;
 import org.mockito.Mockito;
 
 class ServletConfigUtil {
+  static final String GENERIC_TOKEN = "!#$%&<=>@?";
+  static final String USER_NAME = "abcdäöüß";
+
   static void stubServletConfigBase(ServletConfig servletConfig, String acrolinxUrlString) {
     stubInitParameter(servletConfig, "acrolinxUrl", acrolinxUrlString);
-    stubInitParameter(servletConfig, "genericToken", "token");
-    stubInitParameter(servletConfig, "username", "username");
+    stubInitParameter(servletConfig, "genericToken", GENERIC_TOKEN);
+    stubInitParameter(servletConfig, "username", USER_NAME);
   }
 
   static void stubServletConfigTimeout(ServletConfig servletConfig, Duration duration) {
