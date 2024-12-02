@@ -222,6 +222,12 @@ public class OkResponseTestHelper {
         new RequestPatternBuilder(
                 RequestMethod.fromString(httpMethod.name()), urlEqualTo(CHECK_URL))
             .withHeader(ACROLINX_BASE_URL, equalTo(createHeaderValue()))
+            .withHeader("User-Agent", equalTo(AcrolinxProxyHttpServlet.USER_AGENT))
+            .withHeader(
+                "X-Acrolinx-Integration-Proxy-Version",
+                equalTo(AcrolinxProxyHttpServlet.PROXY_VERSION))
+            .withHeader("username", UrlEncodingPattern.equalTo(ServletConfigUtil.USER_NAME))
+            .withHeader("password", UrlEncodingPattern.equalTo(ServletConfigUtil.GENERIC_TOKEN))
             .withRequestBody(AbsentPattern.ABSENT));
 
     Assertions.assertEquals(Collections.emptyList(), wireMockServer.findAllUnmatchedRequests());

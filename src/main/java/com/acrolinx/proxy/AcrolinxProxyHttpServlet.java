@@ -11,6 +11,7 @@ import java.io.OutputStream;
 import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.URI;
+import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpClient.Redirect;
 import java.net.http.HttpClient.Version;
@@ -22,6 +23,7 @@ import java.net.http.HttpRequest.Builder;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodySubscribers;
 import java.net.http.HttpTimeoutException;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -42,6 +44,8 @@ import org.slf4j.LoggerFactory;
 public class AcrolinxProxyHttpServlet extends HttpServlet {
   // TODO: Set this path in context of your servlet's reverse proxy implementation
   public static final String PROXY_PATH = "acrolinx-proxy-sample/proxy";
+  public static final String PROXY_VERSION = "2";
+  public static final String USER_AGENT = "Acrolinx Proxy";
   private static final String ACROLINX_BASE_URL_HEADER = "X-Acrolinx-Base-Url";
   private static final Set<String> DISALLOWED_HEADER_NAMES =
       Set.of("connection", "content-length", "expect", "host", "upgrade");
@@ -169,6 +173,10 @@ public class AcrolinxProxyHttpServlet extends HttpServlet {
     }
   }
 
+  private static String urlEncode(String string) {
+    return URLEncoder.encode(string, StandardCharsets.UTF_8);
+  }
+
   private String acrolinxUrl;
   private String genericToken;
   private final HttpClient httpClient;
@@ -220,8 +228,8 @@ public class AcrolinxProxyHttpServlet extends HttpServlet {
   }
 
   private void addSingleSignOnHeaders(Builder httpRequestBuilder) {
-    setRequestHeader(httpRequestBuilder, "username", username);
-    setRequestHeader(httpRequestBuilder, "password", genericToken);
+    setRequestHeader(httpRequestBuilder, "username", urlEncode(username));
+    setRequestHeader(httpRequestBuilder, "password", urlEncode(genericToken));
   }
 
   private String getInitParameterOrDefaultValue(String name, String defaultValue) {
@@ -256,8 +264,8 @@ public class AcrolinxProxyHttpServlet extends HttpServlet {
 
   private void modifyRequest(HttpServletRequest httpServletRequest, Builder httpRequestBuilder) {
     httpRequestBuilder.uri(getTargetUri(httpServletRequest));
-    setRequestHeader(httpRequestBuilder, "User-Agent", "Acrolinx Proxy");
-    setRequestHeader(httpRequestBuilder, "X-Acrolinx-Integration-Proxy-Version", "2");
+    setRequestHeader(httpRequestBuilder, "User-Agent", USER_AGENT);
+    setRequestHeader(httpRequestBuilder, "X-Acrolinx-Integration-Proxy-Version", PROXY_VERSION);
   }
 
   private void proxyRequest(

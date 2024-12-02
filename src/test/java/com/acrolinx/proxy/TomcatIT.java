@@ -30,12 +30,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 class TomcatIT {
-  private static final String HTTP_METHOD = "GET";
-  private static final String URL_STRING = "/api/v1/auth/sign-ins";
   private static final String CLIENT_SIGNATURE = "SW50ZWdyYXRpb25EZXZlbG9wbWVudERlbW9Pbmx5; 1.0";
+  private static final String HTTP_METHOD = "GET";
   private static final StringValuePattern PASSWORD = equalTo("secret");
-  private static final StringValuePattern PROXY_VERSION = equalTo("2");
+  private static final StringValuePattern PROXY_VERSION =
+      equalTo(AcrolinxProxyHttpServlet.PROXY_VERSION);
   private static final Duration TIMEOUT = Duration.ofSeconds(3);
+  private static final String URL_STRING = "/api/v1/auth/sign-ins";
   private static final StringValuePattern USERNAME = equalTo("testuser");
   private static final String X_ACROLINX_CLIENT = "X-Acrolinx-Client";
 
@@ -94,6 +95,7 @@ class TomcatIT {
     wireMockServer.verify(
         new RequestPatternBuilder(RequestMethod.fromString(HTTP_METHOD), urlEqualTo(URL_STRING))
             .withHeader(X_ACROLINX_CLIENT, equalTo(CLIENT_SIGNATURE))
+            .withHeader("User-Agent", equalTo(AcrolinxProxyHttpServlet.USER_AGENT))
             .withHeader("X-Acrolinx-Integration-Proxy-Version", PROXY_VERSION)
             .withHeader("username", USERNAME)
             .withHeader("password", PASSWORD)
