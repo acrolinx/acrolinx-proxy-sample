@@ -7,7 +7,7 @@ import org.mockito.Mockito;
 
 class ServletConfigUtil {
   static final String GENERIC_TOKEN = "!#$%&<=>@?";
-  static final String USER_NAME = "abcdäöüß";
+  static final String USER_NAME = "abcd äöüß";
 
   static void stubServletConfigBase(ServletConfig servletConfig, String acrolinxUrlString) {
     stubInitParameter(servletConfig, "acrolinxUrl", acrolinxUrlString);
