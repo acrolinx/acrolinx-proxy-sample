@@ -135,7 +135,7 @@ public class AcrolinxProxyHttpServlet extends HttpServlet {
     httpRequestBuilder.setHeader(headerName, headerValue);
   }
 
-  private static void transferResponseBodyWitAdditionalHeaders(
+  private static void transferResponseBodyWithAdditionalHeaders(
       HttpServletResponse httpServletResponse, HttpResponse<InputStream> httpResponse)
       throws IOException {
     HttpHeaders httpHeaders = httpResponse.headers();
@@ -296,7 +296,7 @@ public class AcrolinxProxyHttpServlet extends HttpServlet {
 
       transferResponseHeaders(httpServletResponse, httpResponse.headers());
 
-      transferResponseBodyWitAdditionalHeaders(httpServletResponse, httpResponse);
+      transferResponseBodyWithAdditionalHeaders(httpServletResponse, httpResponse);
     } catch (ConnectException | HttpTimeoutException e) {
       logExceptionAndSendError(httpServletResponse, e, HttpURLConnection.HTTP_BAD_GATEWAY);
     } catch (IOException e) {
