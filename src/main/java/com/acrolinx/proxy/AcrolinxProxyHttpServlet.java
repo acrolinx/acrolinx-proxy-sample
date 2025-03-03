@@ -38,8 +38,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This servlet acts as a reverse proxy. The Acrolinx plug-in uses this servlet to communicate with
- * the Acrolinx core server.
+ * This HttpServlet acts as a reverse proxy. The Acrolinx plug-in uses this servlet to communicate
+ * with the Acrolinx back-end.
  */
 public class AcrolinxProxyHttpServlet extends HttpServlet {
   // TODO: Set this path in context of your servlet's reverse proxy implementation
@@ -54,11 +54,9 @@ public class AcrolinxProxyHttpServlet extends HttpServlet {
 
   private static void addAcrolinxBaseUrlHeader(
       HttpServletRequest httpServletRequest, Builder httpRequestBuilder) {
-    // add an extra header needed for acrolinx
     String acrolinxBaseUrl = httpServletRequest.getHeader(ACROLINX_BASE_URL_HEADER);
 
-    if (acrolinxBaseUrl == null
-        || acrolinxBaseUrl.isEmpty()) { // means we never copied it or it was never there
+    if (acrolinxBaseUrl == null || acrolinxBaseUrl.isEmpty()) {
       String requestUrlString = httpServletRequest.getRequestURL().toString();
       String baseUrl =
           requestUrlString.substring(0, requestUrlString.indexOf(PROXY_PATH) + PROXY_PATH.length());
@@ -223,7 +221,7 @@ public class AcrolinxProxyHttpServlet extends HttpServlet {
     // Properties can be configured by init parameters in the web.xml.
     acrolinxUrl = getInitParameterOrThrowException("acrolinxUrl").replaceAll("/$", "");
     genericToken = getInitParameterOrThrowException("genericToken");
-    username = getUsernameFromApplicationSession();
+    username = getInitParameterOrThrowException("username");
     timeoutDuration = Duration.parse(getInitParameterOrDefaultValue("timeoutDuration", "PT1M"));
   }
 
@@ -237,11 +235,11 @@ public class AcrolinxProxyHttpServlet extends HttpServlet {
     return parameterValue == null ? defaultValue : parameterValue;
   }
 
-  private String getInitParameterOrThrowException(final String name) {
-    String parameterValue = getInitParameter(name);
+  private String getInitParameterOrThrowException(final String parameterName) {
+    String parameterValue = getInitParameter(parameterName);
 
     if (parameterValue == null || parameterValue.isBlank()) {
-      throw new IllegalArgumentException("Missing parameter: " + name);
+      throw new IllegalArgumentException("Missing parameter: " + parameterName);
     }
 
     return parameterValue;
@@ -254,12 +252,6 @@ public class AcrolinxProxyHttpServlet extends HttpServlet {
             : "";
     final String uriString = acrolinxUrl + httpServletRequest.getPathInfo() + queryPart;
     return URI.create(uriString);
-  }
-
-  private String getUsernameFromApplicationSession() {
-    return getInitParameterOrThrowException("username");
-    // TODO: Set user name from the current applications session. This is just an
-    // example code the user name comes from web.xml.
   }
 
   private void modifyRequest(HttpServletRequest httpServletRequest, Builder httpRequestBuilder) {

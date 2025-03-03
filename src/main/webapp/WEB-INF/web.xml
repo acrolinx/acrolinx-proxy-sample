@@ -9,12 +9,12 @@
     <servlet-class>com.acrolinx.proxy.AcrolinxProxyHttpServlet</servlet-class>
 
     <init-param>
-      <param-name>username</param-name>
-      <param-value>testuser</param-value>
-    </init-param>
-    <init-param>
       <param-name>acrolinxUrl</param-name>
       <param-value>http://localhost:8031/</param-value>
+    </init-param>
+    <init-param>
+      <param-name>username</param-name>
+      <param-value>testuser</param-value>
     </init-param>
     <init-param>
       <param-name>genericToken</param-name>
