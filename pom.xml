@@ -20,7 +20,7 @@
     <logback.version>1.5.26</logback.version>
     <mockito.version>5.21.0</mockito.version>
     <slf4j.version>2.0.17</slf4j.version>
-    <tomcat.version>11.0.15</tomcat.version>
+    <tomcat.version>11.0.18</tomcat.version>
     <wiremock.version>3.13.2</wiremock.version>
   </properties>
 
